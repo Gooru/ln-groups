@@ -1,0 +1,39 @@
+{
+	"comment": "This is bundled JSON file. Idea is that we should externalize this also as part of build. Currently this is going to hold the dev env information",
+	"datasources": {
+		"defaultDataSource": {
+			"ds.type": "hikari",
+			"username": "nucleus",
+			"password": "nucleus",
+			"autoCommit": true,
+			"jdbcUrl": "jdbc:postgresql://localhost:5432/nucleus",
+			"maximumPoolSize": 5
+		}
+	},
+	"verticles": {
+		"org.gooru.groups.bootstrap.verticles.HttpVerticle": {
+			"instances": 1,
+			"worker": false,
+			"config": {
+				"http.port": 8083,
+				"metrics.periodicity.seconds": 300,
+				"event.bus.send.timeout.seconds": 180,
+				"request.body.size.max.mb": 5
+			}
+		}
+	},
+	"app.configuration": {
+	},
+	"vertxOptions": {
+		"workerPoolSize": 40,
+		"metricsOptions": {
+			"enabled": true
+		},
+		"clustered": true
+	},
+	"systemProperties": {
+		"vertx.logger-delegate-factory-class-name": "io.vertx.core.logging.SLF4JLogDelegateFactory",
+		"vertx.metrics.options.enabled": "true",
+		"logback.configurationFile": "src/main/resources/logback-groups.xml"
+	}
+}
