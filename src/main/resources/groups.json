@@ -3,14 +3,28 @@
 	"datasources": {
 		"defaultDataSource": {
 			"ds.type": "hikari",
-			"username": "nucleus",
-			"password": "nucleus",
+			"username": "dsuser",
+			"password": "dspass",
 			"autoCommit": true,
-			"jdbcUrl": "jdbc:postgresql://localhost:5432/nucleus",
+			"jdbcUrl": "jdbc:postgresql://localhost:5433/dsdb",
 			"maximumPoolSize": 5
 		}
 	},
 	"verticles": {
+		"org.gooru.groups.bootstrap.verticles.TokenVerificationVerticle": {
+	      "instances": 1,
+	      "worker": false,
+	      "config": {
+	        "redisConfig": {
+	          "host": "localhost",
+	          "port": 6379,
+	          "encoding": "UTF-8",
+	          "tcpKeepAlive": true,
+	          "tcpNoDelay": true
+	        },
+	        "sessionTimeoutInSeconds": 28800
+	      }
+	    },
 		"org.gooru.groups.bootstrap.verticles.HttpVerticle": {
 			"instances": 1,
 			"worker": false,

@@ -20,11 +20,10 @@ public final class Constants {
 
   public static final class EventBus {
 
+    public static final String MBEP_TOKEN_VERIFICATION = "org.gooru.groups.eventbus.token.verification";
+    
+    public static final String MBEP_DISPATCHER = "org.gooru.groups.dispatcher";
     public static final String MBUS_TIMEOUT = "event.bus.send.timeout.seconds";
-
-    public static final String MBEP_FAIL_MSG_SESSION_PERSISTENCE =
-        "mbus.fail.message.sessionpersistence";
-    public static final int MBEP_FAIL_CODE_SESSION_PERSISTENCE = 1;
 
     private EventBus() {
       throw new AssertionError();
@@ -41,6 +40,7 @@ public final class Constants {
 
     public static final String MSG_OP = "mb.op";
     public static final String MSG_OP_STATUS = "mb.op.status";
+    public static final String MSG_OP_VERIFY_TOKEN = "mb.op.verify.token";
     public static final String MSG_OP_STATUS_SUCCESS = "mb.op.status.success";
     public static final String MSG_OP_STATUS_FAIL = "mb.op.status.fail";
 
@@ -55,6 +55,25 @@ public final class Constants {
     public static final String MSG_HTTP_HEADERS = "http.headers";
 
     public static final String MSG_MESSAGE = "message";
+
+    public static final String MSG_OP_GROUPS_CREATE = "mb.op.groups.create";
+    public static final String MSG_OP_GROUPS_UPDATE = "mb.op.groups.update";
+    public static final String MSG_OP_GROUPS_DELETE = "mb.op.groups.delete";
+
+    public static final String MSG_OP_GROUPS_ASSOCIATE = "mb.op.groups.associate";
+    public static final String MSG_OP_GROUPS_REMOVE = "mb.op.groups.remove";
+
+    public static final String MSG_OP_GROUPS_ADD_CLASS = "mb.op.groups.class.add";
+    public static final String MSG_OP_GROUPS_REMOVE_CLASS = "mb.op.groups.class.remove";
+    public static final String MSG_OP_GROUPS_LIST_CLASS = "mb.op.groups.class.list";
+
+    public static final String MSG_OP_GROUPS_ADD_USER = "mb.op.groups.user.add";
+    public static final String MSG_OP_GROUPS_REMOVE_USER = "mb.op.groups.user.remove";
+    public static final String MSG_OP_GROUPS_LIST_USER = "mb.op.groups.user.list";
+
+    public static final String MSG_OP_GROUPS_LIST_GROUPS_TENANT = "mb.op.groups.list.by.tenant";
+    public static final String MSG_OP_GROUPS_LIST_CLASSES_TENANT =
+        "mb.op.groups.classes.list.by.tenant";
 
     private Message() {
       throw new AssertionError();
@@ -80,6 +99,8 @@ public final class Constants {
   public static final class Route {
 
     private static final String API_BASE_ROUTE = "/api/groups/:version/";
+    
+    public static final String API_TOKEN_VERIFICATION = API_BASE_ROUTE + "*";
 
     private Route() {
       throw new AssertionError();
