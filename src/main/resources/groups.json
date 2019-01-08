@@ -3,28 +3,36 @@
 	"datasources": {
 		"defaultDataSource": {
 			"ds.type": "hikari",
+			"username": "nucleus",
+			"password": "nucleus",
+			"autoCommit": false,
+			"jdbcUrl": "jdbc:postgresql://localhost:5432/nucleus",
+			"maximumPoolSize": 5
+		},
+		"dsdbDataSource": {
+			"ds.type": "hikari",
 			"username": "dsuser",
 			"password": "dspass",
-			"autoCommit": true,
+			"autoCommit": false,
 			"jdbcUrl": "jdbc:postgresql://localhost:5433/dsdb",
 			"maximumPoolSize": 5
 		}
 	},
 	"verticles": {
 		"org.gooru.groups.bootstrap.verticles.TokenVerificationVerticle": {
-	      "instances": 1,
-	      "worker": false,
-	      "config": {
-	        "redisConfig": {
-	          "host": "localhost",
-	          "port": 6379,
-	          "encoding": "UTF-8",
-	          "tcpKeepAlive": true,
-	          "tcpNoDelay": true
-	        },
-	        "sessionTimeoutInSeconds": 28800
-	      }
-	    },
+			"instances": 1,
+			"worker": false,
+			"config": {
+				"redisConfig": {
+					"host": "localhost",
+					"port": 6379,
+					"encoding": "UTF-8",
+					"tcpKeepAlive": true,
+					"tcpNoDelay": true
+				},
+				"sessionTimeoutInSeconds": 28800
+			}
+		},
 		"org.gooru.groups.bootstrap.verticles.HttpVerticle": {
 			"instances": 1,
 			"worker": false,
@@ -34,9 +42,17 @@
 				"event.bus.send.timeout.seconds": 180,
 				"request.body.size.max.mb": 5
 			}
+		},
+		"org.gooru.groups.bootstrap.verticles.DispatcherVerticle": {
+			"instances": 1,
+			"worker": false,
+			"config": {
+				
+			}
 		}
 	},
 	"app.configuration": {
+		
 	},
 	"vertxOptions": {
 		"workerPoolSize": 40,

@@ -32,17 +32,7 @@ public final class RouteRequestUtility {
     result.put(Message.MSG_KEY_SESSION, getSession(routingContext));
     result.put(Message.MSG_USER_ID, getUserId(routingContext));
     result.put(Message.MSG_SESSION_TOKEN, getSessionToken(routingContext));
-    result.put(Message.SESSION_CONTEXT_TYPE, getSessionContext(routingContext));
-    result.put(Message.SESSION_CONTEXT_SYSTEM_TENANT, getSessionTenant(routingContext));
     return result;
-  }
-
-  private static String getSessionTenant(RoutingContext routingContext) {
-    return routingContext.get(Message.SESSION_CONTEXT_SYSTEM_TENANT);
-  }
-
-  private static String getSessionContext(RoutingContext routingContext) {
-    return routingContext.get(Message.SESSION_CONTEXT_TYPE);
   }
 
   private static String getSessionToken(RoutingContext routingContext) {

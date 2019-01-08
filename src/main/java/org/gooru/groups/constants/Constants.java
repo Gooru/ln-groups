@@ -20,8 +20,9 @@ public final class Constants {
 
   public static final class EventBus {
 
-    public static final String MBEP_TOKEN_VERIFICATION = "org.gooru.groups.eventbus.token.verification";
-    
+    public static final String MBEP_TOKEN_VERIFICATION =
+        "org.gooru.groups.eventbus.token.verification";
+
     public static final String MBEP_DISPATCHER = "org.gooru.groups.dispatcher";
     public static final String MBUS_TIMEOUT = "event.bus.send.timeout.seconds";
 
@@ -75,6 +76,9 @@ public final class Constants {
     public static final String MSG_OP_GROUPS_LIST_CLASSES_TENANT =
         "mb.op.groups.classes.list.by.tenant";
 
+    public static final String MSG_OP_REPORTS_GET_CA_ACTIVITIES_COUNT =
+        "mb.op.reports.ca.activities.count.get";
+
     private Message() {
       throw new AssertionError();
     }
@@ -98,9 +102,31 @@ public final class Constants {
 
   public static final class Route {
 
-    private static final String API_BASE_ROUTE = "/api/groups/:version/";
-    
-    public static final String API_TOKEN_VERIFICATION = API_BASE_ROUTE + "*";
+    private static final String SEP = "/";
+    private static final String COLON = ":";
+    private static final String API_GROUPS_BASE_ROUTE = "/api/groups/:version/";
+
+    public static final String ID_CLASS = "classId";
+
+    public static final String API_GROUP_TOKEN_VERIFICATION = API_GROUPS_BASE_ROUTE + "*";
+
+    public static final String API_GROUP = API_GROUPS_BASE_ROUTE + "group";
+    public static final String API_GROUP_UPDATE_DELETE = API_GROUP + SEP + ":groupId";
+
+    public static final String API_GROUP_ASSOCIATE =
+        API_GROUP + SEP + ":groupId" + SEP + "associate" + SEP + ":associateGroupId";
+    public static final String API_GROUP_REMOVE =
+        API_GROUP + SEP + ":groupId" + SEP + "remove" + SEP + ":removeGroupId";
+
+    public static final String API_CLASS = API_GROUPS_BASE_ROUTE + "group";
+
+    // Groups report API routes
+    // Scheduled / Unscheduled activities
+    // /api/reports/v1/ca/classes/{class-id}/activities
+    private static final String API_REPORTS_BASE_ROUTE = "/api/reports/:version/";
+    public static final String API_REPORTS_TOKEN_VERIFICATION = API_REPORTS_BASE_ROUTE + "*";
+    public static final String API_REPORTS_CA_ACTIVITIES_COUNT_GET =
+        API_REPORTS_BASE_ROUTE + "ca/classes/" + COLON + ID_CLASS + SEP + "activities";
 
     private Route() {
       throw new AssertionError();

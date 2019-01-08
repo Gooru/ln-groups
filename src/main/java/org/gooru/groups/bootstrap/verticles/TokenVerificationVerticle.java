@@ -29,6 +29,7 @@ public class TokenVerificationVerticle extends AbstractVerticle {
 
     eb.<JsonObject>localConsumer(Constants.EventBus.MBEP_TOKEN_VERIFICATION, message -> {
       String sessionToken = message.headers().get(Message.MSG_SESSION_TOKEN);
+      LOGGER.debug("session token received:{}", sessionToken);
       Future<JsonObject> fetchSessionFuture = this.fetchSessionFromRedis(sessionToken);
 
       fetchSessionFuture.setHandler(sessionAsyncResult -> {
@@ -60,6 +61,7 @@ public class TokenVerificationVerticle extends AbstractVerticle {
         if (redisResult != null) {
           try {
             JsonObject jsonResult = new JsonObject(redisResult);
+            LOGGER.debug("session received from redis:{}", jsonResult);
             future.complete(jsonResult);
           } catch (DecodeException de) {
             LOGGER.error("exception while decoding json for token '{}'", sessionToken, de);
