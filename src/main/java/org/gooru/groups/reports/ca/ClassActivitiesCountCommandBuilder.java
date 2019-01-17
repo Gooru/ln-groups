@@ -54,12 +54,14 @@ public final class ClassActivitiesCountCommandBuilder {
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
           RESOURCE_BUNDLE.getString("invalid.month.format"));
     }
-
-    // If year is future year, return bad request
-    if (command.getYear() > LocalDate.now().getYear()) {
-      LOGGER.warn("future year provided in request");
-      throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-          RESOURCE_BUNDLE.getString("future.year"));
+    
+    LocalDate reqDate = LocalDate.of(command.getYear(), command.getMonth(), 1);
+    LocalDate now = LocalDate.now();
+    
+    if (!reqDate.isEqual(now) && reqDate.isAfter(now)) {
+        LOGGER.warn("trying to fetch report for future date");
+        throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+            RESOURCE_BUNDLE.getString("future.date.report"));
     }
   }
 
