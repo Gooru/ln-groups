@@ -49,7 +49,7 @@ public final class ClassStudentDetailedSummaryCommandBuilder {
           RESOURCE_BUNDLE.getString("invalid.classid.format"));
     }
 
-    // It's decided not to fall back on the current month and year if the input is invalid or not
+    // It's decided not to fall back on the current week if the input is invalid or not
     // present.
 
     // If requested week is not valid week (sun-sat), return bad request

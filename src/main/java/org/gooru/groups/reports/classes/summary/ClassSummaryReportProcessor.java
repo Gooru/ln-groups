@@ -44,7 +44,7 @@ public class ClassSummaryReportProcessor implements MessageProcessor {
       JsonObject response = this.service.fetchClassSummary(bean);
       result.complete(MessageResponseFactory.createOkayResponse(response));
     } catch (Throwable t) {
-      LOGGER.error("exception while fetching class activities count", t);
+      LOGGER.error("exception while fetching class summary", t);
       result.fail(t);
     }
 

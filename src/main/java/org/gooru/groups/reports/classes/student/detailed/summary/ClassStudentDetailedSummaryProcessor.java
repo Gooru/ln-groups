@@ -47,7 +47,7 @@ public class ClassStudentDetailedSummaryProcessor implements MessageProcessor {
       JsonObject response = this.service.fetchClassStudentDetailedSummary(bean);
       result.complete(MessageResponseFactory.createOkayResponse(response));
     } catch (Throwable t) {
-      LOGGER.error("exception while fetching class student summary", t);
+      LOGGER.error("exception while fetching class student detailed summary", t);
       result.fail(t);
     }
 
