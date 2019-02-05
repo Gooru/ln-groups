@@ -15,6 +15,8 @@ public class UserModelMapper implements ResultSetMapper<UserModel> {
     UserModel userModel = new UserModel();
     userModel.setFirstName(r.getString("first_name"));
     userModel.setLastName(r.getString("last_name"));
+    userModel.setEmail(r.getString("email"));
+    userModel.setProfileImage(r.getString("thumbnail"));
     return userModel;
   }
 }

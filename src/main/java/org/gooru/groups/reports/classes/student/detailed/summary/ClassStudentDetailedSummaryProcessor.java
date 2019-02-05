@@ -38,16 +38,15 @@ public class ClassStudentDetailedSummaryProcessor implements MessageProcessor {
   public Future<MessageResponse> process() {
     try {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
-      LOGGER.debug("request body:{}", ebMessage.getRequestBody().toString());
 
       ClassStudentDetailedSummaryCommand command =
           ClassStudentDetailedSummaryCommandBuilder.build(ebMessage);
       ClassStudentDetailedSummaryBean bean = new ClassStudentDetailedSummaryBean(command);
 
-      JsonObject response = this.service.fetchClassStudentDetailedSummary(bean);
+      JsonObject response = this.service.fetchClassStudentDetailedSummary(bean, ebMessage.getUserCdnUrl());
       result.complete(MessageResponseFactory.createOkayResponse(response));
     } catch (Throwable t) {
-      LOGGER.error("exception while fetching class student detailed summary", t);
+      LOGGER.warn("exception while fetching class student detailed summary", t);
       result.fail(t);
     }
 

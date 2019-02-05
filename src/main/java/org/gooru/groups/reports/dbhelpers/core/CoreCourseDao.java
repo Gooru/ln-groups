@@ -8,7 +8,7 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
  */
 public interface CoreCourseDao {
 
-  @SqlQuery("select title from course where id = :id::uuid")
+  @SqlQuery("select title from course where id = :id::uuid and is_deleted = false")
   String fetchCourse(@Bind("id") String id);
 
 }

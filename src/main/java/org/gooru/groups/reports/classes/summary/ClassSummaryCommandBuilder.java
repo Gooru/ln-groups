@@ -6,11 +6,11 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.ResourceBundle;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
+import org.gooru.groups.processor.utils.ValidatorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.vertx.core.json.JsonObject;
@@ -18,13 +18,12 @@ import io.vertx.core.json.JsonObject;
 /**
  * @author renuka
  */
-public final class WeeklyClassSummaryCommandBuilder {
+public final class ClassSummaryCommandBuilder {
 
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(WeeklyClassSummaryCommandBuilder.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClassSummaryCommandBuilder.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
-  private WeeklyClassSummaryCommandBuilder() {
+  private ClassSummaryCommandBuilder() {
     throw new AssertionError();
   }
 
@@ -41,9 +40,7 @@ public final class WeeklyClassSummaryCommandBuilder {
           RESOURCE_BUNDLE.getString("missing.classid"));
     }
 
-    try {
-      UUID.fromString(command.getClassId());
-    } catch (IllegalArgumentException iae) {
+    if (!ValidatorUtils.isValidUUID(command.getClassId())) {
       LOGGER.warn("invalid format of the class id");
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
           RESOURCE_BUNDLE.getString("invalid.classid.format"));
@@ -63,7 +60,7 @@ public final class WeeklyClassSummaryCommandBuilder {
     if (!isValidFromDate(command.getFromDate())) {
       LOGGER.warn("trying to fetch report for future date");
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-          RESOURCE_BUNDLE.getString("future.date.report"));
+          RESOURCE_BUNDLE.getString("future.week"));
     }
   }
 
@@ -71,7 +68,7 @@ public final class WeeklyClassSummaryCommandBuilder {
     String classId = request.getString("classId");
     String fromDate = request.getString("fromDate");
     String toDate = request.getString("toDate");
-    
+
     if (fromDate == null || toDate == null) {
       LOGGER.warn("Missing Date");
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,

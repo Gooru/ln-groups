@@ -1,12 +1,23 @@
 
 package org.gooru.groups.reports.classes.student.summary;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
+import org.gooru.groups.constants.Constants;
+import org.gooru.groups.constants.StatusConstants;
+import org.gooru.groups.constants.HttpConstants.HttpStatus;
+import org.gooru.groups.exceptions.HttpResponseWrapperException;
+import org.gooru.groups.processor.utils.ValidatorUtils;
+import org.gooru.groups.reports.classes.student.detailed.summary.ClassStudentDetailedSummaryService;
 import org.gooru.groups.reports.dbhelpers.core.ClassMembersModel;
 import org.gooru.groups.reports.dbhelpers.core.ClassModel;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.reports.dbhelpers.core.UserModel;
 import org.skife.jdbi.v2.DBI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -15,107 +26,204 @@ import io.vertx.core.json.JsonObject;
  */
 public class ClassStudentSummaryService {
 
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(ClassStudentDetailedSummaryService.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
+
   private final ClassSummaryCompetencyMasteryDao classSummaryMasterydao;
-  private final StudentContentInteractionDao studentInteractionDao;
+  private final StudentItemInteractionDao studentInteractionDao;
   private final CoreService coreService;
 
   public ClassStudentSummaryService(DBI coreDbi, DBI dsDbi, DBI analyticsDbi) {
     this.coreService = new CoreService(coreDbi);
     this.classSummaryMasterydao = dsDbi.onDemand(ClassSummaryCompetencyMasteryDao.class);
-    this.studentInteractionDao = analyticsDbi.onDemand(StudentContentInteractionDao.class);
+    this.studentInteractionDao = analyticsDbi.onDemand(StudentItemInteractionDao.class);
   }
 
-  public JsonObject fetchClassStudentSummary(ClassStudentSummaryBean bean) {
-    JsonObject classObject = new JsonObject();
-    JsonArray studentSummary = new JsonArray();
+  public JsonObject fetchClassStudentSummary(ClassStudentSummaryBean bean, String userCdnUrl) {
+    JsonObject responseObject = new JsonObject();
+
+    ClassModel classData = this.coreService.fetchClass(bean.getClassId());
+    if (classData == null) {
+      LOGGER.warn("Requested class is unavailable");
+      throw new HttpResponseWrapperException(HttpStatus.NOT_FOUND,
+          RESOURCE_BUNDLE.getString("class.unavailable"));
+    }
 
     List<ClassMembersModel> classMembers = this.coreService.fetchClassMembers(bean.getClassId());
-    for (ClassMembersModel classMember : classMembers) {
+    int memberCount = (classMembers != null && !classMembers.isEmpty()) ? classMembers.size() : 0;
+    JsonObject classObject = fetchClassDetails(bean.getClassId(), classData, memberCount);
+    responseObject.put(Constants.Response.CLASS, classObject);
 
-      JsonObject usageSummary = new JsonObject();
-      fetchStudentInteractionStats(bean, classMember, usageSummary);
-      fetchCompetencyStatsInWeek(bean, classMember, usageSummary);
+    JsonObject course = fetchCourseData(classData.getCourseId());
+    responseObject.put(Constants.Response.COURSE, course);
 
-      JsonObject studentStats = new JsonObject();
-      fetchStudentData(classMember, studentStats);
-      studentStats.put("usageData", usageSummary);
-      studentSummary.add(studentStats);
+    JsonObject teacher = fetchUserData(classData.getCreatorId(), userCdnUrl);
+    responseObject.put(Constants.Response.TEACHER, teacher);
+
+    JsonArray studentSummary = new JsonArray();
+    if (memberCount > 0) {
+      for (ClassMembersModel classMember : classMembers) {
+        JsonObject studentObject = new JsonObject();
+        JsonObject student = fetchUserData(classMember.getUserId(), userCdnUrl);
+        studentObject.put(Constants.Response.STUDENT, student);
+
+        JsonObject summaryData = new JsonObject();
+        JsonObject weekData = fetchWeekData(bean, classMember.getUserId());
+        JsonObject allTimeData = fetchAllTimeData(bean, classMember.getUserId());
+
+        summaryData.put(Constants.Response.WEEK_OF, weekData).put(Constants.Response.ALL_TIME,
+            allTimeData);
+
+        studentObject.put(Constants.Response.SUMMARY_DATA, summaryData);
+        studentSummary.add(studentObject);
+      }
     }
-    fetchClassData(bean.getClassId(), classObject);
-    classObject.put("studentSummary", studentSummary);
+    responseObject.put(Constants.Response.STUDENTS, studentSummary);
+    return responseObject;
+  }
+
+  private JsonObject fetchUserData(String userId, String userCdnUrl) {
+    UserModel userData = this.coreService.fetchUser(userId);
+    JsonObject user = new JsonObject();
+    user.put(Constants.Response.ID, userId)
+        .put(Constants.Response.FIRST_NAME, userData.getFirstName())
+        .put(Constants.Response.LAST_NAME, userData.getLastName())
+        .put(Constants.Response.EMAIL, userData.getEmail());
+    String profileImage = null;
+    if (!ValidatorUtils.isNullOrEmpty(userData.getProfileImage()) && userCdnUrl != null) {
+      profileImage = Constants.HTTP + Constants.COLON + userCdnUrl + userData.getProfileImage();
+    }
+    user.put(Constants.Response.PROFILE_IMAGE, profileImage);
+    return user;
+  }
+
+  private JsonObject fetchCourseData(String courseId) {
+    JsonObject course = new JsonObject();
+    course.put(Constants.Response.ID, courseId);
+    course.put(Constants.Response.TITLE, this.coreService.fetchCourseTitle(courseId));
+    return course;
+  }
+
+  private JsonObject fetchClassDetails(String classId, ClassModel classData, int memberCount) {
+    JsonObject classObject = new JsonObject();
+    classObject.put(Constants.Response.ID, classId)
+        .put(Constants.Response.TITLE, classData.getTitle())
+        .put(Constants.Response.CODE, classData.getCode())
+        .put(Constants.Response.GRADE, classData.getGradeCurrent());
+    classObject.put(Constants.Response.ACTIVE_STUDENT_COUNT, memberCount);
     return classObject;
   }
 
-  private void fetchCompetencyStatsInWeek(ClassStudentSummaryBean bean,
-      ClassMembersModel classMember, JsonObject usageSummary) {
-    List<String> competenciesMasteredInWeek =
-        this.classSummaryMasterydao.fetchCompetenciesMasteredInWeek(bean.getClassId(),
-            classMember.getUserId(), bean.getFromDate(), bean.getToDate());
-    int totalCompetenciesMasteredInWeek =
-        (competenciesMasteredInWeek != null && !competenciesMasteredInWeek.isEmpty())
-            ? competenciesMasteredInWeek.size()
-            : 0;
+  private JsonObject fetchAllTimeData(ClassStudentSummaryBean bean, String userId) {
+    JsonObject allTimeData = new JsonObject();
+    Date currentDate = Calendar.getInstance().getTime();
+    generateAllTimeCompetencyStats(bean, userId, allTimeData, currentDate);
 
-    Integer badgesCountInWeek = this.classSummaryMasterydao.fetchBadgesEarnedInWeek(
-        bean.getClassId(), classMember.getUserId(), bean.getFromDate(), bean.getToDate());
-    Integer masteredCountUntilNow = this.classSummaryMasterydao.fetchCompetenciesMasteredUntilNow(
-        bean.getClassId(), classMember.getUserId(), bean.getToDate());
-
-    usageSummary.put("totalCompetenciesMasteredInWeek", totalCompetenciesMasteredInWeek)
-        .put("competenciesMasteredInWeek", competenciesMasteredInWeek)
-        .put("inferredCompetencyMasteredInWeek", totalCompetenciesMasteredInWeek)
-        .put("badgesEarnedInWeek", badgesCountInWeek)
-        .put("totalCompetenciesMastered", masteredCountUntilNow);
+    allTimeData.put(Constants.Response.AS_ON, Constants.Params.DATE_FORMAT.format(currentDate));
+    return allTimeData;
   }
 
-  private void fetchStudentData(ClassMembersModel classMember, JsonObject studentStats) {
-    UserModel userData = this.coreService.fetchUser(classMember.getUserId());
-    studentStats.put("id", classMember.getUserId()).put("firstName", userData.getFirstName())
-        .put("lastName", userData.getLastName());
-  }
+  private JsonObject fetchWeekData(ClassStudentSummaryBean bean, String userId) {
+    JsonObject weekData = new JsonObject();
+    generateWeeklyCompetencyStats(bean, userId, weekData);
 
-  private void fetchClassData(String classId, JsonObject classObject) {
-    ClassModel classData = this.coreService.fetchClass(classId);
-    UserModel userData = this.coreService.fetchUser(classData.getCreatorId());
-    JsonObject teacher = new JsonObject();
-    teacher.put("id", classData.getCreatorId()).put("firstName", userData.getFirstName())
-        .put("lastName", userData.getLastName());
-    classObject.put("id", classId).put("title", classData.getTitle()).put("teacher", teacher);
-  }
-
-  private void fetchStudentInteractionStats(ClassStudentSummaryBean bean,
-      ClassMembersModel classMember, JsonObject studentUsage) {
-    Long totalTimespentInWeek = this.studentInteractionDao.fetchClassTimespentInWeek(
-        bean.getClassId(), classMember.getUserId(), bean.getFromDate(), bean.getToDate());
-
-    List<StudentSuggestedItemInteraction> studentInteractionOnSuggestedItems =
+    List<StudentItemInteraction> studentInteractionOnSuggestedItems =
         this.studentInteractionDao.fetchStudentInteractionOnSuggestedItemInWeek(bean.getClassId(),
-            classMember.getUserId(), bean.getFromDate(), bean.getToDate());
-    int takenAssessmentSuggestions = 0;
-    int takenCollectionSuggestions = 0;
-    for (StudentSuggestedItemInteraction studentInteractionOnSuggestedItem : studentInteractionOnSuggestedItems) {
-      if (studentInteractionOnSuggestedItem.getSuggestType().equalsIgnoreCase("assessment")) {
-        takenAssessmentSuggestions = studentInteractionOnSuggestedItem.getInteractedSuggestCount();
-      } else if (studentInteractionOnSuggestedItem.getSuggestType()
-          .equalsIgnoreCase("collection")) {
-        takenCollectionSuggestions = studentInteractionOnSuggestedItem.getInteractedSuggestCount();
+            userId, bean.getFromDate(), bean.getToDate());
+    JsonObject suggestions = fetchItemInteractionStats(studentInteractionOnSuggestedItems);
+
+    List<StudentItemInteraction> studentInteractionOnNormalItems =
+        this.studentInteractionDao.fetchStudentContentInteractionInWeek(bean.getClassId(), userId,
+            bean.getFromDate(), bean.getToDate());
+    JsonObject interactions = fetchItemInteractionStats(studentInteractionOnNormalItems);
+
+    weekData
+        .put(Constants.Response.START_DATE, Constants.Params.DATE_FORMAT.format(bean.getFromDate()))
+        .put(Constants.Response.END_DATE, Constants.Params.DATE_FORMAT.format(bean.getToDate()))
+        .put(Constants.Response.SUGGESTIONS, suggestions)
+        .put(Constants.Response.INTERACTIONS, interactions);
+    return weekData;
+  }
+
+  private JsonObject fetchItemInteractionStats(List<StudentItemInteraction> interactedItems) {
+    JsonObject itemObject = new JsonObject();
+    if (interactedItems != null && !interactedItems.isEmpty()) {
+      for (StudentItemInteraction interactedItem : interactedItems) {
+        JsonObject item = new JsonObject();
+        item.put(Constants.Response.COUNT, interactedItem.getInteractionCount());
+        item.put(Constants.Response.TOTAL_TIME_SPENT, interactedItem.getTimespent());
+        item.put(Constants.Response.AVERAGE_SCORE, interactedItem.getScore());
+        item.put(Constants.Response.TOTAL_MAX_SCORE, interactedItem.getMaxScore());
+        itemObject.put(interactedItem.getCollectionType(), item);
       }
     }
-    studentUsage.put("assessmentSuggestionsTakenInweek", takenAssessmentSuggestions)
-        .put("collectionSuggestionsTakenInweek", takenCollectionSuggestions)
-        .put("totalTimespentInWeek", totalTimespentInWeek);
+    return itemObject;
+  }
 
-    int collectionInteractionCountInWeek = 0;
-    int assessmentInteractionCountInWeek = 0;
-    StudentContentInteraction studentContentInteraction =
-        this.studentInteractionDao.fetchStudentContentInteractionInWeek(bean.getClassId(),
-            classMember.getUserId(), bean.getFromDate(), bean.getToDate());
-    if (studentContentInteraction != null) {
-      collectionInteractionCountInWeek = studentContentInteraction.getCollectionCount();
-      assessmentInteractionCountInWeek = studentContentInteraction.getAssessmentCount();
-    }
-    studentUsage.put("collectionsInteractedInWeek", collectionInteractionCountInWeek)
-        .put("assessmentsInteractedInWeek", assessmentInteractionCountInWeek);
+  private void generateWeeklyCompetencyStats(ClassStudentSummaryBean bean, String userId,
+      JsonObject weekData) {
+    List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
+        .fetchCompetenciesInWeek(bean.getClassId(), userId, bean.getFromDate(), bean.getToDate());
+    JsonArray masteredCompetencyList = new JsonArray();
+    JsonArray completedCompetencyList = new JsonArray();
+    JsonArray inferredCompetencyList = new JsonArray();
+    JsonArray inprogressCompetencyList = new JsonArray();
+    aggregateCompetencyPerfPerStatus(studentCompetencyStudyStatus, masteredCompetencyList,
+        completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
+    weekData.put(Constants.Response.MASTERED, masteredCompetencyList)
+        .put(Constants.Response.COMPLETED, completedCompetencyList)
+        .put(Constants.Response.INFERRED, inferredCompetencyList)
+        .put(Constants.Response.IN_PROGRESS, inprogressCompetencyList);
 
   }
+
+  private void generateAllTimeCompetencyStats(ClassStudentSummaryBean bean, String userId,
+      JsonObject allTimeData, Date currentDate) {
+    List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
+        .fetchCompetenciesTillNow(bean.getClassId(), userId, currentDate);
+    JsonArray masteredCompetencyList = new JsonArray();
+    JsonArray completedCompetencyList = new JsonArray();
+    JsonArray inferredCompetencyList = new JsonArray();
+    JsonArray inprogressCompetencyList = new JsonArray();
+    aggregateCompetencyPerfPerStatus(studentCompetencyStudyStatus, masteredCompetencyList,
+        completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
+    allTimeData.put(Constants.Response.MASTERED, masteredCompetencyList.size())
+        .put(Constants.Response.COMPLETED, completedCompetencyList.size())
+        .put(Constants.Response.INFERRED, inferredCompetencyList.size())
+        .put(Constants.Response.IN_PROGRESS, inprogressCompetencyList.size());
+  }
+
+  private void aggregateCompetencyPerfPerStatus(
+      List<CompetencyStatusModel> studentCompetencyStudyStatus, JsonArray masteredCompetencyList,
+      JsonArray completedCompetencyList, JsonArray inferredCompetencyList,
+      JsonArray inprogressCompetencyList) {
+    for (CompetencyStatusModel competencyStudyStatus : studentCompetencyStudyStatus) {
+      switch (competencyStudyStatus.getStatus()) {
+        case StatusConstants.MASTERED:
+          addToRespectiveArray(competencyStudyStatus, masteredCompetencyList);
+          break;
+        case StatusConstants.COMPLETED:
+          addToRespectiveArray(competencyStudyStatus, completedCompetencyList);
+          break;
+        case StatusConstants.INFERRED:
+          addToRespectiveArray(competencyStudyStatus, inferredCompetencyList);
+          break;
+        case StatusConstants.IN_PROGRESS:
+          addToRespectiveArray(competencyStudyStatus, inprogressCompetencyList);
+          break;
+        default:
+          // Do Nothing
+      }
+    }
+  }
+
+  private void addToRespectiveArray(CompetencyStatusModel competencyStudyStatus,
+      JsonArray competencyList) {
+    JsonObject competencies = new JsonObject();
+    competencies.put(Constants.Response.ID, competencyStudyStatus.getCompetencyCode());
+    competencies.put(Constants.Response.CODE, competencyStudyStatus.getCompetencyDisplayCode());
+    competencyList.add(competencies);
+  }
+
 }

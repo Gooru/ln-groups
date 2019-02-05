@@ -8,11 +8,14 @@ public class StudentPerformanceModel {
 
   private Long timespent;
   private Integer score;
+  private Integer maxScore;
   private String collectionId;
   private String collectionType;
   private String lessonId;
   private String unitId;
   private String courseId;
+  private String sessionId;
+  private Boolean isGraded;
   private String dateOfActivity;
 
   public Long getTimespent() {
@@ -29,6 +32,14 @@ public class StudentPerformanceModel {
 
   public void setScore(Integer score) {
     this.score = score;
+  }
+
+  public Integer getMaxScore() {
+    return maxScore;
+  }
+
+  public void setMaxScore(Integer maxScore) {
+    this.maxScore = maxScore;
   }
 
   public String getCollectionId() {
@@ -69,6 +80,22 @@ public class StudentPerformanceModel {
 
   public void setCourseId(String courseId) {
     this.courseId = courseId;
+  }
+
+  public String getSessionId() {
+    return sessionId;
+  }
+
+  public void setSessionId(String sessionId) {
+    this.sessionId = sessionId;
+  }
+
+  public Boolean getIsGraded() {
+    return isGraded;
+  }
+
+  public void setIsGraded(Boolean isGraded) {
+    this.isGraded = isGraded;
   }
 
   public String getDateOfActivity() {

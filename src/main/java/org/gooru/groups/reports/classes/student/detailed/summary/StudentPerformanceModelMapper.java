@@ -16,13 +16,16 @@ public class StudentPerformanceModelMapper implements ResultSetMapper<StudentPer
       throws SQLException {
     StudentPerformanceModel activity = new StudentPerformanceModel();
     activity.setScore(r.getInt("score"));
-    activity.setTimespent(r.getLong("time_spent"));
+    activity.setTimespent(r.getLong("timespent"));
+    activity.setMaxScore(r.getInt("max_score"));
     activity.setCollectionId(r.getString("collection_id"));
     activity.setCollectionType(r.getString("collection_type"));
     activity.setLessonId(r.getString("lesson_id"));
     activity.setUnitId(r.getString("unit_id"));
     activity.setCourseId(r.getString("course_id"));
-    activity.setDateOfActivity(r.getString("date_in_time_zone"));
+    activity.setSessionId(r.getString("session_id"));
+    activity.setIsGraded(r.getBoolean("is_graded"));
+    activity.setDateOfActivity(r.getString("created_at"));
     return activity;
   }
 

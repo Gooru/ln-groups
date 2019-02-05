@@ -10,6 +10,6 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 public interface CoreUserDao {
 	
     @Mapper(UserModelMapper.class)
-	@SqlQuery("select first_name, last_name from users where id = :userId::uuid")
+	@SqlQuery("select first_name, last_name, email, thumbnail from users where id = :userId::uuid and is_deleted = false")
 	UserModel fetchUser(@Bind("userId") String userId);
 }

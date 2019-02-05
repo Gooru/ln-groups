@@ -73,6 +73,6 @@
 		"vertx.logger-delegate-factory-class-name": "io.vertx.core.logging.SLF4JLogDelegateFactory",
 		"vertx.metrics.options.enabled": "true",
 		"logback.configurationFile": "src/main/resources/logback-groups.xml",
-		"host":"http://gooru.org"
+		"product.domain":"http://gooru.org"
 	}
 }

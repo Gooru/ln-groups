@@ -36,15 +36,14 @@ public class ClassSummaryReportProcessor implements MessageProcessor {
   public Future<MessageResponse> process() {
     try {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
-      LOGGER.debug("request body:{}", ebMessage.getRequestBody().toString());
 
-      ClassSummaryCommand command = WeeklyClassSummaryCommandBuilder.build(ebMessage);
+      ClassSummaryCommand command = ClassSummaryCommandBuilder.build(ebMessage);
       ClassSummaryBean bean = new ClassSummaryBean(command);
 
-      JsonObject response = this.service.fetchClassSummary(bean);
+      JsonObject response = this.service.fetchClassSummary(bean, ebMessage.getUserCdnUrl());
       result.complete(MessageResponseFactory.createOkayResponse(response));
     } catch (Throwable t) {
-      LOGGER.error("exception while fetching class summary", t);
+      LOGGER.warn("exception while fetching class summary", t);
       result.fail(t);
     }
 

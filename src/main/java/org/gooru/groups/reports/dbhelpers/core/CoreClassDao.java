@@ -10,7 +10,7 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 public interface CoreClassDao {
 
   @Mapper(ClassModelMapper.class)
-  @SqlQuery("select title, creator_id from class where id = :classId::uuid")
+  @SqlQuery("select code, title, creator_id, course_id, grade_current from class where id = :classId::uuid and is_deleted = false")
   ClassModel fetchClass(@Bind("classId") String classId);
 
 }

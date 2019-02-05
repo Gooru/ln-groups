@@ -34,16 +34,16 @@ public class CoreService {
     return this.courseDao.fetchCourse(courseId);
   }
 
-  public String fetchUnitTitle(String unitId) {
-    return this.unitDao.fetchUnit(unitId);
+  public String fetchUnitTitle(String unitId, String courseId) {
+    return this.unitDao.fetchUnit(unitId, courseId);
   }
 
-  public String fetchLessonTitle(String lessonId) {
-    return this.lessonDao.fetchLesson(lessonId);
+  public String fetchLessonTitle(String lessonId, String unitId) {
+    return this.lessonDao.fetchLesson(lessonId, unitId);
   }
 
-  public String fetchCollectionTitle(String collectionId) {
-    return this.collectionDao.fetchCollection(collectionId);
+  public String fetchCollectionTitle(String collectionId, String lessonId) {
+    return this.collectionDao.fetchCollection(collectionId, lessonId);
   }
 
   public List<ClassMembersModel> fetchClassMembers(String classId) {
@@ -54,7 +54,7 @@ public class CoreService {
     return this.userDao.fetchUser(userId);
   }
 
-  public List<String> findCompetenciesForCollection(String collectionId) {
+  public List<CompetencyModel> findCompetenciesForCollection(String collectionId) {
     return this.collectionDao.findCompetenciesForCollection(collectionId);
   }
 }
