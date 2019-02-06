@@ -138,6 +138,7 @@ public final class Constants {
     public static final String TIMESPENT = "timespent";
     public static final String GRADING_STATUS = "gradingStatus";
     public static final String USAGE_DATA = "usageData";
+    public static final String SESSIONS_COUNT = "sessionsCount";
 
     private Response() {
       throw new AssertionError();

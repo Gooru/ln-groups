@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.classes.student.summary;
+package org.gooru.groups.reports.classes.summary;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,12 +15,8 @@ public class StudentItemInteractionMapper implements ResultSetMapper<StudentItem
   public StudentItemInteraction map(int index, ResultSet r, StatementContext ctx)
       throws SQLException {
     StudentItemInteraction activity = new StudentItemInteraction();
-    activity.setCollectionType(r.getString("collection_type"));
-    activity.setUniqueItemCount(r.getString("unique_item_count"));
     activity.setInteractionCount(r.getInt("interaction_count"));
-    activity.setScore(r.getInt("score"));
     activity.setTimespent(r.getLong("timespent"));
-    activity.setMaxScore(r.getInt("max_score"));
     return activity;
   }
 

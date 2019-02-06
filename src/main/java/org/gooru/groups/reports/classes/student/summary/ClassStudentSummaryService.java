@@ -6,11 +6,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import org.gooru.groups.constants.Constants;
-import org.gooru.groups.constants.StatusConstants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
+import org.gooru.groups.constants.StatusConstants;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
 import org.gooru.groups.processor.utils.ValidatorUtils;
-import org.gooru.groups.reports.classes.student.detailed.summary.ClassStudentDetailedSummaryService;
 import org.gooru.groups.reports.dbhelpers.core.ClassMembersModel;
 import org.gooru.groups.reports.dbhelpers.core.ClassModel;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
@@ -26,8 +25,7 @@ import io.vertx.core.json.JsonObject;
  */
 public class ClassStudentSummaryService {
 
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(ClassStudentDetailedSummaryService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClassStudentSummaryService.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
   private final ClassSummaryCompetencyMasteryDao classSummaryMasterydao;
@@ -128,15 +126,28 @@ public class ClassStudentSummaryService {
     JsonObject weekData = new JsonObject();
     generateWeeklyCompetencyStats(bean, userId, weekData);
 
-    List<StudentItemInteraction> studentInteractionOnSuggestedItems =
-        this.studentInteractionDao.fetchStudentInteractionOnSuggestedItemInWeek(bean.getClassId(),
-            userId, bean.getFromDate(), bean.getToDate());
-    JsonObject suggestions = fetchItemInteractionStats(studentInteractionOnSuggestedItems);
+    JsonObject suggestions = new JsonObject();
+    JsonObject interactions = new JsonObject();
 
-    List<StudentItemInteraction> studentInteractionOnNormalItems =
-        this.studentInteractionDao.fetchStudentContentInteractionInWeek(bean.getClassId(), userId,
+    List<StudentItemInteraction> studentAssessmentSuggestionInteraction =
+        this.studentInteractionDao.fetchAssessmentSuggestionInteractionInWeek(bean.getClassId(),
+            userId, bean.getFromDate(), bean.getToDate());
+    fetchItemInteractionStats(studentAssessmentSuggestionInteraction, suggestions);
+
+    List<StudentItemInteraction> studentAssessmentInteraction =
+        this.studentInteractionDao.fetchAssessmentInteractionInWeek(bean.getClassId(), userId,
             bean.getFromDate(), bean.getToDate());
-    JsonObject interactions = fetchItemInteractionStats(studentInteractionOnNormalItems);
+    fetchItemInteractionStats(studentAssessmentInteraction, interactions);
+
+    List<StudentItemInteraction> studentCollectionSuggestionInteraction =
+        this.studentInteractionDao.fetchCollectionSuggestionInteractionInWeek(bean.getClassId(),
+            userId, bean.getFromDate(), bean.getToDate());
+    fetchItemInteractionStats(studentCollectionSuggestionInteraction, suggestions);
+
+    List<StudentItemInteraction> studentCollectionInteraction =
+        this.studentInteractionDao.fetchCollectionInteractionInWeek(bean.getClassId(), userId,
+            bean.getFromDate(), bean.getToDate());
+    fetchItemInteractionStats(studentCollectionInteraction, interactions);
 
     weekData
         .put(Constants.Response.START_DATE, Constants.Params.DATE_FORMAT.format(bean.getFromDate()))
@@ -146,19 +157,20 @@ public class ClassStudentSummaryService {
     return weekData;
   }
 
-  private JsonObject fetchItemInteractionStats(List<StudentItemInteraction> interactedItems) {
-    JsonObject itemObject = new JsonObject();
+  private JsonObject fetchItemInteractionStats(List<StudentItemInteraction> interactedItems,
+      JsonObject interactions) {
     if (interactedItems != null && !interactedItems.isEmpty()) {
       for (StudentItemInteraction interactedItem : interactedItems) {
         JsonObject item = new JsonObject();
-        item.put(Constants.Response.COUNT, interactedItem.getInteractionCount());
+        item.put(Constants.Response.COUNT, interactedItem.getUniqueItemCount());
+        item.put(Constants.Response.SESSIONS_COUNT, interactedItem.getInteractionCount());
         item.put(Constants.Response.TOTAL_TIME_SPENT, interactedItem.getTimespent());
         item.put(Constants.Response.AVERAGE_SCORE, interactedItem.getScore());
         item.put(Constants.Response.TOTAL_MAX_SCORE, interactedItem.getMaxScore());
-        itemObject.put(interactedItem.getCollectionType(), item);
+        interactions.put(interactedItem.getCollectionType(), item);
       }
     }
-    return itemObject;
+    return interactions;
   }
 
   private void generateWeeklyCompetencyStats(ClassStudentSummaryBean bean, String userId,

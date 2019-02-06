@@ -129,8 +129,13 @@ public class ClassStudentDetailedSummaryService {
       String courseId) {
     JsonArray usageData = new JsonArray();
     List<StudentPerformanceModel> studentPerfs =
-        this.studentInteractionDao.fetchStudentPerformanceInWeek(bean.getClassId(), userId,
+        this.studentInteractionDao.fetchAssessmentPerformanceInWeek(bean.getClassId(), userId,
             bean.getFromDate(), bean.getToDate());
+    List<StudentPerformanceModel> collPerfs =
+        this.studentInteractionDao.fetchCollectionPerformanceInWeek(bean.getClassId(), userId,
+            bean.getFromDate(), bean.getToDate());
+    if (collPerfs != null && !collPerfs.isEmpty())
+      studentPerfs.addAll(collPerfs);
     if (studentPerfs != null && !studentPerfs.isEmpty()) {
       for (StudentPerformanceModel studentPerf : studentPerfs) {
         JsonObject usageSummary = new JsonObject();
@@ -161,9 +166,9 @@ public class ClassStudentDetailedSummaryService {
       return null;
     }
 
-    JsonObject unit = populateContext(studentPerf.getUnitId(), unitTitle);
+    JsonObject unit = populateContainerMeta(studentPerf.getUnitId(), unitTitle);
     context.put(Constants.Response.UNIT, unit);
-    JsonObject lesson = populateContext(studentPerf.getLessonId(), lessonTitle);
+    JsonObject lesson = populateContainerMeta(studentPerf.getLessonId(), lessonTitle);
     context.put(Constants.Response.LESSON, lesson);
     context.put(Constants.Response.SESSION_ID, studentPerf.getSessionId());
     context.put(Constants.Response.DATE_OF_ACTIVITY, studentPerf.getDateOfActivity());
@@ -199,11 +204,11 @@ public class ClassStudentDetailedSummaryService {
     return content;
   }
 
-  private JsonObject populateContext(String id, String title) {
-    JsonObject unit = new JsonObject();
-    unit.put(Constants.Response.ID, id);
-    unit.put(Constants.Response.TITLE, title);
-    return unit;
+  private JsonObject populateContainerMeta(String id, String title) {
+    JsonObject container = new JsonObject();
+    container.put(Constants.Response.ID, id);
+    container.put(Constants.Response.TITLE, title);
+    return container;
   }
 
 }

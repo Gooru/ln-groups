@@ -6,11 +6,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import org.gooru.groups.constants.Constants;
-import org.gooru.groups.constants.StatusConstants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
+import org.gooru.groups.constants.StatusConstants;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
 import org.gooru.groups.processor.utils.ValidatorUtils;
-import org.gooru.groups.reports.classes.student.detailed.summary.ClassStudentDetailedSummaryService;
 import org.gooru.groups.reports.dbhelpers.core.ClassMembersModel;
 import org.gooru.groups.reports.dbhelpers.core.ClassModel;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
@@ -26,18 +25,17 @@ import io.vertx.core.json.JsonObject;
  */
 public class ClassSummaryService {
 
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(ClassStudentDetailedSummaryService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClassSummaryService.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
   private final CompetencyStatusDao classSummaryMasterydao;
-  private final ClassTimespentSummaryDao classTimespentSummaryDao;
+  private final StudentItemInteractionDao studentItemInteractionDao;
   private final CoreService coreService;
 
   public ClassSummaryService(DBI coreDbi, DBI dsDbi, DBI analyticsDbi) {
     this.coreService = new CoreService(coreDbi);
     this.classSummaryMasterydao = dsDbi.onDemand(CompetencyStatusDao.class);
-    this.classTimespentSummaryDao = analyticsDbi.onDemand(ClassTimespentSummaryDao.class);
+    this.studentItemInteractionDao = analyticsDbi.onDemand(StudentItemInteractionDao.class);
   }
 
   public JsonObject fetchClassSummary(ClassSummaryBean bean, String userCdnUrl) {
@@ -123,12 +121,14 @@ public class ClassSummaryService {
         this.classSummaryMasterydao.fetchCompetenciesInWeek(bean);
     aggregateCompetenciesPerStatus(studentCompetencyStudyStatus, weekData);
 
-    Long totalTimespentInWeek = this.classTimespentSummaryDao.fetchClassTimespentInWeek(bean);
+    StudentItemInteraction contentInteractionStats =
+        this.studentItemInteractionDao.fetchContentInteractionStatsInWeek(bean);
 
     weekData
         .put(Constants.Response.START_DATE, Constants.Params.DATE_FORMAT.format(bean.getFromDate()))
         .put(Constants.Response.END_DATE, Constants.Params.DATE_FORMAT.format(bean.getToDate()))
-        .put(Constants.Response.TOTAL_TIME_SPENT, totalTimespentInWeek);
+        .put(Constants.Response.TOTAL_TIME_SPENT, contentInteractionStats.getTimespent())
+        .put(Constants.Response.SESSIONS_COUNT, contentInteractionStats.getInteractionCount());
     return weekData;
   }
 
