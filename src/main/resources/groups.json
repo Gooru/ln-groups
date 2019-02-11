@@ -16,7 +16,15 @@
 			"autoCommit": false,
 			"jdbcUrl": "jdbc:postgresql://localhost:5433/dsdb",
 			"maximumPoolSize": 5
-		}
+		},
+        "analyticsDataSource": {
+            "ds.type": "hikari",
+            "username": "nucleus",
+            "password": "nucleus",
+            "autoCommit": true,
+            "jdbcUrl": "jdbc:postgresql://localhost:5432/reports_db",
+            "maximumPoolSize": 5
+        }
 	},
 	"verticles": {
 		"org.gooru.groups.bootstrap.verticles.TokenVerificationVerticle": {
@@ -64,6 +72,7 @@
 	"systemProperties": {
 		"vertx.logger-delegate-factory-class-name": "io.vertx.core.logging.SLF4JLogDelegateFactory",
 		"vertx.metrics.options.enabled": "true",
-		"logback.configurationFile": "src/main/resources/logback-groups.xml"
+		"logback.configurationFile": "src/main/resources/logback-groups.xml",
+		"product.domain":"http://gooru.org"
 	}
 }

@@ -1,5 +1,7 @@
 package org.gooru.groups.constants;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.UUID;
 
 /**
@@ -78,6 +80,12 @@ public final class Constants {
 
     public static final String MSG_OP_REPORTS_GET_CA_ACTIVITIES_COUNT =
         "mb.op.reports.ca.activities.count.get";
+    public static final String MSG_OP_REPORTS_GET_CLASS_SUMMARY_WEEKLY =
+        "mb.op.reports.class.summary.weekly";
+    public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY_WEEKLY =
+        "mb.op.reports.class.student.summary.weekly";
+    public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_DETAILED_SUMMARY_WEEKLY =
+        "mb.op.reports.class.student.detailed.summary.weekly";
 
     private Message() {
       throw new AssertionError();
@@ -85,6 +93,52 @@ public final class Constants {
   }
 
   public static final class Response {
+
+    public static final String CLASS = "class";
+    public static final String ID = "id";
+    public static final String TITLE = "title";
+    public static final String TEACHER = "teacher";
+    public static final String COURSE = "course";
+    public static final String GRADE = "grade";
+    public static final String CODE = "code";
+    public static final String STUDENT = "student";
+    public static final String STUDENTS = "students";
+    public static final String PROFILE_IMAGE = "profileImage";
+    public static final String EMAIL = "email";
+    public static final String FIRST_NAME = "firstName";
+    public static final String LAST_NAME = "lastName";
+    public static final String ACTIVE_STUDENT_COUNT = "activeStudentCount";
+    public static final String SUMMARY_DATA = "summaryData";
+    public static final String WEEK_OF = "weekOf";
+    public static final String ALL_TIME = "allTime";
+    public static final String START_DATE = "startDate";
+    public static final String END_DATE = "endDate";
+    public static final String AS_ON = "asOn";
+    public static final String MASTERED = "mastered";
+    public static final String COMPLETED = "completed";
+    public static final String INFERRED = "inferred";
+    public static final String IN_PROGRESS = "inprogress";
+    public static final String TOTAL_TIME_SPENT = "totalTimespent";
+    public static final String SUGGESTIONS = "suggestions";
+    public static final String INTERACTIONS = "interactions";
+    public static final String COUNT = "count";
+    public static final String AVERAGE_SCORE = "averageScore";
+    public static final String TOTAL_MAX_SCORE = "totalMaxScore";
+    public static final String CONTEXT = "context";
+    public static final String CONTENT = "content";
+    public static final String UNIT = "unit";
+    public static final String LESSON = "lesson";
+    public static final String SESSION_ID = "sessionId";
+    public static final String DATE_OF_ACTIVITY = "dateOfActivity";
+    public static final String TYPE = "type";
+    public static final String URL = "url";
+    public static final String COMPETENCIES = "competencies";
+    public static final String SCORE = "score";
+    public static final String MAX_SCORE = "maxScore";
+    public static final String TIMESPENT = "timespent";
+    public static final String GRADING_STATUS = "gradingStatus";
+    public static final String USAGE_DATA = "usageData";
+    public static final String SESSIONS_COUNT = "sessionsCount";
 
     private Response() {
       throw new AssertionError();
@@ -94,6 +148,7 @@ public final class Constants {
   public static final class Params {
 
     public static final UUID NO_UUID = new UUID(0, 0);
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private Params() {
       throw new AssertionError();
@@ -104,6 +159,11 @@ public final class Constants {
 
     private static final String SEP = "/";
     private static final String COLON = ":";
+    private static final String CLASS = "class";
+    private static final String STUDENT = "student";
+    private static final String SUMMARY = "summary";
+    private static final String DETAILED = "detailed";
+    private static final String ACTIVITIES = "activities";
     private static final String API_GROUPS_BASE_ROUTE = "/api/groups/:version/";
 
     public static final String ID_CLASS = "classId";
@@ -126,13 +186,26 @@ public final class Constants {
     private static final String API_REPORTS_BASE_ROUTE = "/api/reports/:version/";
     public static final String API_REPORTS_TOKEN_VERIFICATION = API_REPORTS_BASE_ROUTE + "*";
     public static final String API_REPORTS_CA_ACTIVITIES_COUNT_GET =
-        API_REPORTS_BASE_ROUTE + "ca/classes/" + COLON + ID_CLASS + SEP + "activities";
+        API_REPORTS_BASE_ROUTE + "ca/classes/" + COLON + ID_CLASS + SEP + ACTIVITIES;
+    public static final String API_REPORTS_CLASS_SUMMARY_GET =
+        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + SUMMARY;
+    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_GET =
+        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY;
+    public static final String API_REPORTS_CLASS_STUDENT_DETAILED_SUMMARY_GET =
+        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + DETAILED
+            + SEP + SUMMARY;
 
     private Route() {
       throw new AssertionError();
     }
   }
 
+  public static final String CDN_URLS = "cdn_urls";
+  public static final String USER_CDN_URL = "user_cdn_url";
+  public static final String HTTP = "http";
+  public static final String COLON = ":";
+  public static final String PRODUCT_DOMAIN = "product.domain";
+  
   private Constants() {
     throw new AssertionError();
   }
