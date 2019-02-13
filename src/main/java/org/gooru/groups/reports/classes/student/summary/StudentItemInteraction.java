@@ -7,7 +7,7 @@ package org.gooru.groups.reports.classes.student.summary;
 public class StudentItemInteraction {
 
   private String collectionType;
-  private String uniqueItemCount;
+  private Integer uniqueItemCount;
   private Integer interactionCount;
   private Long timespent;
   private Integer score;
@@ -21,11 +21,11 @@ public class StudentItemInteraction {
     this.collectionType = collectionType;
   }
 
-  public String getUniqueItemCount() {
+  public Integer getUniqueItemCount() {
     return uniqueItemCount;
   }
 
-  public void setUniqueItemCount(String uniqueItemCount) {
+  public void setUniqueItemCount(Integer uniqueItemCount) {
     this.uniqueItemCount = uniqueItemCount;
   }
 

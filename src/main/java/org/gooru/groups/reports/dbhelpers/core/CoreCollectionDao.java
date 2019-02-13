@@ -11,7 +11,10 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 public interface CoreCollectionDao {
 
   @SqlQuery("select title from collection where id = :id::uuid and lesson_id = :lessonId::uuid and is_deleted = false")
-  String fetchCollection(@Bind("id") String id, @Bind("lessonId") String lessonId);
+  String fetchCollectionByLessonId(@Bind("id") String id, @Bind("lessonId") String lessonId);
+  
+  @SqlQuery("select title from collection where id = :id::uuid and is_deleted = false")
+  String fetchCollection(@Bind("id") String id);
 
   @Mapper(CompetencyModelMapper.class)
   @SqlQuery("select dc.key as id, dc.value::jsonb ->>'code' as code from collection JOIN jsonb_each_text(taxonomy) dc ON true where id = :id::uuid")

@@ -42,8 +42,12 @@ public class CoreService {
     return this.lessonDao.fetchLesson(lessonId, unitId);
   }
 
-  public String fetchCollectionTitle(String collectionId, String lessonId) {
-    return this.collectionDao.fetchCollection(collectionId, lessonId);
+  public String fetchCollectionTitleByLessonId(String collectionId, String lessonId) {
+    return this.collectionDao.fetchCollectionByLessonId(collectionId, lessonId);
+  }
+  
+  public String fetchCollectionTitle(String collectionId) {
+    return this.collectionDao.fetchCollection(collectionId);
   }
 
   public List<ClassMembersModel> fetchClassMembers(String classId) {

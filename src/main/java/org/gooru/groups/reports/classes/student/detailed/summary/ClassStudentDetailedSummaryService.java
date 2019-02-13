@@ -143,7 +143,6 @@ public class ClassStudentDetailedSummaryService {
         JsonObject context = populateContextObject(courseId, studentPerf, usageSummary);
 
         JsonObject content = populateContentObject(studentPerf, usageSummary);
-
         usageSummary.put(Constants.Response.CONTEXT, context);
         usageSummary.put(Constants.Response.CONTENT, content);
         if (context == null || content == null) {
@@ -159,16 +158,24 @@ public class ClassStudentDetailedSummaryService {
   private JsonObject populateContextObject(String courseId, StudentPerformanceModel studentPerf,
       JsonObject usageSummary) {
     JsonObject context = new JsonObject();
-    String unitTitle = this.coreService.fetchUnitTitle(studentPerf.getUnitId(), courseId);
-    String lessonTitle =
-        this.coreService.fetchLessonTitle(studentPerf.getLessonId(), studentPerf.getUnitId());
-    if (unitTitle == null || lessonTitle == null) {
-      return null;
+    JsonObject unit = null;
+    if (studentPerf.getUnitId() != null) {
+      String unitTitle = this.coreService.fetchUnitTitle(studentPerf.getUnitId(), courseId);
+      if (unitTitle == null) {
+        return null;
+      }
+      unit = populateContainerMeta(studentPerf.getUnitId(), unitTitle);
     }
-
-    JsonObject unit = populateContainerMeta(studentPerf.getUnitId(), unitTitle);
+    JsonObject lesson = null;
+    if (studentPerf.getLessonId() != null) {
+      String lessonTitle =
+          this.coreService.fetchLessonTitle(studentPerf.getLessonId(), studentPerf.getUnitId());
+      if (lessonTitle == null) {
+        return null;
+      }
+      lesson = populateContainerMeta(studentPerf.getLessonId(), lessonTitle);
+    }
     context.put(Constants.Response.UNIT, unit);
-    JsonObject lesson = populateContainerMeta(studentPerf.getLessonId(), lessonTitle);
     context.put(Constants.Response.LESSON, lesson);
     context.put(Constants.Response.SESSION_ID, studentPerf.getSessionId());
     context.put(Constants.Response.DATE_OF_ACTIVITY, studentPerf.getDateOfActivity());
@@ -178,8 +185,14 @@ public class ClassStudentDetailedSummaryService {
   private JsonObject populateContentObject(StudentPerformanceModel studentPerf,
       JsonObject usageSummary) {
     JsonObject content = new JsonObject();
-    String collectionTitle = this.coreService.fetchCollectionTitle(studentPerf.getCollectionId(),
-        studentPerf.getLessonId());
+    String collectionTitle = null;
+    if (studentPerf.getLessonId() != null) {
+      collectionTitle = this.coreService
+          .fetchCollectionTitleByLessonId(studentPerf.getCollectionId(), studentPerf.getLessonId());
+    } else {
+      // May be Offline CA data which will not have unit/lesson 
+      collectionTitle = this.coreService.fetchCollectionTitle(studentPerf.getCollectionId());
+    }
     if (collectionTitle == null) {
       return null;
     }
