@@ -16,7 +16,7 @@ public class StudentItemInteractionMapper implements ResultSetMapper<StudentItem
       throws SQLException {
     StudentItemInteraction activity = new StudentItemInteraction();
     activity.setCollectionType(r.getString("collection_type"));
-    activity.setUniqueItemCount(r.getString("unique_item_count"));
+    activity.setUniqueItemCount(r.getInt("unique_item_count"));
     activity.setInteractionCount(r.getInt("interaction_count"));
     activity.setScore(r.getInt("score"));
     activity.setTimespent(r.getLong("timespent"));
