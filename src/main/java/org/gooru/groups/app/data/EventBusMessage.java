@@ -20,6 +20,7 @@ public final class EventBusMessage {
   private final JsonObject requestBody;
   private final UUID userId;
   private final JsonObject session;
+  private final String userCdnUrl;
   private JsonObject readOnlySession;
   private JsonObject readOnlyRequestBody;
 
@@ -41,15 +42,20 @@ public final class EventBusMessage {
   public JsonObject getSession() {
     return this.readOnlySession;
   }
+  
+  public String getUserCdnUrl() {
+    return this.userCdnUrl;
+  }
 
   private EventBusMessage(String sessionToken, JsonObject requestBody, UUID userId,
-      JsonObject session) {
+      JsonObject session, String userCdnUrl) {
     this.sessionToken = sessionToken;
     this.requestBody = requestBody;
     this.userId = userId;
     this.session = session;
     this.readOnlyRequestBody = new JsonObject(Collections.unmodifiableMap(requestBody.getMap()));
     this.readOnlySession = new JsonObject(Collections.unmodifiableMap(session.getMap()));
+    this.userCdnUrl= userCdnUrl;
   }
 
   public static EventBusMessage eventBusMessageBuilder(Message<JsonObject> message) {
@@ -58,8 +64,18 @@ public final class EventBusMessage {
     String userId = message.body().getString(Constants.Message.MSG_USER_ID);
     JsonObject requestBody = message.body().getJsonObject(Constants.Message.MSG_HTTP_BODY);
     JsonObject session = message.body().getJsonObject(Constants.Message.MSG_KEY_SESSION);
+    String userCdnUrl = setUserCdnUrl(session);
 
     return new EventBusMessage(sessionToken, requestBody,
-        userId != null ? UUID.fromString(userId) : null, session);
+        userId != null ? UUID.fromString(userId) : null, session, userCdnUrl);
+  }
+  
+  private static String setUserCdnUrl(JsonObject session) {
+    String userCDNURL = null;
+    JsonObject json = session.getJsonObject(Constants.CDN_URLS);
+    if (json != null) {
+        userCDNURL = json.getString(Constants.USER_CDN_URL);
+    }
+    return userCDNURL;
   }
 }
