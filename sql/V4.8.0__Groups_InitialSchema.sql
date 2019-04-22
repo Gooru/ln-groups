@@ -33,7 +33,7 @@ CREATE TABLE groups (
 	code text,
 	description text,
 	type varchar(128) CHECK (type::varchar = ANY(ARRAY['system'::varchar, 'custom'::varchar])),
-	sub_type varchar(128) CHECK ( sub_type::varchar = ANY(ARRAY['school_district'::varchar, 'district'::varchar, 'block'::varchar, 'cluster'::varchar])),
+	sub_type varchar(128) CHECK (sub_type::varchar = ANY(ARRAY['school_district'::varchar, 'district'::varchar, 'block'::varchar, 'cluster'::varchar, 'custom'::varchar])),
 	parent_id bigint,
 	state_id bigint REFERENCES state(id),
 	country_id bigint REFERENCES country(id),
@@ -43,48 +43,6 @@ CREATE TABLE groups (
 	modifier_id text NOT NULL,
 	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
 	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')	
-);
-
-CREATE TABLE class_level_data_reports (
-	id bigserial PRIMARY KEY,
-	class_id text NOT NULL,
-	views int,
-	attempts int,
-	collection_timespent bigint,
-	assessment_timespent bigint,
-	assessment_performance numeric (5,2),
-	school_id bigint REFERENCES school(id),
-	state_id bigint REFERENCES state(id),
-	country_id bigint REFERENCES country(id),
-	month int,
-	year int,
-	tenant text NOT NULL,
-	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')
-);
-
-COMMENT ON COLUMN class_level_data_reports.class_id IS 'Even though the type of the column is text, expected value is UUID';
-COMMENT ON COLUMN class_level_data_reports.tenant IS 'Even though the type of the column is text, expected value is UUID';
-
-CREATE TABLE group_level_data_reports (
-	id bigserial PRIMARY KEY,
-	class_id text NOT NULL,
-	views int,
-	attempts int,
-	collection_timespent bigint,
-	assessment_timespent bigint,
-	assessment_performance numeric (5,2),
-	group_id bigint REFERENCES groups(id),
-	group_type varchar(128) CHECK (group_type::varchar = ANY(ARRAY['system'::varchar, 'custom'::varchar])),
-	group_sub_type varchar(128) CHECK ( group_sub_type::varchar = ANY(ARRAY['school_district'::varchar, 'district'::varchar, 'block'::varchar, 'cluster'::varchar])),
-	school_id bigint REFERENCES school(id),
-	state_id bigint REFERENCES state(id),
-	country_id bigint REFERENCES country(id),
-	month int,
-	year int,
-	tenant text NOT NULL,
-	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')
 );
 
 CREATE TABLE group_user_acl (
@@ -110,3 +68,103 @@ CREATE TABLE school_class_mapping (
 );
 
 COMMENT ON COLUMN school_class_mapping.class_id IS 'Even though the type of the column is text, expected value is UUID';
+
+
+---- QUEUE Tables ----
+
+CREATE TABLE performance_data_reports_queue (
+	id bigserial PRIMARY KEY,
+	class_id text NOT NULL,
+	course_id text NOT NULL,
+	tenant text NOT NULL,
+	status varchar(128) CHECK (status::varchar = ANY(ARRAY['pending'::varchar, 'completed'::varchar])),
+	content_source varchar(128) NOT NULL,
+	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	UNIQUE (class_id, content_source)
+);
+
+CREATE TABLE competency_data_reports_queue (
+	id bigserial PRIMARY KEY,
+	class_id text NOT NULL,
+	course_id text NOT NULL,
+	tenant text NOT NULL,
+	status varchar(128) CHECK (status::varchar = ANY(ARRAY['pending'::varchar, 'completed'::varchar])),
+	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	UNIQUE (class_id)
+);
+
+
+--- DATA Report Tables ----
+
+CREATE TABLE class_performance_data_reports (
+	id bigserial PRIMARY KEY,
+	class_id text NOT NULL,
+	collection_timespent bigint,
+	assessment_timespent bigint,
+	assessment_performance numeric (5,2),
+	school_id bigint REFERENCES school(id),
+	state_id bigint REFERENCES state(id),
+	country_id bigint REFERENCES country(id),
+	month int,
+	year int,
+	content_source varchar(128) NOT NULL,
+	tenant text NOT NULL,
+	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	UNIQUE(class_id, content_source, month, year)
+);
+
+COMMENT ON COLUMN class_performance_data_reports.class_id IS 'Even though the type of the column is text, expected value is UUID';
+COMMENT ON COLUMN class_performance_data_reports.tenant IS 'Even though the type of the column is text, expected value is UUID';
+
+CREATE TABLE group_performance_data_reports (
+	id bigserial PRIMARY KEY,
+	collection_timespent bigint,
+	assessment_timespent bigint,
+	assessment_performance numeric (5,2),
+	group_id bigint REFERENCES groups(id),
+	school_id bigint REFERENCES school(id),
+	state_id bigint REFERENCES state(id),
+	country_id bigint REFERENCES country(id),
+	month int,
+	year int,
+	content_source varchar(128) NOT NULL,
+	tenant text NOT NULL,
+	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	UNIQUE(group_id, content_source, month, year)
+);
+
+CREATE TABLE class_competency_data_reports (
+	id bigserial PRIMARY KEY,
+	class_id text NOT NULL,
+	completed_count bigint,
+	total_count bigint,
+	school_id bigint REFERENCES school(id),
+	state_id bigint REFERENCES state(id),
+	country_id bigint REFERENCES country(id),
+	month int,
+	year int,
+	tenant text NOT NULL,
+	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	UNIQUE(class_id, month, year)
+);
+
+CREATE TABLE group_competency_data_reports (
+	id bigserial PRIMARY KEY,
+	completed_count bigint,
+	total_count bigint,
+	group_id bigint REFERENCES groups(id),
+	school_id bigint REFERENCES school(id),
+	state_id bigint REFERENCES state(id),
+	country_id bigint REFERENCES country(id),
+	month int,
+	year int,
+	tenant text NOT NULL,
+	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	UNIQUE(group_id, month, year)
+);
