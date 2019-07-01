@@ -31,11 +31,14 @@ public class RouteReportsConfigurator implements RouteConfigurator {
     
     router.get(Constants.Route.API_REPORTS_CLASS_SUMMARY_GET).handler(this::getClassSummary);
 
-    router.get(Constants.Route.API_REPORTS_CLASS_STUDENT_SUMMARY_GET)
-        .handler(this::getClassStudentSummary);
+    router.get(Constants.Route.API_REPORTS_CLASS_STUDENT_SUMMARY_WEEKLY_GET)
+        .handler(this::getClassStudentSummaryWeekly);
 
     router.get(Constants.Route.API_REPORTS_CLASS_STUDENT_DETAILED_SUMMARY_GET)
         .handler(this::getClassStudentDetailedSummary);
+    
+    router.get(Constants.Route.API_REPORTS_CLASS_STUDENT_SUMMARY_GET)
+    .handler(this::getClassStudentSummary);
   }
 
   private void getClassActivitiesCount(RoutingContext routingContext) {
@@ -50,7 +53,7 @@ public class RouteReportsConfigurator implements RouteConfigurator {
         Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
   }
 
-  private void getClassStudentSummary(RoutingContext routingContext) {
+  private void getClassStudentSummaryWeekly(RoutingContext routingContext) {
     RouteHandlerUtils.baseHandler(this.eb, routingContext,
         Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY_WEEKLY,
         Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
@@ -59,6 +62,12 @@ public class RouteReportsConfigurator implements RouteConfigurator {
   private void getClassStudentDetailedSummary(RoutingContext routingContext) {
     RouteHandlerUtils.baseHandler(this.eb, routingContext,
         Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_DETAILED_SUMMARY_WEEKLY,
+        Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
+  }
+  
+  private void getClassStudentSummary(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY,
         Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
   }
   

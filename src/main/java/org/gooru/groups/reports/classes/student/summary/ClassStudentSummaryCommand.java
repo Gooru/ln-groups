@@ -9,25 +9,19 @@ import java.util.Date;
 public class ClassStudentSummaryCommand {
 
   private String classId;
-  private Date fromDate;
-  private Date toDate;
+  private Date dateTill;
 
-  public ClassStudentSummaryCommand(String classId, Date fromDate, Date toDate) {
+  public ClassStudentSummaryCommand(String classId, Date dateTill) {
     super();
     this.classId = classId;
-    this.fromDate = fromDate;
-    this.toDate = toDate;
+    this.dateTill = dateTill;
   }
 
   public String getClassId() {
     return classId;
   }
 
-  public Date getFromDate() {
-    return fromDate;
-  }
-
-  public Date getToDate() {
-    return toDate;
+  public Date getDateTill() {
+    return dateTill;
   }
 }

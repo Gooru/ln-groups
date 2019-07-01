@@ -13,27 +13,27 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 public interface StudentItemInteractionDao {
 
   @Mapper(StudentItemInteractionMapper.class)
-  @SqlQuery("select collection_type, count(distinct collection_id) as unique_item_count, count(*) as interaction_count, SUM(timespent) as timespent, ROUND(AVG(score)) as score, SUM(max_score) as max_score from collection_performance WHERE course_id is NOT NULL AND (path_id IS NULL OR path_id = 0) AND collection_type IN ('assessment', 'assessment-external') AND status = true AND created_at BETWEEN :fromDate AND :toDate and class_id =:classId and actor_id = :actorId group by collection_type")
-  List<StudentItemInteraction> fetchAssessmentInteractionInWeek(@Bind("classId") String classId,
-      @Bind("actorId") String actorId, @Bind("fromDate") Date fromDate,
-      @Bind("toDate") Date toDate);
+  @SqlQuery("select collection_type, count(distinct collection_id) as unique_item_count, count(*) as interaction_count, SUM(timespent) as timespent, ROUND(AVG(score)) as score, SUM(max_score) as max_score from collection_performance WHERE course_id is NOT NULL AND (path_id IS NULL OR path_id = 0) AND collection_type IN ('assessment', 'assessment-external') AND status = true AND created_at <= :dateTill and class_id =:classId and actor_id = :actorId group by collection_type")
+  List<StudentItemInteraction> fetchAssessmentInteraction(@Bind("classId") String classId,
+      @Bind("actorId") String actorId, @Bind("dateTill") Date dateTill);
 
   @Mapper(StudentItemInteractionMapper.class)
-  @SqlQuery("select collection_type, count(distinct collection_id) as unique_item_count, count(*) as interaction_count, SUM(timespent) as timespent, ROUND(AVG(score)) as score, SUM(max_score) as max_score from collection_performance WHERE course_id is NOT NULL AND (path_id IS NOT NULL AND path_id <> 0) AND collection_type IN ('assessment', 'assessment-external') AND status = true AND created_at BETWEEN :fromDate AND :toDate and class_id =:classId and actor_id = :actorId group by collection_type")
-  List<StudentItemInteraction> fetchAssessmentSuggestionInteractionInWeek(
+  @SqlQuery("select collection_type, count(distinct collection_id) as unique_item_count, count(*) as interaction_count, SUM(timespent) as timespent, ROUND(AVG(score)) as score, SUM(max_score) as max_score from collection_performance WHERE course_id is NOT NULL AND (path_id IS NOT NULL AND path_id <> 0) AND collection_type IN ('assessment', 'assessment-external') AND status = true AND created_at <= :dateTill and class_id =:classId and actor_id = :actorId group by collection_type")
+  List<StudentItemInteraction> fetchAssessmentSuggestionInteraction(
       @Bind("classId") String classId, @Bind("actorId") String actorId,
-      @Bind("fromDate") Date fromDate, @Bind("toDate") Date toDate);
+      @Bind("dateTill") Date dateTill);
 
   @Mapper(StudentItemInteractionMapper.class)
-  @SqlQuery("select collection_type, count(distinct collection_id) as unique_item_count, count(*) as interaction_count, SUM(timespent) as timespent, ROUND(AVG(score)) as score, SUM(max_score) as max_score from collection_performance WHERE course_id is NOT NULL AND (path_id IS NULL OR path_id = 0) AND collection_type IN ('collection', 'collection-external') AND created_at BETWEEN :fromDate AND :toDate and class_id =:classId and actor_id = :actorId group by collection_type")
-  List<StudentItemInteraction> fetchCollectionInteractionInWeek(@Bind("classId") String classId,
-      @Bind("actorId") String actorId, @Bind("fromDate") Date fromDate,
-      @Bind("toDate") Date toDate);
+  @SqlQuery("select collection_type, count(distinct collection_id) as unique_item_count, count(*) as interaction_count, SUM(timespent) as timespent, ROUND(AVG(score)) as score, SUM(max_score) as max_score from collection_performance WHERE course_id is NOT NULL AND (path_id IS NULL OR path_id = 0) AND collection_type IN ('collection', 'collection-external') AND created_at <= :dateTill and class_id =:classId and actor_id = :actorId group by collection_type")
+  List<StudentItemInteraction> fetchCollectionInteraction(@Bind("classId") String classId,
+      @Bind("actorId") String actorId, @Bind("dateTill") Date dateTill);
 
   @Mapper(StudentItemInteractionMapper.class)
-  @SqlQuery("select collection_type, count(distinct collection_id) as unique_item_count, count(*) as interaction_count, SUM(timespent) as timespent, ROUND(AVG(score)) as score, SUM(max_score) as max_score from collection_performance WHERE course_id is NOT NULL AND (path_id IS NOT NULL AND path_id <> 0) AND collection_type IN ('collection', 'collection-external') AND created_at BETWEEN :fromDate AND :toDate and class_id =:classId and actor_id = :actorId group by collection_type")
-  List<StudentItemInteraction> fetchCollectionSuggestionInteractionInWeek(
+  @SqlQuery("select collection_type, count(distinct collection_id) as unique_item_count, count(*) as interaction_count, SUM(timespent) as timespent, ROUND(AVG(score)) as score, SUM(max_score) as max_score from collection_performance WHERE course_id is NOT NULL AND (path_id IS NOT NULL AND path_id <> 0) AND collection_type IN ('collection', 'collection-external') AND created_at <= :dateTill and class_id =:classId and actor_id = :actorId group by collection_type")
+  List<StudentItemInteraction> fetchCollectionSuggestionInteraction(
       @Bind("classId") String classId, @Bind("actorId") String actorId,
-      @Bind("fromDate") Date fromDate, @Bind("toDate") Date toDate);
-
+      @Bind("dateTill") Date dateTill);
+  
+  @SqlQuery("SELECT date_in_time_zone from collection_performance where class_id =:classId and actor_id = :actorId ORDER BY date_in_time_zone DESC LIMIT 1")
+  String fetchLastInteractionDate(@Bind("classId") String classId, @Bind("actorId") String actorId);
 }
