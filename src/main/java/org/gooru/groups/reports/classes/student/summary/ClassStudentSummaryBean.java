@@ -9,13 +9,11 @@ import java.util.Date;
 public class ClassStudentSummaryBean {
 
   private String classId;
-  private Date fromDate;
-  private Date toDate;
+  private Date dateTill;
 
   public ClassStudentSummaryBean(ClassStudentSummaryCommand command) {
     this.classId = command.getClassId();
-    this.fromDate = command.getFromDate();
-    this.toDate = command.getToDate();
+    this.dateTill = command.getDateTill();
   }
 
   public String getClassId() {
@@ -26,20 +24,12 @@ public class ClassStudentSummaryBean {
     this.classId = classId;
   }
 
-  public Date getFromDate() {
-    return fromDate;
+  public Date getDateTill() {
+    return dateTill;
   }
 
-  public void setFromDate(Date fromDate) {
-    this.fromDate = fromDate;
-  }
-
-  public Date getToDate() {
-    return toDate;
-  }
-
-  public void setToDate(Date toDate) {
-    this.toDate = toDate;
+  public void setDateTill(Date dateTill) {
+    this.dateTill = dateTill;
   }
 
 }

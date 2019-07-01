@@ -86,6 +86,8 @@ public final class Constants {
         "mb.op.reports.class.student.summary.weekly";
     public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_DETAILED_SUMMARY_WEEKLY =
         "mb.op.reports.class.student.detailed.summary.weekly";
+    public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY =
+        "mb.op.reports.class.student.summary";
 
     private Message() {
       throw new AssertionError();
@@ -139,6 +141,7 @@ public final class Constants {
     public static final String GRADING_STATUS = "gradingStatus";
     public static final String USAGE_DATA = "usageData";
     public static final String SESSIONS_COUNT = "sessionsCount";
+    public static final String LAST_ACCESSED_DATE = "lastAccessedDate";
 
     private Response() {
       throw new AssertionError();
@@ -164,6 +167,7 @@ public final class Constants {
     private static final String SUMMARY = "summary";
     private static final String DETAILED = "detailed";
     private static final String ACTIVITIES = "activities";
+    private static final String WEEKLY = "weekly";
     private static final String API_GROUPS_BASE_ROUTE = "/api/groups/:version/";
 
     public static final String ID_CLASS = "classId";
@@ -189,11 +193,13 @@ public final class Constants {
         API_REPORTS_BASE_ROUTE + "ca/classes/" + COLON + ID_CLASS + SEP + ACTIVITIES;
     public static final String API_REPORTS_CLASS_SUMMARY_GET =
         API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + SUMMARY;
-    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_GET =
-        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY;
+    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_WEEKLY_GET =
+        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY + SEP + WEEKLY;
     public static final String API_REPORTS_CLASS_STUDENT_DETAILED_SUMMARY_GET =
         API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + DETAILED
             + SEP + SUMMARY;
+    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_GET =
+        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY;
 
     private Route() {
       throw new AssertionError();
