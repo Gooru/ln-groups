@@ -45,29 +45,51 @@ public final class ClassStudentSummaryCommandBuilder {
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
           RESOURCE_BUNDLE.getString("invalid.classid.format"));
     }
-  }
-
-  private static ClassStudentSummaryCommand buildFromJson(JsonObject request) {
-    String classId = request.getString("classId");
-    String dateTill = request.getString("dateTill");
-
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    Date tDate;
-    if (dateTill == null) {
-      tDate = Calendar.getInstance().getTime();
-    } else {
-      try {
-        tDate = simpleDateFormat.parse(dateTill);
-      } catch (Exception e) {
+        
+    if (command.getFromDate() != null && command.getToDate() != null) {
+      if (!isValidFromAndToDate(command.getFromDate(), command.getToDate())) {
         LOGGER.warn("Invalid date requested");
         throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
             RESOURCE_BUNDLE.getString("invalid.date.format"));
       }
     }
-    if(!isValidDate(tDate)) {
-      tDate = Calendar.getInstance().getTime();
+  }
+
+  private static ClassStudentSummaryCommand buildFromJson(JsonObject request) {
+    String classId = request.getString("classId");
+    String dateTill = request.getString("dateTill");
+    String fromDate = request.getString("fromDate");
+    String toDate = request.getString("toDate");
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    Date fDate = null;
+    Date tDate = null;
+    Date tillDate = null;
+    if (fromDate != null && toDate != null) {
+      try {
+        fDate = simpleDateFormat.parse(fromDate);
+        tDate = simpleDateFormat.parse(toDate);
+      } catch (Exception e) {
+        LOGGER.warn("Invalid date requested");
+        throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+            RESOURCE_BUNDLE.getString("invalid.date.format"));
+      }
+    } else if (dateTill != null){
+      try {
+        tillDate = simpleDateFormat.parse(dateTill);
+      } catch (Exception e) {
+        LOGGER.warn("Invalid date requested");
+        throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+            RESOURCE_BUNDLE.getString("invalid.date.format"));
+      }
+    } else {
+      tillDate = Calendar.getInstance().getTime();
+    } 
+
+    if (tillDate != null && !isValidDate(tillDate)) {
+      tillDate = Calendar.getInstance().getTime();
     }
-    return new ClassStudentSummaryCommand(classId, tDate);
+    return new ClassStudentSummaryCommand(classId, fDate, tDate, tillDate);
   }
 
   private static Boolean isValidDate(Date requestedDate) {
@@ -78,6 +100,23 @@ public final class ClassStudentSummaryCommandBuilder {
         calendar.get(Calendar.DAY_OF_MONTH));
     LocalDate now = LocalDate.now();
     if (reqDate.isAfter(now)) {
+      isValidDate = false;
+    }
+    return isValidDate;
+  }
+  
+  private static Boolean isValidFromAndToDate(Date fromDate, Date toDate) {
+    Boolean isValidDate = true;
+    Calendar fromCalendar = Calendar.getInstance();
+    fromCalendar.setTime(toDate);
+    LocalDate reqFromDate = LocalDate.of(fromCalendar.get(Calendar.YEAR), fromCalendar.get(Calendar.MONTH) + 1,
+        fromCalendar.get(Calendar.DAY_OF_MONTH));
+    Calendar toCalendar = Calendar.getInstance();
+    toCalendar.setTime(toDate);
+    LocalDate reqToDate = LocalDate.of(toCalendar.get(Calendar.YEAR), toCalendar.get(Calendar.MONTH) + 1,
+        toCalendar.get(Calendar.DAY_OF_MONTH));
+    LocalDate now = LocalDate.now();
+    if (reqFromDate.isAfter(now) || reqToDate.isBefore(reqFromDate)) {
       isValidDate = false;
     }
     return isValidDate;
