@@ -108,7 +108,7 @@ public final class ClassStudentSummaryCommandBuilder {
   private static Boolean isValidFromAndToDate(Date fromDate, Date toDate) {
     Boolean isValidDate = true;
     Calendar fromCalendar = Calendar.getInstance();
-    fromCalendar.setTime(toDate);
+    fromCalendar.setTime(fromDate);
     LocalDate reqFromDate = LocalDate.of(fromCalendar.get(Calendar.YEAR), fromCalendar.get(Calendar.MONTH) + 1,
         fromCalendar.get(Calendar.DAY_OF_MONTH));
     Calendar toCalendar = Calendar.getInstance();
