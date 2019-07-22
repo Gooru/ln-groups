@@ -23,8 +23,11 @@ public class ClassStudentSummaryReportProcessor implements MessageProcessor {
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
-  private ClassStudentSummaryService service =
+  private ClassStudentSummaryService allTimeService =
       new ClassStudentSummaryService(DBICreator.getDbiForDefaultDS(), DBICreator.getDbiForDsdbDS(),
+          DBICreator.getDbiForAnalyticsDS());
+  private ClassStudentSummaryForCustomDateService customDateService =
+      new ClassStudentSummaryForCustomDateService(DBICreator.getDbiForDefaultDS(), DBICreator.getDbiForDsdbDS(),
           DBICreator.getDbiForAnalyticsDS());
 
   public ClassStudentSummaryReportProcessor(Vertx vertx, Message<JsonObject> message) {
@@ -41,7 +44,12 @@ public class ClassStudentSummaryReportProcessor implements MessageProcessor {
       ClassStudentSummaryCommand command = ClassStudentSummaryCommandBuilder.build(ebMessage);
       ClassStudentSummaryBean bean = new ClassStudentSummaryBean(command);
 
-      JsonObject response = this.service.fetchClassStudentSummary(bean, ebMessage.getUserCdnUrl());
+      JsonObject response = new JsonObject();
+      if (bean.getDateTill() != null) {
+        response = this.allTimeService.fetchClassStudentSummary(bean, ebMessage.getUserCdnUrl());
+      } else if (bean.getFromDate() != null && bean.getToDate() != null) {
+        response = this.customDateService.fetchClassStudentSummary(bean, ebMessage.getUserCdnUrl());
+      }
       result.complete(MessageResponseFactory.createOkayResponse(response));
     } catch (Throwable t) {
       LOGGER.warn("exception while fetching class student summary", t);

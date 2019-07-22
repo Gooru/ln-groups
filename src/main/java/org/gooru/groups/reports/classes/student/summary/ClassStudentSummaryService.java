@@ -64,12 +64,9 @@ public class ClassStudentSummaryService {
         JsonObject student = fetchUserData(classMember.getUserId(), userCdnUrl);
         studentObject.put(Constants.Response.STUDENT, student);
 
-        JsonObject summaryData = new JsonObject();
         JsonObject asOfNowData = fetchAllTimeData(bean, classMember.getUserId());
 
-        summaryData.put(Constants.Response.ALL_TIME, asOfNowData);
-
-        studentObject.put(Constants.Response.SUMMARY_DATA, summaryData);
+        studentObject.put(Constants.Response.SUMMARY_DATA, asOfNowData);
         studentSummary.add(studentObject);
       }
     }
@@ -138,7 +135,7 @@ public class ClassStudentSummaryService {
 
     String lastAccessedDate = this.studentInteractionDao.fetchLastInteractionDate(bean.getClassId(), userId);
     asOfNowData
-        .put(Constants.Response.LAST_ACCESSED_DATE, lastAccessedDate != null ? lastAccessedDate.toString() : null)
+        .put(Constants.Response.LAST_ACCESSED, lastAccessedDate != null ? lastAccessedDate.toString() : null)
         .put(Constants.Response.END_DATE, Constants.Params.DATE_FORMAT.format(bean.getDateTill()))
         .put(Constants.Response.SUGGESTIONS, suggestions)
         .put(Constants.Response.INTERACTIONS, interactions);

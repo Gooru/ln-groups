@@ -141,7 +141,7 @@ public final class Constants {
     public static final String GRADING_STATUS = "gradingStatus";
     public static final String USAGE_DATA = "usageData";
     public static final String SESSIONS_COUNT = "sessionsCount";
-    public static final String LAST_ACCESSED_DATE = "lastAccessedDate";
+    public static final String LAST_ACCESSED = "lastAccessed";
 
     private Response() {
       throw new AssertionError();
