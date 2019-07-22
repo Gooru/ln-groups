@@ -48,9 +48,9 @@ public final class ClassStudentSummaryCommandBuilder {
         
     if (command.getFromDate() != null && command.getToDate() != null) {
       if (!isValidFromAndToDate(command.getFromDate(), command.getToDate())) {
-        LOGGER.warn("Invalid date requested");
+        LOGGER.warn("Invalid date range requested");
         throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-            RESOURCE_BUNDLE.getString("invalid.date.format"));
+            RESOURCE_BUNDLE.getString("invalid.date.range"));
       }
     }
   }
