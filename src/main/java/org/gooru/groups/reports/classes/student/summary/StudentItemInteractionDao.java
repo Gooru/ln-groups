@@ -34,7 +34,7 @@ public interface StudentItemInteractionDao {
       @Bind("classId") String classId, @Bind("actorId") String actorId,
       @Bind("dateTill") Date dateTill);
   
-  @SqlQuery("SELECT created_at from collection_performance where class_id =:classId and actor_id = :actorId ORDER BY created_at DESC LIMIT 1")
+  @SqlQuery("SELECT updated_at from collection_performance where class_id =:classId and actor_id = :actorId ORDER BY updated_at DESC LIMIT 1")
   String fetchLastInteractionDate(@Bind("classId") String classId, @Bind("actorId") String actorId);
   
   @Mapper(StudentItemInteractionMapper.class)
@@ -61,7 +61,7 @@ public interface StudentItemInteractionDao {
       @Bind("classId") String classId, @Bind("actorId") String actorId,
       @Bind("fromDate") Date fromDate, @Bind("toDate") Date toDate);
 
-  @SqlQuery("SELECT created_at from collection_performance where class_id =:classId and actor_id = :actorId and cast(created_at as date) BETWEEN :fromDate AND :toDate ORDER BY created_at DESC LIMIT 1")
+  @SqlQuery("SELECT updated_at from collection_performance where class_id =:classId and actor_id = :actorId and cast(created_at as date) BETWEEN :fromDate AND :toDate ORDER BY updated_at DESC LIMIT 1")
   String fetchLastInteractionDate(@Bind("classId") String classId, @Bind("actorId") String actorId,
       @Bind("fromDate") Date fromDate, @Bind("toDate") Date toDate);
 }
