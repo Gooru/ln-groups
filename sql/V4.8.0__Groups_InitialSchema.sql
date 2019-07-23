@@ -72,22 +72,22 @@ COMMENT ON COLUMN school_class_mapping.class_id IS 'Even though the type of the 
 
 ---- QUEUE Tables ----
 
-CREATE TABLE performance_data_reports_queue (
+CREATE TABLE perf_ts_data_reports_queue (
 	id bigserial PRIMARY KEY,
 	class_id text NOT NULL,
 	course_id text NOT NULL,
+	kpi varchar(128) CHECK (kpi::varchar = ANY(ARRAY['performance'::varchar, 'timespent'::varchar])),
 	tenant text NOT NULL,
 	status varchar(128) CHECK (status::varchar = ANY(ARRAY['pending'::varchar, 'completed'::varchar])),
 	content_source varchar(128) NOT NULL,
 	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
 	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-	UNIQUE (class_id, content_source)
+	UNIQUE (class_id, kpi, content_source)
 );
 
 CREATE TABLE competency_data_reports_queue (
 	id bigserial PRIMARY KEY,
 	class_id text NOT NULL,
-	course_id text NOT NULL,
 	tenant text NOT NULL,
 	status varchar(128) CHECK (status::varchar = ANY(ARRAY['pending'::varchar, 'completed'::varchar])),
 	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
@@ -141,7 +141,8 @@ CREATE TABLE class_competency_data_reports (
 	id bigserial PRIMARY KEY,
 	class_id text NOT NULL,
 	completed_count bigint,
-	total_count bigint,
+	inprogress_count bigint,
+	cumulative_completed_count bigint,
 	school_id bigint REFERENCES school(id),
 	state_id bigint REFERENCES state(id),
 	country_id bigint REFERENCES country(id),
@@ -156,7 +157,8 @@ CREATE TABLE class_competency_data_reports (
 CREATE TABLE group_competency_data_reports (
 	id bigserial PRIMARY KEY,
 	completed_count bigint,
-	total_count bigint,
+	inprogress_count bigint,
+	cumulative_completed_count bigint,
 	group_id bigint REFERENCES groups(id),
 	school_id bigint REFERENCES school(id),
 	state_id bigint REFERENCES state(id),
@@ -168,3 +170,25 @@ CREATE TABLE group_competency_data_reports (
 	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
 	UNIQUE(group_id, month, year)
 );
+
+
+CREATE TABLE group_client_data_reports (
+	id bigserial PRIMARY KEY,
+	total_students bigint,
+	total_teachers bigint,
+	total_others bigint,
+	total_classes bigint,
+	total_competencies_gained bigint,
+	total_timespent bigint,
+	total_activities_conducted bigint,
+	total_navigator_courses bigint,
+	country_id bigint REFERENCES country(id),
+	month int,
+	year int,
+	tenant text,
+	partner text,
+	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')
+);
+
+ CREATE INDEX group_client_data_reports_country_idx ON group_client_data_reports USING btree (country_id);
