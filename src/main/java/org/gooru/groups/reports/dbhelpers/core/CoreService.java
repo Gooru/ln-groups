@@ -1,6 +1,7 @@
 package org.gooru.groups.reports.dbhelpers.core;
 
 import java.util.List;
+import org.gooru.groups.reports.utils.CollectionUtils;
 import org.skife.jdbi.v2.DBI;
 
 /**
@@ -28,6 +29,10 @@ public class CoreService {
 
   public ClassModel fetchClass(String classId) {
     return this.classDao.fetchClass(classId);
+  }
+  
+  public List<ClassTitleModel> fetchClassTitles(List<String> classIds) {
+    return this.classDao.fetchClassTitles(CollectionUtils.convertToSqlArrayOfUUID(classIds));
   }
 
   public String fetchCourseTitle(String courseId) {

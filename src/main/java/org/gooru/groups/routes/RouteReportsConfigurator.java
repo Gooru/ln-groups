@@ -25,10 +25,10 @@ public class RouteReportsConfigurator implements RouteConfigurator {
   public void configureRoutes(Vertx vertx, Router router, JsonObject config) {
     this.eb = vertx.eventBus();
     this.mbusTimeout = config.getLong(Constants.EventBus.MBUS_TIMEOUT, 30L) * 1000;
-    
+
     router.get(Constants.Route.API_REPORTS_CA_ACTIVITIES_COUNT_GET)
         .handler(this::getClassActivitiesCount);
-    
+
     router.get(Constants.Route.API_REPORTS_CLASS_SUMMARY_GET).handler(this::getClassSummary);
 
     router.get(Constants.Route.API_REPORTS_CLASS_STUDENT_SUMMARY_WEEKLY_GET)
@@ -36,6 +36,16 @@ public class RouteReportsConfigurator implements RouteConfigurator {
 
     router.get(Constants.Route.API_REPORTS_CLASS_STUDENT_DETAILED_SUMMARY_GET)
         .handler(this::getClassStudentDetailedSummary);
+
+    router.get(Constants.Route.API_FETCH_COUNTRIES).handler(this::fetchGroupReportCountries);
+    router.get(Constants.Route.API_FETCH_PERF_REPORT_BY_COUNTRY)
+        .handler(this::fetchGroupReportByCountry);
+    router.get(Constants.Route.API_FETCH_PERF_REPORT_BY_STATE)
+        .handler(this::fetchGroupReportByState);
+    router.get(Constants.Route.API_FETCH_PERF_REPORT_BY_GROUP)
+        .handler(this::fetchGroupReportByGroup);
+    router.get(Constants.Route.API_FETCH_PERF_REPORT_BY_SCHOOL)
+        .handler(this::fetchGroupReportBySchool);
     
     router.get(Constants.Route.API_REPORTS_CLASS_STUDENT_SUMMARY_GET)
     .handler(this::getClassStudentSummary);
@@ -64,11 +74,40 @@ public class RouteReportsConfigurator implements RouteConfigurator {
         Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_DETAILED_SUMMARY_WEEKLY,
         Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
   }
+
+  private void fetchGroupReportCountries(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_REPORTS_GROUPS_COUNTRIES, Constants.EventBus.MBEP_DISPATCHER,
+        this.mbusTimeout, LOGGER);
+  }
+
+  private void fetchGroupReportByCountry(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_REPORTS_GROUPS_BY_COUNTRY, Constants.EventBus.MBEP_DISPATCHER,
+        this.mbusTimeout, LOGGER);
+  }
+
+  private void fetchGroupReportByState(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_REPORTS_GROUPS_BY_STATE, Constants.EventBus.MBEP_DISPATCHER,
+        this.mbusTimeout, LOGGER);
+  }
+
+  private void fetchGroupReportByGroup(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_REPORTS_GROUPS_BY_GROUP, Constants.EventBus.MBEP_DISPATCHER,
+        this.mbusTimeout, LOGGER);
+  }
+
+  private void fetchGroupReportBySchool(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_REPORTS_GROUPS_BY_SCHOOL, Constants.EventBus.MBEP_DISPATCHER,
+        this.mbusTimeout, LOGGER);
+  }
   
   private void getClassStudentSummary(RoutingContext routingContext) {
     RouteHandlerUtils.baseHandler(this.eb, routingContext,
         Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY,
         Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
   }
-  
 }
