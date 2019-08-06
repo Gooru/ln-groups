@@ -49,6 +49,8 @@ public final class Constants {
 
     public static final String MSG_API_VERSION = "api.version";
     public static final String MSG_SESSION_TOKEN = "session.token";
+    public static final String MSG_SESSION_TENANT = "tenant";
+    public static final String MSG_SESSION_TENANT_ID = "tenant_id";
     public static final String MSG_ACCESS_TOKEN = "access_token";
     public static final String MSG_KEY_SESSION = "session";
     public static final String MSG_USER_ANONYMOUS = "anonymous";
@@ -86,6 +88,12 @@ public final class Constants {
         "mb.op.reports.class.student.summary.weekly";
     public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_DETAILED_SUMMARY_WEEKLY =
         "mb.op.reports.class.student.detailed.summary.weekly";
+    
+    public static final String MSG_OP_REPORTS_GROUPS_COUNTRIES = "mb.op.reports.groups.contries.get";
+    public static final String MSG_OP_REPORTS_GROUPS_BY_COUNTRY = "mb.op.reports.groups.country.get";
+    public static final String MSG_OP_REPORTS_GROUPS_BY_STATE = "mb.op.reports.groups.state.get";
+    public static final String MSG_OP_REPORTS_GROUPS_BY_GROUP = "mb.op.reports.groups.group.get";
+    public static final String MSG_OP_REPORTS_GROUPS_BY_SCHOOL = "mb.op.reports.groups.school.get";
 
     private Message() {
       throw new AssertionError();
@@ -163,22 +171,27 @@ public final class Constants {
     private static final String STUDENT = "student";
     private static final String SUMMARY = "summary";
     private static final String DETAILED = "detailed";
+    private static final String GROUPS = "groups";
     private static final String ACTIVITIES = "activities";
-    private static final String API_GROUPS_BASE_ROUTE = "/api/groups/:version/";
+    private static final String COUNTRIES = "countries";
+    private static final String STATES = "states";
+    private static final String SCHOOLS = "schools";
+    private static final String API_GROUPS_BASE_ROUTE = "/api/:version/" + GROUPS;
 
     public static final String ID_CLASS = "classId";
+    public static final String ID_GROUP = "groupId";
+    public static final String ID_COUNTRY = "countryId";
+    public static final String ID_STATE = "stateId";
+    public static final String ID_SCHOOL = "schoolId";
 
-    public static final String API_GROUP_TOKEN_VERIFICATION = API_GROUPS_BASE_ROUTE + "*";
+    public static final String API_GROUP_TOKEN_VERIFICATION = API_GROUPS_BASE_ROUTE + SEP + "*";
 
-    public static final String API_GROUP = API_GROUPS_BASE_ROUTE + "group";
-    public static final String API_GROUP_UPDATE_DELETE = API_GROUP + SEP + ":groupId";
+    public static final String API_GROUP_UPDATE_DELETE = API_GROUPS_BASE_ROUTE + SEP + COLON + ID_GROUP;
 
     public static final String API_GROUP_ASSOCIATE =
-        API_GROUP + SEP + ":groupId" + SEP + "associate" + SEP + ":associateGroupId";
+        API_GROUPS_BASE_ROUTE + SEP + COLON + ID_GROUP + SEP + "associate" + SEP + ":associateGroupId";
     public static final String API_GROUP_REMOVE =
-        API_GROUP + SEP + ":groupId" + SEP + "remove" + SEP + ":removeGroupId";
-
-    public static final String API_CLASS = API_GROUPS_BASE_ROUTE + "group";
+        API_GROUPS_BASE_ROUTE + SEP + COLON + ID_GROUP + SEP + "remove" + SEP + ":removeGroupId";
 
     // Groups report API routes
     // Scheduled / Unscheduled activities
@@ -195,6 +208,17 @@ public final class Constants {
         API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + DETAILED
             + SEP + SUMMARY;
 
+    // Data Reports
+    public static final String API_FETCH_COUNTRIES = API_REPORTS_BASE_ROUTE + COUNTRIES;
+    public static final String API_FETCH_PERF_REPORT_BY_COUNTRY =
+        API_REPORTS_BASE_ROUTE + COUNTRIES + SEP + COLON + ID_COUNTRY;
+    public static final String API_FETCH_PERF_REPORT_BY_STATE = API_REPORTS_BASE_ROUTE + COUNTRIES
+        + SEP + COLON + ID_COUNTRY + SEP + STATES + SEP + COLON + ID_STATE;
+    public static final String API_FETCH_PERF_REPORT_BY_GROUP =
+        API_REPORTS_BASE_ROUTE + GROUPS + SEP + COLON + ID_GROUP;
+    public static final String API_FETCH_PERF_REPORT_BY_SCHOOL =
+        API_REPORTS_BASE_ROUTE + SCHOOLS + SEP + COLON + ID_SCHOOL;
+    
     private Route() {
       throw new AssertionError();
     }
