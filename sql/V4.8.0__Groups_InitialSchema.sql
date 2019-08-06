@@ -27,6 +27,20 @@ CREATE TABLE school (
 
 COMMENT ON COLUMN school.tenant IS 'Even though the type of the column is text, expected value is UUID';
 
+CREATE TABLE group_school_mapping (
+	group_id bigint REFERENCES groups(id),
+	school_id bigint REFERENCES school(id),
+	UNIQUE(group_id, school_id)
+);
+
+CREATE TABLE school_class_mapping (
+	school_id bigint REFERENCES school(id),
+	class_id text NOT NULL,
+	UNIQUE(school_id, class_id)
+);
+
+COMMENT ON COLUMN school_class_mapping.class_id IS 'Even though the type of the column is text, expected value is UUID';
+
 CREATE TABLE groups (
 	id bigserial PRIMARY KEY,
 	name text NOT NULL,
@@ -55,19 +69,7 @@ CREATE TABLE group_user_acl (
 
 COMMENT ON COLUMN group_user_acl.user_id IS 'Even though the type of the column is text, expected value is UUID';
 
-CREATE TABLE group_school_mapping (
-	group_id bigint REFERENCES groups(id),
-	school_id bigint REFERENCES school(id),
-	UNIQUE(group_id, school_id)
-);
 
-CREATE TABLE school_class_mapping (
-	school_id bigint REFERENCES school(id),
-	class_id text NOT NULL,
-	UNIQUE(school_id, class_id)
-);
-
-COMMENT ON COLUMN school_class_mapping.class_id IS 'Even though the type of the column is text, expected value is UUID';
 
 
 ---- QUEUE Tables ----
@@ -192,3 +194,6 @@ CREATE TABLE group_client_data_reports (
 );
 
  CREATE INDEX group_client_data_reports_country_idx ON group_client_data_reports USING btree (country_id);
+ 
+ ALTER TABLE class_performance_data_reports ALTER COLUMN tenant DROP NOT NULL;
+ ALTER TABLE class_competency_data_reports ALTER COLUMN tenant DROP NOT NULL;
