@@ -88,17 +88,14 @@ public final class Constants {
         "mb.op.reports.class.student.summary.weekly";
     public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_DETAILED_SUMMARY_WEEKLY =
         "mb.op.reports.class.student.detailed.summary.weekly";
-<<<<<<< HEAD
     
     public static final String MSG_OP_REPORTS_GROUPS_COUNTRIES = "mb.op.reports.groups.contries.get";
     public static final String MSG_OP_REPORTS_GROUPS_BY_COUNTRY = "mb.op.reports.groups.country.get";
     public static final String MSG_OP_REPORTS_GROUPS_BY_STATE = "mb.op.reports.groups.state.get";
     public static final String MSG_OP_REPORTS_GROUPS_BY_GROUP = "mb.op.reports.groups.group.get";
     public static final String MSG_OP_REPORTS_GROUPS_BY_SCHOOL = "mb.op.reports.groups.school.get";
-=======
     public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY =
         "mb.op.reports.class.student.summary";
->>>>>>> e55a223e4c6b6846bb319e1c95036a3100b2bf01
 
     private Message() {
       throw new AssertionError();
@@ -179,15 +176,11 @@ public final class Constants {
     private static final String DETAILED = "detailed";
     private static final String GROUPS = "groups";
     private static final String ACTIVITIES = "activities";
-<<<<<<< HEAD
     private static final String COUNTRIES = "countries";
     private static final String STATES = "states";
     private static final String SCHOOLS = "schools";
     private static final String API_GROUPS_BASE_ROUTE = "/api/:version/" + GROUPS;
-=======
     private static final String WEEKLY = "weekly";
-    private static final String API_GROUPS_BASE_ROUTE = "/api/groups/:version/";
->>>>>>> e55a223e4c6b6846bb319e1c95036a3100b2bf01
 
     public static final String ID_CLASS = "classId";
     public static final String ID_GROUP = "groupId";

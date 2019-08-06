@@ -6,14 +6,11 @@ import org.gooru.groups.reports.classes.student.detailed.summary.ClassStudentDet
 import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryReportProcessor;
 import org.gooru.groups.reports.classes.student.summary.weekly.ClassStudentSummaryWeeklyReportProcessor;
 import org.gooru.groups.reports.classes.summary.ClassSummaryReportProcessor;
-<<<<<<< HEAD
 import org.gooru.groups.reports.country.perf.GroupReportByCountryProcessor;
 import org.gooru.groups.reports.fetchcountries.FetchCountriesForGroupReportProcessor;
 import org.gooru.groups.reports.group.perf.GroupReportByGroupProcessor;
 import org.gooru.groups.reports.school.perf.GroupReportBySchoolProcessor;
 import org.gooru.groups.reports.state.perf.GroupReportByStateProcessor;
-=======
->>>>>>> e55a223e4c6b6846bb319e1c95036a3100b2bf01
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
@@ -37,8 +34,6 @@ public final class MessageProcessorBuilder {
         return new ClassStudentSummaryWeeklyReportProcessor(vertx, message);
       case Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_DETAILED_SUMMARY_WEEKLY:
         return new ClassStudentDetailedSummaryProcessor(vertx, message);
-<<<<<<< HEAD
-        
       case Constants.Message.MSG_OP_REPORTS_GROUPS_COUNTRIES:
         return new FetchCountriesForGroupReportProcessor(vertx, message);
         
@@ -54,10 +49,8 @@ public final class MessageProcessorBuilder {
       case Constants.Message.MSG_OP_REPORTS_GROUPS_BY_SCHOOL:
         return new GroupReportBySchoolProcessor(vertx, message);
         
-=======
       case Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY:
         return new ClassStudentSummaryReportProcessor(vertx, message);
->>>>>>> e55a223e4c6b6846bb319e1c95036a3100b2bf01
       default:
         return null;
     }
