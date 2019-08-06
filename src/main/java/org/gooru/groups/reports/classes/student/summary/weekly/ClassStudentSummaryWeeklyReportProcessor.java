@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.classes.student.summary;
+package org.gooru.groups.reports.classes.student.summary.weekly;
 
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
@@ -15,22 +15,19 @@ import io.vertx.core.json.JsonObject;
 /**
  * @author renuka
  */
-public class ClassStudentSummaryReportProcessor implements MessageProcessor {
+public class ClassStudentSummaryWeeklyReportProcessor implements MessageProcessor {
 
   private final static Logger LOGGER =
-      LoggerFactory.getLogger(ClassStudentSummaryReportProcessor.class);
+      LoggerFactory.getLogger(ClassStudentSummaryWeeklyReportProcessor.class);
   private final Vertx vertx;
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
-  private ClassStudentSummaryService allTimeService =
+  private ClassStudentSummaryService service =
       new ClassStudentSummaryService(DBICreator.getDbiForDefaultDS(), DBICreator.getDbiForDsdbDS(),
           DBICreator.getDbiForAnalyticsDS());
-  private ClassStudentSummaryForCustomDateService customDateService =
-      new ClassStudentSummaryForCustomDateService(DBICreator.getDbiForDefaultDS(), DBICreator.getDbiForDsdbDS(),
-          DBICreator.getDbiForAnalyticsDS());
 
-  public ClassStudentSummaryReportProcessor(Vertx vertx, Message<JsonObject> message) {
+  public ClassStudentSummaryWeeklyReportProcessor(Vertx vertx, Message<JsonObject> message) {
     this.vertx = vertx;
     this.message = message;
     this.result = Future.future();
@@ -44,12 +41,7 @@ public class ClassStudentSummaryReportProcessor implements MessageProcessor {
       ClassStudentSummaryCommand command = ClassStudentSummaryCommandBuilder.build(ebMessage);
       ClassStudentSummaryBean bean = new ClassStudentSummaryBean(command);
 
-      JsonObject response = new JsonObject();
-      if (bean.getDateTill() != null) {
-        response = this.allTimeService.fetchClassStudentSummary(bean, ebMessage.getUserCdnUrl());
-      } else if (bean.getFromDate() != null && bean.getToDate() != null) {
-        response = this.customDateService.fetchClassStudentSummary(bean, ebMessage.getUserCdnUrl());
-      }
+      JsonObject response = this.service.fetchClassStudentSummary(bean, ebMessage.getUserCdnUrl());
       result.complete(MessageResponseFactory.createOkayResponse(response));
     } catch (Throwable t) {
       LOGGER.warn("exception while fetching class student summary", t);

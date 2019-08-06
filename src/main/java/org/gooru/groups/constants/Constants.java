@@ -88,12 +88,17 @@ public final class Constants {
         "mb.op.reports.class.student.summary.weekly";
     public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_DETAILED_SUMMARY_WEEKLY =
         "mb.op.reports.class.student.detailed.summary.weekly";
+<<<<<<< HEAD
     
     public static final String MSG_OP_REPORTS_GROUPS_COUNTRIES = "mb.op.reports.groups.contries.get";
     public static final String MSG_OP_REPORTS_GROUPS_BY_COUNTRY = "mb.op.reports.groups.country.get";
     public static final String MSG_OP_REPORTS_GROUPS_BY_STATE = "mb.op.reports.groups.state.get";
     public static final String MSG_OP_REPORTS_GROUPS_BY_GROUP = "mb.op.reports.groups.group.get";
     public static final String MSG_OP_REPORTS_GROUPS_BY_SCHOOL = "mb.op.reports.groups.school.get";
+=======
+    public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY =
+        "mb.op.reports.class.student.summary";
+>>>>>>> e55a223e4c6b6846bb319e1c95036a3100b2bf01
 
     private Message() {
       throw new AssertionError();
@@ -147,6 +152,7 @@ public final class Constants {
     public static final String GRADING_STATUS = "gradingStatus";
     public static final String USAGE_DATA = "usageData";
     public static final String SESSIONS_COUNT = "sessionsCount";
+    public static final String LAST_ACCESSED = "lastAccessed";
 
     private Response() {
       throw new AssertionError();
@@ -173,10 +179,15 @@ public final class Constants {
     private static final String DETAILED = "detailed";
     private static final String GROUPS = "groups";
     private static final String ACTIVITIES = "activities";
+<<<<<<< HEAD
     private static final String COUNTRIES = "countries";
     private static final String STATES = "states";
     private static final String SCHOOLS = "schools";
     private static final String API_GROUPS_BASE_ROUTE = "/api/:version/" + GROUPS;
+=======
+    private static final String WEEKLY = "weekly";
+    private static final String API_GROUPS_BASE_ROUTE = "/api/groups/:version/";
+>>>>>>> e55a223e4c6b6846bb319e1c95036a3100b2bf01
 
     public static final String ID_CLASS = "classId";
     public static final String ID_GROUP = "groupId";
@@ -202,11 +213,13 @@ public final class Constants {
         API_REPORTS_BASE_ROUTE + "ca/classes/" + COLON + ID_CLASS + SEP + ACTIVITIES;
     public static final String API_REPORTS_CLASS_SUMMARY_GET =
         API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + SUMMARY;
-    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_GET =
-        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY;
+    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_WEEKLY_GET =
+        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY + SEP + WEEKLY;
     public static final String API_REPORTS_CLASS_STUDENT_DETAILED_SUMMARY_GET =
         API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + DETAILED
             + SEP + SUMMARY;
+    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_GET =
+        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY;
 
     // Data Reports
     public static final String API_FETCH_COUNTRIES = API_REPORTS_BASE_ROUTE + COUNTRIES;

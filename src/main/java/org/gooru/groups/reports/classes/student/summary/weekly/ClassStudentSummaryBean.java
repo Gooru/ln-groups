@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.classes.student.summary;
+package org.gooru.groups.reports.classes.student.summary.weekly;
 
 import java.util.Date;
 
@@ -9,13 +9,11 @@ import java.util.Date;
 public class ClassStudentSummaryBean {
 
   private String classId;
-  private Date dateTill;
-  private Date toDate;
   private Date fromDate;
+  private Date toDate;
 
   public ClassStudentSummaryBean(ClassStudentSummaryCommand command) {
     this.classId = command.getClassId();
-    this.dateTill = command.getDateTill();
     this.fromDate = command.getFromDate();
     this.toDate = command.getToDate();
   }
@@ -28,12 +26,12 @@ public class ClassStudentSummaryBean {
     this.classId = classId;
   }
 
-  public Date getDateTill() {
-    return dateTill;
+  public Date getFromDate() {
+    return fromDate;
   }
 
-  public void setDateTill(Date dateTill) {
-    this.dateTill = dateTill;
+  public void setFromDate(Date fromDate) {
+    this.fromDate = fromDate;
   }
 
   public Date getToDate() {
@@ -42,14 +40,6 @@ public class ClassStudentSummaryBean {
 
   public void setToDate(Date toDate) {
     this.toDate = toDate;
-  }
-
-  public Date getFromDate() {
-    return fromDate;
-  }
-
-  public void setFromDate(Date fromDate) {
-    this.fromDate = fromDate;
   }
 
 }
