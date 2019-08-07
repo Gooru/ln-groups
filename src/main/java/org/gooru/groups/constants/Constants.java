@@ -94,6 +94,8 @@ public final class Constants {
     public static final String MSG_OP_REPORTS_GROUPS_BY_STATE = "mb.op.reports.groups.state.get";
     public static final String MSG_OP_REPORTS_GROUPS_BY_GROUP = "mb.op.reports.groups.group.get";
     public static final String MSG_OP_REPORTS_GROUPS_BY_SCHOOL = "mb.op.reports.groups.school.get";
+    public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY =
+        "mb.op.reports.class.student.summary";
 
     private Message() {
       throw new AssertionError();
@@ -147,6 +149,7 @@ public final class Constants {
     public static final String GRADING_STATUS = "gradingStatus";
     public static final String USAGE_DATA = "usageData";
     public static final String SESSIONS_COUNT = "sessionsCount";
+    public static final String LAST_ACCESSED = "lastAccessed";
 
     private Response() {
       throw new AssertionError();
@@ -177,6 +180,7 @@ public final class Constants {
     private static final String STATES = "states";
     private static final String SCHOOLS = "schools";
     private static final String API_GROUPS_BASE_ROUTE = "/api/:version/" + GROUPS;
+    private static final String WEEKLY = "weekly";
 
     public static final String ID_CLASS = "classId";
     public static final String ID_GROUP = "groupId";
@@ -202,11 +206,13 @@ public final class Constants {
         API_REPORTS_BASE_ROUTE + "ca/classes/" + COLON + ID_CLASS + SEP + ACTIVITIES;
     public static final String API_REPORTS_CLASS_SUMMARY_GET =
         API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + SUMMARY;
-    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_GET =
-        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY;
+    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_WEEKLY_GET =
+        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY + SEP + WEEKLY;
     public static final String API_REPORTS_CLASS_STUDENT_DETAILED_SUMMARY_GET =
         API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + DETAILED
             + SEP + SUMMARY;
+    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_GET =
+        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY;
 
     // Data Reports
     public static final String API_FETCH_COUNTRIES = API_REPORTS_BASE_ROUTE + COUNTRIES;

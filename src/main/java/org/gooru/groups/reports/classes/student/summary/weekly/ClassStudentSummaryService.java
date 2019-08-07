@@ -1,6 +1,8 @@
 
-package org.gooru.groups.reports.classes.student.summary;
+package org.gooru.groups.reports.classes.student.summary.weekly;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import org.gooru.groups.constants.Constants;
@@ -64,9 +66,14 @@ public class ClassStudentSummaryService {
         JsonObject student = fetchUserData(classMember.getUserId(), userCdnUrl);
         studentObject.put(Constants.Response.STUDENT, student);
 
-        JsonObject asOfNowData = fetchAllTimeData(bean, classMember.getUserId());
+        JsonObject summaryData = new JsonObject();
+        JsonObject weekData = fetchWeekData(bean, classMember.getUserId());
+        JsonObject allTimeData = fetchAllTimeData(bean, classMember.getUserId());
 
-        studentObject.put(Constants.Response.SUMMARY_DATA, asOfNowData);
+        summaryData.put(Constants.Response.WEEK_OF, weekData).put(Constants.Response.ALL_TIME,
+            allTimeData);
+
+        studentObject.put(Constants.Response.SUMMARY_DATA, summaryData);
         studentSummary.add(studentObject);
       }
     }
@@ -107,39 +114,53 @@ public class ClassStudentSummaryService {
   }
 
   private JsonObject fetchAllTimeData(ClassStudentSummaryBean bean, String userId) {
-    JsonObject asOfNowData = new JsonObject();
-    generateWeeklyCompetencyStats(bean, userId, asOfNowData);
+    JsonObject allTimeData = new JsonObject();
+    Date currentDate = Calendar.getInstance().getTime();
+    generateAllTimeCompetencyStats(bean, userId, allTimeData, currentDate);
+
+    allTimeData.put(Constants.Response.AS_ON, Constants.Params.DATE_FORMAT.format(currentDate));
+    return allTimeData;
+  }
+
+  private JsonObject fetchWeekData(ClassStudentSummaryBean bean, String userId) {
+    JsonObject weekData = new JsonObject();
+    generateWeeklyCompetencyStats(bean, userId, weekData);
 
     JsonObject suggestions = new JsonObject();
     JsonObject interactions = new JsonObject();
 
     List<StudentItemInteraction> studentAssessmentSuggestionInteraction =
-        this.studentInteractionDao.fetchAssessmentSuggestionInteraction(bean.getClassId(),
-            userId, bean.getDateTill());
+        this.studentInteractionDao.fetchAssessmentSuggestionInteractionInWeek(bean.getClassId(),
+            userId, bean.getFromDate(), bean.getToDate());
     fetchItemInteractionStats(studentAssessmentSuggestionInteraction, suggestions);
 
     List<StudentItemInteraction> studentAssessmentInteraction =
-        this.studentInteractionDao.fetchAssessmentInteraction(bean.getClassId(), userId,
-            bean.getDateTill());
+        this.studentInteractionDao.fetchAssessmentInteractionInWeek(bean.getClassId(), userId,
+            bean.getFromDate(), bean.getToDate());
     fetchItemInteractionStats(studentAssessmentInteraction, interactions);
 
     List<StudentItemInteraction> studentCollectionSuggestionInteraction =
-        this.studentInteractionDao.fetchCollectionSuggestionInteraction(bean.getClassId(),
-            userId, bean.getDateTill());
+        this.studentInteractionDao.fetchCollectionSuggestionInteractionInWeek(bean.getClassId(),
+            userId, bean.getFromDate(), bean.getToDate());
     fetchItemInteractionStats(studentCollectionSuggestionInteraction, suggestions);
 
     List<StudentItemInteraction> studentCollectionInteraction =
-        this.studentInteractionDao.fetchCollectionInteraction(bean.getClassId(), userId,
-            bean.getDateTill());
+        this.studentInteractionDao.fetchCollectionInteractionInWeek(bean.getClassId(), userId,
+            bean.getFromDate(), bean.getToDate());
     fetchItemInteractionStats(studentCollectionInteraction, interactions);
 
-    String lastAccessedDate = this.studentInteractionDao.fetchLastInteractionDate(bean.getClassId(), userId);
-    asOfNowData
-        .put(Constants.Response.LAST_ACCESSED, lastAccessedDate != null ? lastAccessedDate.toString() : null)
-        .put(Constants.Response.END_DATE, Constants.Params.DATE_FORMAT.format(bean.getDateTill()))
+    String lastAccessedDate = this.studentInteractionDao.fetchLastInteractionDate(bean.getClassId(),
+        userId, bean.getFromDate(), bean.getToDate());
+
+    weekData.put(Constants.Response.LAST_ACCESSED,
+        lastAccessedDate != null ? lastAccessedDate.toString() : null);
+
+    weekData
+        .put(Constants.Response.START_DATE, Constants.Params.DATE_FORMAT.format(bean.getFromDate()))
+        .put(Constants.Response.END_DATE, Constants.Params.DATE_FORMAT.format(bean.getToDate()))
         .put(Constants.Response.SUGGESTIONS, suggestions)
         .put(Constants.Response.INTERACTIONS, interactions);
-    return asOfNowData;
+    return weekData;
   }
 
   private JsonObject fetchItemInteractionStats(List<StudentItemInteraction> interactedItems,
@@ -161,7 +182,7 @@ public class ClassStudentSummaryService {
   private void generateWeeklyCompetencyStats(ClassStudentSummaryBean bean, String userId,
       JsonObject weekData) {
     List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesTillNow(bean.getClassId(), userId, bean.getDateTill());
+        .fetchCompetenciesInWeek(bean.getClassId(), userId, bean.getFromDate(), bean.getToDate());
     JsonArray masteredCompetencyList = new JsonArray();
     JsonArray completedCompetencyList = new JsonArray();
     JsonArray inferredCompetencyList = new JsonArray();
@@ -173,6 +194,22 @@ public class ClassStudentSummaryService {
         .put(Constants.Response.INFERRED, inferredCompetencyList)
         .put(Constants.Response.IN_PROGRESS, inprogressCompetencyList);
 
+  }
+
+  private void generateAllTimeCompetencyStats(ClassStudentSummaryBean bean, String userId,
+      JsonObject allTimeData, Date currentDate) {
+    List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
+        .fetchCompetenciesTillNow(bean.getClassId(), userId, currentDate);
+    JsonArray masteredCompetencyList = new JsonArray();
+    JsonArray completedCompetencyList = new JsonArray();
+    JsonArray inferredCompetencyList = new JsonArray();
+    JsonArray inprogressCompetencyList = new JsonArray();
+    aggregateCompetencyPerfPerStatus(studentCompetencyStudyStatus, masteredCompetencyList,
+        completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
+    allTimeData.put(Constants.Response.MASTERED, masteredCompetencyList.size())
+        .put(Constants.Response.COMPLETED, completedCompetencyList.size())
+        .put(Constants.Response.INFERRED, inferredCompetencyList.size())
+        .put(Constants.Response.IN_PROGRESS, inprogressCompetencyList.size());
   }
 
   private void aggregateCompetencyPerfPerStatus(

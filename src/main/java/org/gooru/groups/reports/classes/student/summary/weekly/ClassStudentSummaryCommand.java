@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.classes.student.summary;
+package org.gooru.groups.reports.classes.student.summary.weekly;
 
 import java.util.Date;
 
@@ -11,12 +11,10 @@ public class ClassStudentSummaryCommand {
   private String classId;
   private Date fromDate;
   private Date toDate;
-  private Date dateTill;
 
-  public ClassStudentSummaryCommand(String classId, Date fromDate, Date toDate, Date dateTill) {
+  public ClassStudentSummaryCommand(String classId, Date fromDate, Date toDate) {
     super();
     this.classId = classId;
-    this.dateTill = dateTill;
     this.fromDate = fromDate;
     this.toDate = toDate;
   }
@@ -25,14 +23,10 @@ public class ClassStudentSummaryCommand {
     return classId;
   }
 
-  public Date getDateTill() {
-    return dateTill;
-  }
-  
   public Date getFromDate() {
     return fromDate;
   }
-  
+
   public Date getToDate() {
     return toDate;
   }

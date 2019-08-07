@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
@@ -46,92 +45,81 @@ public final class ClassStudentSummaryCommandBuilder {
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
           RESOURCE_BUNDLE.getString("invalid.classid.format"));
     }
-
-    // It's decided not to fall back on the current week if the input is invalid or not
-    // present.
-
-    // If requested week is not valid week (sun-sat), return bad request
-    if (!(isFirstDayOfWeek(command.getFromDate()) && isLastDayOfWeek(command.getToDate())
-        && hasSixDaysBetween(command.getFromDate(), command.getToDate()))) {
-      LOGGER.warn("Invalid date requested");
-      throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-          RESOURCE_BUNDLE.getString("invalid.date.format"));
-    }
-
-    if (!isValidFromDate(command.getFromDate())) {
-      LOGGER.warn("trying to fetch report for future date");
-      throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-          RESOURCE_BUNDLE.getString("future.week"));
+        
+    if (command.getFromDate() != null && command.getToDate() != null) {
+      if (!isValidFromAndToDate(command.getFromDate(), command.getToDate())) {
+        LOGGER.warn("Invalid date range requested");
+        throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+            RESOURCE_BUNDLE.getString("invalid.date.range"));
+      }
     }
   }
 
   private static ClassStudentSummaryCommand buildFromJson(JsonObject request) {
     String classId = request.getString("classId");
+    String dateTill = request.getString("dateTill");
     String fromDate = request.getString("fromDate");
     String toDate = request.getString("toDate");
 
-    if (fromDate == null || toDate == null) {
-      LOGGER.warn("Missing Date");
-      throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-          RESOURCE_BUNDLE.getString("missing.date"));
-    }
-
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    Date fDate;
-    Date tDate;
-    try {
-      fDate = simpleDateFormat.parse(fromDate);
-      tDate = simpleDateFormat.parse(toDate);
-    } catch (Exception e) {
-      LOGGER.warn("Invalid date requested");
-      throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-          RESOURCE_BUNDLE.getString("invalid.date.format"));
+    Date fDate = null;
+    Date tDate = null;
+    Date tillDate = null;
+    if (fromDate != null && toDate != null) {
+      try {
+        fDate = simpleDateFormat.parse(fromDate);
+        tDate = simpleDateFormat.parse(toDate);
+      } catch (Exception e) {
+        LOGGER.warn("Invalid date requested");
+        throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+            RESOURCE_BUNDLE.getString("invalid.date.format"));
+      }
+    } else if (dateTill != null){
+      try {
+        tillDate = simpleDateFormat.parse(dateTill);
+      } catch (Exception e) {
+        LOGGER.warn("Invalid date requested");
+        throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+            RESOURCE_BUNDLE.getString("invalid.date.format"));
+      }
+    } else {
+      tillDate = Calendar.getInstance().getTime();
+    } 
+
+    if (tillDate != null && !isValidDate(tillDate)) {
+      tillDate = Calendar.getInstance().getTime();
     }
-    return new ClassStudentSummaryCommand(classId, fDate, tDate);
+    return new ClassStudentSummaryCommand(classId, fDate, tDate, tillDate);
   }
 
-  private static Boolean isFirstDayOfWeek(Date requestedDate) {
-    Boolean isValidWeek = false;
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(requestedDate);
-    int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-    if (dayOfWeek == 1) {
-      isValidWeek = true;
-    }
-    return isValidWeek;
-  }
-
-  private static Boolean isLastDayOfWeek(Date requestedDate) {
-    Boolean isValidWeek = false;
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(requestedDate);
-    int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-    if (dayOfWeek == 7) {
-      isValidWeek = true;
-    }
-    return isValidWeek;
-  }
-
-  private static Boolean isValidFromDate(Date requestedDate) {
+  private static Boolean isValidDate(Date requestedDate) {
     Boolean isValidDate = true;
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(requestedDate);
     LocalDate reqDate = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
         calendar.get(Calendar.DAY_OF_MONTH));
     LocalDate now = LocalDate.now();
-    if (!reqDate.isEqual(now) && reqDate.isAfter(now)) {
+    if (reqDate.isAfter(now)) {
       isValidDate = false;
     }
     return isValidDate;
   }
-
-  private static Boolean hasSixDaysBetween(Date d1, Date d2) {
-    Boolean isValidWeek = false;
-    long diff = d2.getTime() - d1.getTime();
-    if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) == 6) {
-      isValidWeek = true;
+  
+  private static Boolean isValidFromAndToDate(Date fromDate, Date toDate) {
+    Boolean isValidDate = true;
+    Calendar fromCalendar = Calendar.getInstance();
+    fromCalendar.setTime(fromDate);
+    LocalDate reqFromDate = LocalDate.of(fromCalendar.get(Calendar.YEAR), fromCalendar.get(Calendar.MONTH) + 1,
+        fromCalendar.get(Calendar.DAY_OF_MONTH));
+    Calendar toCalendar = Calendar.getInstance();
+    toCalendar.setTime(toDate);
+    LocalDate reqToDate = LocalDate.of(toCalendar.get(Calendar.YEAR), toCalendar.get(Calendar.MONTH) + 1,
+        toCalendar.get(Calendar.DAY_OF_MONTH));
+    LocalDate now = LocalDate.now();
+    if (reqFromDate.isAfter(now) || reqToDate.isBefore(reqFromDate)) {
+      isValidDate = false;
     }
-    return isValidWeek;
+    return isValidDate;
   }
 
 }
