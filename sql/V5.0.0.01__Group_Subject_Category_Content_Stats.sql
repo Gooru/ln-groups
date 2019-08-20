@@ -40,9 +40,9 @@ CREATE TABLE group_client_content_usage_reports
 	  partner text,
 	  created_at timestamp without time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
 	  updated_at timestamp without time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
-	  CONSTRAINT gccdr_pkey PRIMARY KEY (id),
-	  CONSTRAINT gccdr_content_type_check CHECK (((content_type)::text = ANY (ARRAY['assessment'::text, 'collection'::text, 'assessment-external'::text, 'question'::text, 'resource'::text, 'collection-external'::text, 'offline-activity'::text, 'course'::text]))),
-	  CONSTRAINT gccdr_country_id_fkey FOREIGN KEY (country_id)
+	  CONSTRAINT gccur_pkey PRIMARY KEY (id),
+	  CONSTRAINT gccur_content_type_check CHECK (((content_type)::text = ANY (ARRAY['assessment'::text, 'collection'::text, 'assessment-external'::text, 'question'::text, 'resource'::text, 'collection-external'::text, 'offline-activity'::text, 'course'::text]))),
+	  CONSTRAINT gccur_country_id_fkey FOREIGN KEY (country_id)
 	      REFERENCES public.country (id) MATCH SIMPLE
 	      ON UPDATE NO ACTION ON DELETE NO ACTION
 );
