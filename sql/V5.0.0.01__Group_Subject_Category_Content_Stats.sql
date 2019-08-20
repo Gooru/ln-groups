@@ -8,6 +8,7 @@ CREATE TABLE group_client_subject_data_reports
 	  month integer,
 	  year integer,
 	  tenant text,
+	  tenant_root text,
 	  partner text,
 	  created_at timestamp without time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
 	  updated_at timestamp without time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
@@ -27,6 +28,7 @@ CREATE TABLE group_client_content_data_reports
 	  month integer,
 	  year integer,
 	  tenant text,
+	  tenant_root text,
 	  partner text,
 	  created_at timestamp without time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
 	  updated_at timestamp without time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
@@ -37,3 +39,4 @@ CREATE TABLE group_client_content_data_reports
 	      ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+ALTER TABLE group_client_data_reports  ADD COLUMN tenant_root text;
