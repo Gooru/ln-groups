@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import org.gooru.groups.app.jdbi.PGArrayUtils;
 import org.gooru.groups.constants.Constants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
 import org.gooru.groups.constants.StatusConstants;
@@ -181,8 +182,10 @@ public class ClassStudentSummaryService {
 
   private void generateWeeklyCompetencyStats(ClassStudentSummaryBean bean, String userId,
       JsonObject weekData) {
+    List<String> compCodes = this.classSummaryMasterydao
+        .fetchCompetenciesInWeek(bean.getClassId(), userId, bean.getFromDate(), bean.getToDate());
     List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesInWeek(userId, bean.getFromDate(), bean.getToDate());
+    .fetchCompetenciesStatus(userId, PGArrayUtils.convertFromListStringToSqlArrayOfString(compCodes));
     JsonArray masteredCompetencyList = new JsonArray();
     JsonArray completedCompetencyList = new JsonArray();
     JsonArray inferredCompetencyList = new JsonArray();
@@ -198,8 +201,10 @@ public class ClassStudentSummaryService {
 
   private void generateAllTimeCompetencyStats(ClassStudentSummaryBean bean, String userId,
       JsonObject allTimeData, Date currentDate) {
+    List<String> compCodes = this.classSummaryMasterydao
+        .fetchCompetenciesTillNow(bean.getClassId(), userId, currentDate);
     List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesTillNow(userId, currentDate);
+    .fetchCompetenciesStatus(userId, PGArrayUtils.convertFromListStringToSqlArrayOfString(compCodes));
     JsonArray masteredCompetencyList = new JsonArray();
     JsonArray completedCompetencyList = new JsonArray();
     JsonArray inferredCompetencyList = new JsonArray();

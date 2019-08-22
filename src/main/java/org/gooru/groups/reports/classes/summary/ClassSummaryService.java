@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import org.gooru.groups.app.jdbi.PGArrayUtils;
 import org.gooru.groups.constants.Constants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
 import org.gooru.groups.constants.StatusConstants;
@@ -106,8 +107,10 @@ public class ClassSummaryService {
     JsonObject allTimeData = new JsonObject();
     Date currentDate = Calendar.getInstance().getTime();
 
-    List<CompetencyStatus> studentCompetencyStudyStatus =
-        this.classSummaryMasterydao.fetchCompetenciesTillNow(currentDate);
+    List<String> compCodes = this.classSummaryMasterydao
+        .fetchCompetenciesTillNow(bean.getClassId(), currentDate);
+    List<CompetencyStatus> studentCompetencyStudyStatus = this.classSummaryMasterydao
+    .fetchCompetenciesStatus(PGArrayUtils.convertFromListStringToSqlArrayOfString(compCodes));
     aggregateCompetenciesPerStatus(studentCompetencyStudyStatus, allTimeData);
 
     allTimeData.put(Constants.Response.AS_ON, Constants.Params.DATE_FORMAT.format(currentDate));
@@ -117,8 +120,10 @@ public class ClassSummaryService {
   private JsonObject fetchWeekData(ClassSummaryBean bean) {
     JsonObject weekData = new JsonObject();
 
-    List<CompetencyStatus> studentCompetencyStudyStatus =
-        this.classSummaryMasterydao.fetchCompetenciesInWeek(bean);
+    List<String> compCodes = this.classSummaryMasterydao
+        .fetchCompetenciesInWeek(bean);
+    List<CompetencyStatus> studentCompetencyStudyStatus = this.classSummaryMasterydao
+    .fetchCompetenciesStatus(PGArrayUtils.convertFromListStringToSqlArrayOfString(compCodes));
     aggregateCompetenciesPerStatus(studentCompetencyStudyStatus, weekData);
 
     StudentItemInteraction contentInteractionStats =

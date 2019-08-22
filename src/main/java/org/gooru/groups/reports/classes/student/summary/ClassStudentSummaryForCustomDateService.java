@@ -3,6 +3,7 @@ package org.gooru.groups.reports.classes.student.summary;
 
 import java.util.List;
 import java.util.ResourceBundle;
+import org.gooru.groups.app.jdbi.PGArrayUtils;
 import org.gooru.groups.constants.Constants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
 import org.gooru.groups.constants.StatusConstants;
@@ -165,8 +166,10 @@ public class ClassStudentSummaryForCustomDateService {
 
   private void generateCompetencyStats(ClassStudentSummaryBean bean, String userId,
       JsonObject usageSummaryData) {
+    List<String> compCodes = this.classSummaryMasterydao
+        .fetchCompetenciesInAPeriod(bean.getClassId(), userId, bean.getFromDate(), bean.getToDate());
     List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesInAPeriod(userId, bean.getFromDate(), bean.getToDate());
+        .fetchCompetenciesStatus(userId, PGArrayUtils.convertFromListStringToSqlArrayOfString(compCodes));
     JsonArray masteredCompetencyList = new JsonArray();
     JsonArray completedCompetencyList = new JsonArray();
     JsonArray inferredCompetencyList = new JsonArray();

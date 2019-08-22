@@ -3,6 +3,7 @@ package org.gooru.groups.reports.classes.student.summary;
 
 import java.util.List;
 import java.util.ResourceBundle;
+import org.gooru.groups.app.jdbi.PGArrayUtils;
 import org.gooru.groups.constants.Constants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
 import org.gooru.groups.constants.StatusConstants;
@@ -108,7 +109,7 @@ public class ClassStudentSummaryService {
 
   private JsonObject fetchAllTimeData(ClassStudentSummaryBean bean, String userId) {
     JsonObject asOfNowData = new JsonObject();
-    generateWeeklyCompetencyStats(bean, userId, asOfNowData);
+    generateAllTimeCompetencyStats(bean, userId, asOfNowData);
 
     JsonObject suggestions = new JsonObject();
     JsonObject interactions = new JsonObject();
@@ -158,10 +159,12 @@ public class ClassStudentSummaryService {
     return interactions;
   }
 
-  private void generateWeeklyCompetencyStats(ClassStudentSummaryBean bean, String userId,
+  private void generateAllTimeCompetencyStats(ClassStudentSummaryBean bean, String userId,
       JsonObject weekData) {
+    List<String> compCodes = this.classSummaryMasterydao
+        .fetchCompetenciesTillNow(bean.getClassId(), userId, bean.getDateTill());
     List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesTillNow(userId, bean.getDateTill());
+    .fetchCompetenciesStatus(userId, PGArrayUtils.convertFromListStringToSqlArrayOfString(compCodes));
     JsonArray masteredCompetencyList = new JsonArray();
     JsonArray completedCompetencyList = new JsonArray();
     JsonArray inferredCompetencyList = new JsonArray();
