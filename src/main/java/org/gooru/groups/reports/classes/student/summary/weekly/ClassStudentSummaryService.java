@@ -182,7 +182,7 @@ public class ClassStudentSummaryService {
   private void generateWeeklyCompetencyStats(ClassStudentSummaryBean bean, String userId,
       JsonObject weekData) {
     List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesInWeek(bean.getClassId(), userId, bean.getFromDate(), bean.getToDate());
+        .fetchCompetenciesInWeek(userId, bean.getFromDate(), bean.getToDate());
     JsonArray masteredCompetencyList = new JsonArray();
     JsonArray completedCompetencyList = new JsonArray();
     JsonArray inferredCompetencyList = new JsonArray();
@@ -199,7 +199,7 @@ public class ClassStudentSummaryService {
   private void generateAllTimeCompetencyStats(ClassStudentSummaryBean bean, String userId,
       JsonObject allTimeData, Date currentDate) {
     List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesTillNow(bean.getClassId(), userId, currentDate);
+        .fetchCompetenciesTillNow(userId, currentDate);
     JsonArray masteredCompetencyList = new JsonArray();
     JsonArray completedCompetencyList = new JsonArray();
     JsonArray inferredCompetencyList = new JsonArray();

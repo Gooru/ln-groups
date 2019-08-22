@@ -166,7 +166,7 @@ public class ClassStudentSummaryForCustomDateService {
   private void generateCompetencyStats(ClassStudentSummaryBean bean, String userId,
       JsonObject usageSummaryData) {
     List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesInAPeriod(bean.getClassId(), userId, bean.getFromDate(), bean.getToDate());
+        .fetchCompetenciesInAPeriod(userId, bean.getFromDate(), bean.getToDate());
     JsonArray masteredCompetencyList = new JsonArray();
     JsonArray completedCompetencyList = new JsonArray();
     JsonArray inferredCompetencyList = new JsonArray();

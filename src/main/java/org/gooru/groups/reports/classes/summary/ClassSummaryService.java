@@ -107,7 +107,7 @@ public class ClassSummaryService {
     Date currentDate = Calendar.getInstance().getTime();
 
     List<CompetencyStatus> studentCompetencyStudyStatus =
-        this.classSummaryMasterydao.fetchCompetenciesTillNow(bean.getClassId(), currentDate);
+        this.classSummaryMasterydao.fetchCompetenciesTillNow(currentDate);
     aggregateCompetenciesPerStatus(studentCompetencyStudyStatus, allTimeData);
 
     allTimeData.put(Constants.Response.AS_ON, Constants.Params.DATE_FORMAT.format(currentDate));

@@ -14,11 +14,11 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 public interface CompetencyStatusDao {
 
   @Mapper(CompetencyStatusMapper.class)
-  @SqlQuery("select distinct on (gut_code, status) gut_code, status from learner_profile_competency_evidence_ts where status IN (1,2,4,5) and cast(created_at as date) BETWEEN :fromDate AND :toDate and class_id =:classId  order by gut_code, status asc")
+  @SqlQuery("select gut_code, status from learner_profile_competency_status where status IN (1,2,4,5) and cast(created_at as date) BETWEEN :fromDate AND :toDate  order by gut_code, status asc")
   List<CompetencyStatus> fetchCompetenciesInWeek(@BindBean ClassSummaryBean bean);
   
   @Mapper(CompetencyStatusMapper.class)
-  @SqlQuery("select distinct on (gut_code, status) gut_code, status  from learner_profile_competency_evidence_ts where status IN (1,2,4,5) and cast(created_at as date) <= :now and class_id =:classId  order by gut_code, status asc")
-  List<CompetencyStatus> fetchCompetenciesTillNow(@Bind("classId") String classId, @Bind("now") Date now);
+  @SqlQuery("select gut_code, status  from learner_profile_competency_status where status IN (1,2,4,5) and cast(created_at as date) <= :now order by gut_code, status asc")
+  List<CompetencyStatus> fetchCompetenciesTillNow(@Bind("now") Date now);
   
 }
