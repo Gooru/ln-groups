@@ -6,8 +6,6 @@ package org.gooru.groups.reports.dbhelpers;
  */
 public class PerformanceAndTSReportByCountryModel {
   private Long stateId;
-  private String name;
-  private String code;
   private Long timespent;
   private Double performance;
 
@@ -17,22 +15,6 @@ public class PerformanceAndTSReportByCountryModel {
 
   public void setStateId(Long stateId) {
     this.stateId = stateId;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
   }
 
   public Long getTimespent() {

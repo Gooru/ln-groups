@@ -1,34 +1,33 @@
 
-package org.gooru.groups.reports.perfcountry;
+package org.gooru.groups.reports.perf.group;
 
 import java.util.List;
 
 /**
- * @author szgooru Created On 19-Mar-2019
+ * @author szgooru Created On 20-Mar-2019
  */
-public class GroupPerfReportByCountryResponseModel {
-  private List<StateLevelPerf> data;
+public class GroupPerfReportByClusterResponseModel {
+  private List<ClusterResponseModel> data;
 
-  public List<StateLevelPerf> getData() {
+  public List<ClusterResponseModel> getData() {
     return data;
   }
 
-  public void setData(List<StateLevelPerf> data) {
+  public void setData(List<ClusterResponseModel> data) {
     this.data = data;
   }
 
-  static class StateLevelPerf {
+  static class ClusterResponseModel {
     private Long id;
     private String name;
     private String code;
     private String type;
     private String subType;
-
     private Long timespent;
     private Double performance;
     private Long completedCompetencies;
     private Long inprogressCompetencies;
-    
+
     public Long getId() {
       return id;
     }
@@ -36,7 +35,7 @@ public class GroupPerfReportByCountryResponseModel {
     public void setId(Long id) {
       this.id = id;
     }
-    
+
     public String getName() {
       return name;
     }
@@ -100,6 +99,6 @@ public class GroupPerfReportByCountryResponseModel {
     public void setInprogressCompetencies(Long inprogressCompetencies) {
       this.inprogressCompetencies = inprogressCompetencies;
     }
-    
+
   }
 }

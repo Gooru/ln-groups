@@ -4,17 +4,17 @@ package org.gooru.groups.reports.dbhelpers;
 /**
  * @author szgooru Created On 20-Mar-2019
  */
-public class PerformanceAndTSReportByGroupModel {
-  private Long groupId;
+public class PerformanceAndTSReportByClusterModel {
+  private Long schoolId;
   private Long timespent;
   private Double performance;
 
-  public Long getGroupId() {
-    return groupId;
+  public Long getSchoolId() {
+    return schoolId;
   }
 
-  public void setGroupId(Long groupId) {
-    this.groupId = groupId;
+  public void setSchoolId(Long schoolId) {
+    this.schoolId = schoolId;
   }
 
   public Long getTimespent() {

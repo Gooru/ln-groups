@@ -7,11 +7,11 @@ import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryRepor
 import org.gooru.groups.reports.classes.student.summary.weekly.ClassStudentSummaryWeeklyReportProcessor;
 import org.gooru.groups.reports.classes.summary.ClassSummaryReportProcessor;
 import org.gooru.groups.reports.fetchcountries.FetchCountriesForGroupReportProcessor;
+import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryProcessor;
 import org.gooru.groups.reports.perf.fetchsubject.country.FetchSubjectsForPerfReportByCountryProcessor;
-import org.gooru.groups.reports.perf.group.GroupReportByGroupProcessor;
-import org.gooru.groups.reports.perf.school.GroupReportBySchoolProcessor;
-import org.gooru.groups.reports.perf.state.GroupReportByStateProcessor;
-import org.gooru.groups.reports.perfcountry.GroupPerfReportByCountryProcessor;
+import org.gooru.groups.reports.perf.group.GroupPerfReportByGroupProcessor;
+import org.gooru.groups.reports.perf.school.GroupPerfReportBySchoolProcessor;
+import org.gooru.groups.reports.perf.state.GroupPerfReportByStateProcessor;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
@@ -45,13 +45,13 @@ public final class MessageProcessorBuilder {
         return new GroupPerfReportByCountryProcessor(vertx, message);
         
       case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_STATE:
-        return new GroupReportByStateProcessor(vertx, message);
+        return new GroupPerfReportByStateProcessor(vertx, message);
         
       case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_GROUP:
-        return new GroupReportByGroupProcessor(vertx, message);
+        return new GroupPerfReportByGroupProcessor(vertx, message);
         
       case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_SCHOOL:
-        return new GroupReportBySchoolProcessor(vertx, message);
+        return new GroupPerfReportBySchoolProcessor(vertx, message);
         
       case Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY:
         return new ClassStudentSummaryReportProcessor(vertx, message);

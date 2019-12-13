@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.perfcountry;
+package org.gooru.groups.reports.perf.country;
 
 import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.constants.HttpConstants;

@@ -9,14 +9,14 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
 /**
  * @author szgooru Created On 20-Mar-2019
  */
-public class PerformanceAndTSReportByGroupModelMapper
-    implements ResultSetMapper<PerformanceAndTSReportByGroupModel> {
+public class PerformanceAndTSReportByClusterModelMapper
+    implements ResultSetMapper<PerformanceAndTSReportByClusterModel> {
 
   @Override
-  public PerformanceAndTSReportByGroupModel map(int index, ResultSet r, StatementContext ctx)
+  public PerformanceAndTSReportByClusterModel map(int index, ResultSet r, StatementContext ctx)
       throws SQLException {
-    PerformanceAndTSReportByGroupModel model = new PerformanceAndTSReportByGroupModel();
-    model.setGroupId(r.getLong("group_id"));
+    PerformanceAndTSReportByClusterModel model = new PerformanceAndTSReportByClusterModel();
+    model.setSchoolId(r.getLong("school_id"));
     model.setTimespent(r.getLong("collection_ts"));
     model.setPerformance(r.getDouble("assessment_perf"));
     return model;
