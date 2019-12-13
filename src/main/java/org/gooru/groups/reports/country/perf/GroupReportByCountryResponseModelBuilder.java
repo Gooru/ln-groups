@@ -22,7 +22,7 @@ public class GroupReportByCountryResponseModelBuilder {
       stateLevelPerfs.add(buildStateLevelPerfObject(perf, state));
     });
 
-    responseModel.setStates(stateLevelPerfs);
+    responseModel.setData(stateLevelPerfs);
     return responseModel;
   }
 
@@ -32,8 +32,12 @@ public class GroupReportByCountryResponseModelBuilder {
     stateLevelPerf.setId(perf.getStateId());
     stateLevelPerf.setName(state.getName());
     stateLevelPerf.setCode(state.getCode());
+    stateLevelPerf.setType("state");
+    stateLevelPerf.setSubType(null);
     stateLevelPerf.setTimespent(perf.getTimespent());
     stateLevelPerf.setPerformance(perf.getPerformance());
+    stateLevelPerf.setCompletedCompetencies(0l);
+    stateLevelPerf.setInprogressCompetencies(0l);
     return stateLevelPerf;
   }
 }
