@@ -49,8 +49,8 @@ public class GroupReportByCountryProcessor implements MessageProcessor {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
 
       // User role authorization
-      AuthorizerBuilder.buildGroupReportAuthorizer(
-          ebMessage.getSession().getString(Constants.Message.MSG_USER_ID)).authorize();
+      //AuthorizerBuilder.buildGroupReportAuthorizer(
+      //    ebMessage.getSession().getString(Constants.Message.MSG_USER_ID)).authorize();
 
       // Build command object and validate input data
       GroupReportByCountryCommand command =
