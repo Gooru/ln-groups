@@ -3,6 +3,7 @@ package org.gooru.groups.reports.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -65,6 +66,10 @@ public final class CollectionUtils {
   
   public static PGArray<Integer> convertToSqlArrayOfInteger(List<Integer> input) {
     return PGArray.arrayOf(Integer.class, input);
+  }
+  
+  public static PGArray<Long> convertToSqlArrayOfLong(Collection<Long> input) {
+    return PGArray.arrayOf(Long.class, input);
   }
 
   public static PGArray<String> convertToSqlArrayOfString(Set<String> input) {

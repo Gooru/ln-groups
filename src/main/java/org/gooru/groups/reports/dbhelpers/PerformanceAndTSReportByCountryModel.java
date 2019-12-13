@@ -5,17 +5,17 @@ package org.gooru.groups.reports.dbhelpers;
  * @author szgooru Created On 20-Mar-2019
  */
 public class PerformanceAndTSReportByCountryModel {
-  private Integer stateId;
+  private Long stateId;
   private String name;
   private String code;
   private Long timespent;
   private Double performance;
 
-  public Integer getStateId() {
+  public Long getStateId() {
     return stateId;
   }
 
-  public void setStateId(Integer stateId) {
+  public void setStateId(Long stateId) {
     this.stateId = stateId;
   }
 

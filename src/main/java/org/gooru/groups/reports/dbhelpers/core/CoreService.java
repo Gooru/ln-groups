@@ -1,6 +1,10 @@
 package org.gooru.groups.reports.dbhelpers.core;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.gooru.groups.reports.dbhelpers.StateModel;
 import org.gooru.groups.reports.utils.CollectionUtils;
 import org.skife.jdbi.v2.DBI;
 
@@ -16,6 +20,7 @@ public class CoreService {
   private final CoreLessonDao lessonDao;
   private final CoreCollectionDao collectionDao;
   private final CoreUserDao userDao;
+  private final CoreDao coreDao;
 
   public CoreService(DBI dbi) {
     this.classDao = dbi.onDemand(CoreClassDao.class);
@@ -25,12 +30,13 @@ public class CoreService {
     this.lessonDao = dbi.onDemand(CoreLessonDao.class);
     this.collectionDao = dbi.onDemand(CoreCollectionDao.class);
     this.userDao = dbi.onDemand(CoreUserDao.class);
+    this.coreDao = dbi.onDemand(CoreDao.class);
   }
 
   public ClassModel fetchClass(String classId) {
     return this.classDao.fetchClass(classId);
   }
-  
+
   public List<ClassTitleModel> fetchClassTitles(List<String> classIds) {
     return this.classDao.fetchClassTitles(CollectionUtils.convertToSqlArrayOfUUID(classIds));
   }
@@ -50,7 +56,7 @@ public class CoreService {
   public String fetchCollectionTitleByLessonId(String collectionId, String lessonId) {
     return this.collectionDao.fetchCollectionByLessonId(collectionId, lessonId);
   }
-  
+
   public String fetchCollectionTitle(String collectionId) {
     return this.collectionDao.fetchCollection(collectionId);
   }
@@ -65,5 +71,15 @@ public class CoreService {
 
   public List<CompetencyModel> findCompetenciesForCollection(String collectionId) {
     return this.collectionDao.findCompetenciesForCollection(collectionId);
+  }
+
+  public Map<Long, StateModel> fetchStateDetails(Set<Long> stateIds) {
+    Map<Long, StateModel> stateModelMap = new HashMap<>();
+    List<StateModel> stateModels =
+        this.coreDao.fetchStateDetails(CollectionUtils.convertToSqlArrayOfLong(stateIds));
+    stateModels.forEach(state -> {
+      stateModelMap.put(state.getId(), state);
+    });
+    return stateModelMap;
   }
 }

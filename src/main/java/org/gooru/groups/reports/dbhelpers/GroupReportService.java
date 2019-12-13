@@ -34,8 +34,13 @@ public class GroupReportService {
     return this.reportDao.fetchPerformanceAndTSReportByState(bean, tenant);
   }
 
-  public List<PerformanceAndTSReportByCountryModel> fetchPerformanceAndTSReportByCountry(
-      GroupReportByCountryCommand.GroupReportByCountryCommandBean bean, String tenant) {
-    return this.reportDao.fetchPerformanceAndTSReportByCountry(bean, tenant);
+  public List<PerformanceAndTSReportByCountryModel> fetchPerformanceAndTSMonthReportByCountry(
+      GroupReportByCountryCommand.GroupReportByCountryCommandBean bean) {
+    return this.reportDao.fetchPerformanceAndTSMonthReportByCountry(bean);
+  }
+  
+  public List<PerformanceAndTSReportByCountryModel> fetchPerformanceAndTSWeekReportByCountry(
+      GroupReportByCountryCommand.GroupReportByCountryCommandBean bean) {
+    return this.reportDao.fetchPerformanceAndTSWeekReportByCountry(bean);
   }
 }

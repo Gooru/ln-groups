@@ -66,7 +66,6 @@ public class GroupReportByGroupProcessor implements MessageProcessor {
     }
 
     return this.result;
-
   }
 
 }
