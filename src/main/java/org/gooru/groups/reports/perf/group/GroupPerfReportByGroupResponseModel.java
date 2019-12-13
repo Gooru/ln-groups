@@ -8,7 +8,8 @@ import java.util.List;
  */
 public class GroupPerfReportByGroupResponseModel {
   private List<GroupResponseModel> data;
-
+  private OverallStats overallStats;
+  
   public List<GroupResponseModel> getData() {
     return data;
   }
@@ -16,7 +17,27 @@ public class GroupPerfReportByGroupResponseModel {
   public void setData(List<GroupResponseModel> data) {
     this.data = data;
   }
+  
+  public OverallStats getOverallStats() {
+    return overallStats;
+  }
 
+  public void setOverallStats(OverallStats overallStats) {
+    this.overallStats = overallStats;
+  }
+
+  static class OverallStats {
+    private Double averagePerformance;
+
+    public Double getAveragePerformance() {
+      return averagePerformance;
+    }
+
+    public void setAveragePerformance(Double averagePerformance) {
+      this.averagePerformance = averagePerformance;
+    }
+  }
+  
   static class GroupResponseModel {
     private Long id;
     private String name;

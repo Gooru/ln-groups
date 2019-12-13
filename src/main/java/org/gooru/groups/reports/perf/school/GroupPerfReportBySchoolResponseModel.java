@@ -9,13 +9,34 @@ import java.util.List;
 public class GroupPerfReportBySchoolResponseModel {
 
   private List<ClassPerformance> data;
-
+  private OverallStats overallStats;
+  
   public List<ClassPerformance> getData() {
     return data;
   }
 
   public void setData(List<ClassPerformance> data) {
     this.data = data;
+  }
+  
+  public OverallStats getOverallStats() {
+    return overallStats;
+  }
+
+  public void setOverallStats(OverallStats overallStats) {
+    this.overallStats = overallStats;
+  }
+
+  static class OverallStats {
+    private Double averagePerformance;
+
+    public Double getAveragePerformance() {
+      return averagePerformance;
+    }
+
+    public void setAveragePerformance(Double averagePerformance) {
+      this.averagePerformance = averagePerformance;
+    }
   }
 
   static class ClassPerformance {
