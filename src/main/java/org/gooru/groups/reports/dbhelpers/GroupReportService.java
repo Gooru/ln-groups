@@ -5,7 +5,7 @@ import java.util.List;
 import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryCommand;
 import org.gooru.groups.reports.perf.fetchsubject.country.FetchSubjectsForPerfReportByCountryCommand;
 import org.gooru.groups.reports.perf.group.GroupPerfReportByGroupCommand;
-import org.gooru.groups.reports.perf.school.GroupReportBySchoolCommand;
+import org.gooru.groups.reports.perf.school.GroupPerfReportBySchoolCommand;
 import org.gooru.groups.reports.perf.state.GroupPerfReportByStateCommand;
 import org.skife.jdbi.v2.DBI;
 
@@ -20,26 +20,41 @@ public class GroupReportService {
     this.reportDao = dsdbDBI.onDemand(GroupReportsDao.class);
   }
 
-  public List<PerformanceAndTSReportBySchoolModel> fetchPerformanceAndTSReportBySchool(
-      GroupReportBySchoolCommand.GroupReportBySchoolCommandBean bean, String tenant) {
-    return this.reportDao.fetchPerformanceAndTSReportBySchool(bean, tenant);
+  public List<PerformanceAndTSReportBySchoolModel> fetchPerformanceAndTSWeekReportBySchool(
+      GroupPerfReportBySchoolCommand.GroupPerfReportBySchoolCommandBean bean) {
+    return this.reportDao.fetchPerformanceAndTSWeekReportBySchool(bean);
+  }
+
+  public List<PerformanceAndTSReportBySchoolModel> fetchPerformanceAndTSMonthReportBySchool(
+      GroupPerfReportBySchoolCommand.GroupPerfReportBySchoolCommandBean bean) {
+    return this.reportDao.fetchPerformanceAndTSMonthReportBySchool(bean);
   }
 
   public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByGroup(
       GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
     return this.reportDao.fetchPerformanceAndTSWeekReportByGroup(bean);
   }
-  
+
   public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByGroup(
       GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
     return this.reportDao.fetchPerformanceAndTSMonthReportByGroup(bean);
+  }
+
+  public List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSWeekReportByCluster(
+      GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
+    return this.reportDao.fetchPerformanceAndTSWeekReportByCluster(bean);
+  }
+
+  public List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSMonthReportByCluster(
+      GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
+    return this.reportDao.fetchPerformanceAndTSMonthReportByCluster(bean);
   }
 
   public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByState(
       GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean) {
     return this.reportDao.fetchPerformanceAndTSWeekReportByState(bean);
   }
-  
+
   public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByState(
       GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean) {
     return this.reportDao.fetchPerformanceAndTSMonthReportByState(bean);

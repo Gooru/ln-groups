@@ -18,4 +18,12 @@ public interface CoreDao {
   @Mapper(GroupModelMapper.class)
   @SqlQuery("SELECT id, name, code, type, sub_type FROM groups WHERE id = ANY(:groupIds::bigint[])")
   List<GroupModel> fetchGroupDetails(@Bind("groupIds") String groupIds);
+  
+  @Mapper(GroupModelMapper.class)
+  @SqlQuery("SELECT id, name, code, type, sub_type FROM groups WHERE id = :groupId::bigint")
+  GroupModel fetchGroupById(@Bind("groupId") Long groupId);
+  
+  @Mapper(SchoolModelMapper.class)
+  @SqlQuery("SELECT id, name, code FROM school_ds WHERE id = ANY(:schoolIds::bigint[])")
+  List<SchoolModel> fetchSchoolDetails(@Bind("schoolIds") String schoolIds);
 }

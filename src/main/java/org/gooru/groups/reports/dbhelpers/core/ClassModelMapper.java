@@ -14,6 +14,7 @@ public class ClassModelMapper implements ResultSetMapper<ClassModel> {
   @Override
   public ClassModel map(int index, ResultSet r, StatementContext ctx) throws SQLException {
     ClassModel classModel = new ClassModel();
+    classModel.setId(r.getString("id"));
     classModel.setCode(r.getString("code"));
     classModel.setTitle(r.getString("title"));
     classModel.setCreatorId(r.getString("creator_id"));

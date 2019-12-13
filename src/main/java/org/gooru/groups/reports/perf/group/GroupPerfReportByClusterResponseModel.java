@@ -6,18 +6,18 @@ import java.util.List;
 /**
  * @author szgooru Created On 20-Mar-2019
  */
-public class GroupPerfReportByGroupResponseModel {
-  private List<GroupResponseModel> data;
+public class GroupPerfReportByClusterResponseModel {
+  private List<ClusterResponseModel> data;
 
-  public List<GroupResponseModel> getData() {
+  public List<ClusterResponseModel> getData() {
     return data;
   }
 
-  public void setData(List<GroupResponseModel> data) {
+  public void setData(List<ClusterResponseModel> data) {
     this.data = data;
   }
 
-  static class GroupResponseModel {
+  static class ClusterResponseModel {
     private Long id;
     private String name;
     private String code;

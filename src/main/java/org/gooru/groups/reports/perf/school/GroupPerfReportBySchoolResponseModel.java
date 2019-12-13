@@ -1,24 +1,25 @@
 
-package org.gooru.groups.reports.perf.group;
+package org.gooru.groups.reports.perf.school;
 
 import java.util.List;
 
 /**
- * @author szgooru Created On 20-Mar-2019
+ * @author szgooru Created On 18-Mar-2019
  */
-public class GroupPerfReportByGroupResponseModel {
-  private List<GroupResponseModel> data;
+public class GroupPerfReportBySchoolResponseModel {
 
-  public List<GroupResponseModel> getData() {
+  private List<ClassPerformance> data;
+
+  public List<ClassPerformance> getData() {
     return data;
   }
 
-  public void setData(List<GroupResponseModel> data) {
+  public void setData(List<ClassPerformance> data) {
     this.data = data;
   }
 
-  static class GroupResponseModel {
-    private Long id;
+  static class ClassPerformance {
+    private String id;
     private String name;
     private String code;
     private String type;
@@ -28,11 +29,11 @@ public class GroupPerfReportByGroupResponseModel {
     private Long completedCompetencies;
     private Long inprogressCompetencies;
 
-    public Long getId() {
+    public String getId() {
       return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
       this.id = id;
     }
 

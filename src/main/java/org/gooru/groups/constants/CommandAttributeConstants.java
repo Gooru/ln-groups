@@ -16,6 +16,7 @@ public class CommandAttributeConstants {
   public static final String GROUP_ID = "groupId";
   public static final String STATE_ID = "stateId";
   public static final String COUNTRY_ID = "countryId";
+  public static final String SCHOOL_ID = "schoolId";
   public static final String FREQUENCY = "frequency";
   public static final String WEEK = "week";
   public static final String MONTH = "month";
@@ -26,4 +27,7 @@ public class CommandAttributeConstants {
   public final static String FREQUENCY_WEEKLY = "weekly";
   public final static String FREQUENCY_MONTHLY = "monthly";
   public final static List<String> VALID_FREQUENCY = Arrays.asList(FREQUENCY_WEEKLY, FREQUENCY_MONTHLY);
+  
+  public final static String GROUP_TYPE_CLUSTER = "cluster";
+
 }

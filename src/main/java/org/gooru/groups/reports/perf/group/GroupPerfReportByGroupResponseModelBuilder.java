@@ -22,7 +22,7 @@ public class GroupPerfReportByGroupResponseModelBuilder {
     });
 
     GroupPerfReportByGroupResponseModel responseModel = new GroupPerfReportByGroupResponseModel();
-    responseModel.setGroups(groupResponseModels);
+    responseModel.setData(groupResponseModels);
     return responseModel;
   }
 
@@ -36,6 +36,9 @@ public class GroupPerfReportByGroupResponseModelBuilder {
     model.setSubType(groupModel.getSubType());
     model.setTimespent(perfModel.getTimespent());
     model.setPerformance(perfModel.getPerformance());
+    
+    model.setInprogressCompetencies(0l);
+    model.setCompletedCompetencies(0l);
     return model;
   }
 }

@@ -2,15 +2,17 @@
 package org.gooru.groups.reports.perf.school;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
-import org.gooru.groups.constants.Constants;
+import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.processors.MessageProcessor;
-import org.gooru.groups.reports.auth.AuthorizerBuilder;
 import org.gooru.groups.reports.dbhelpers.GroupReportService;
 import org.gooru.groups.reports.dbhelpers.PerformanceAndTSReportBySchoolModel;
-import org.gooru.groups.reports.dbhelpers.core.ClassTitleModel;
+import org.gooru.groups.reports.dbhelpers.core.ClassModel;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.responses.MessageResponse;
 import org.gooru.groups.responses.MessageResponseFactory;
@@ -25,16 +27,17 @@ import io.vertx.core.json.JsonObject;
 /**
  * @author szgooru Created On 18-Mar-2019
  */
-public class GroupReportBySchoolProcessor implements MessageProcessor {
+public class GroupPerfReportBySchoolProcessor implements MessageProcessor {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(GroupReportBySchoolProcessor.class);
+  private final static Logger LOGGER =
+      LoggerFactory.getLogger(GroupPerfReportBySchoolProcessor.class);
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
   private final GroupReportService service = new GroupReportService(DBICreator.getDbiForDsdbDS());
   private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
 
-  public GroupReportBySchoolProcessor(Vertx vertx, Message<JsonObject> message) {
+  public GroupPerfReportBySchoolProcessor(Vertx vertx, Message<JsonObject> message) {
     this.message = message;
     this.result = Future.future();
   }
@@ -45,36 +48,36 @@ public class GroupReportBySchoolProcessor implements MessageProcessor {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
 
       // User role authorization
-      AuthorizerBuilder.buildGroupReportAuthorizer(
-          ebMessage.getSession().getString(Constants.Message.MSG_USER_ID)).authorize();
+      // AuthorizerBuilder.buildGroupReportAuthorizer(
+      // ebMessage.getSession().getString(Constants.Message.MSG_USER_ID)).authorize();
 
-      GroupReportBySchoolCommand command =
-          GroupReportBySchoolCommand.build(ebMessage.getRequestBody());
-      GroupReportBySchoolCommand.GroupReportBySchoolCommandBean bean = command.asBean();
+      GroupPerfReportBySchoolCommand command =
+          GroupPerfReportBySchoolCommand.build(ebMessage.getRequestBody());
+      GroupPerfReportBySchoolCommand.GroupPerfReportBySchoolCommandBean bean = command.asBean();
 
       // Extract tenant from the session
-      JsonObject tenantJson =
-          ebMessage.getSession().getJsonObject(Constants.Message.MSG_SESSION_TENANT);
+      // JsonObject tenantJson =
+      // ebMessage.getSession().getJsonObject(Constants.Message.MSG_SESSION_TENANT);
 
-      List<PerformanceAndTSReportBySchoolModel> report =
-          this.service.fetchPerformanceAndTSReportBySchool(bean,
-              tenantJson.getString(Constants.Message.MSG_SESSION_TENANT_ID));
-
-      List<Integer> schoolIds = new ArrayList<>(1);
-      schoolIds.add(bean.getSchoolId());
+      List<PerformanceAndTSReportBySchoolModel> report = new ArrayList<>();
+      if (bean.getFrequency().equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
+        report = this.service.fetchPerformanceAndTSWeekReportBySchool(bean);
+      } else {
+        report = this.service.fetchPerformanceAndTSMonthReportBySchool(bean);
+      }
 
       // Fetch class ids from the report data
-      List<String> classes = new ArrayList<>(report.size());
+      Set<String> classIds = new HashSet<>(report.size());
       report.forEach(model -> {
-        classes.add(model.getClassId());
+        classIds.add(model.getClassId());
       });
 
       // Fetch the titles of the classes from core db
-      List<ClassTitleModel> classTitles = this.coreService.fetchClassTitles(classes);
+      Map<String, ClassModel> classDetails = this.coreService.fetchClassDetails(classIds);
 
       // Build response
-      GroupReportBySchoolResponseModel responseModel =
-          GroupReportBySchoolResponseModelBuilder.build(report, classTitles);
+      GroupPerfReportBySchoolResponseModel responseModel =
+          GroupPerfReportBySchoolResponseModelBuilder.build(report, classDetails);
       String resultString = new ObjectMapper().writeValueAsString(responseModel);
       result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
     } catch (Throwable t) {

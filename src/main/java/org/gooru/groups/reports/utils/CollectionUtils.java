@@ -53,7 +53,7 @@ public final class CollectionUtils {
     return result;
   }
 
-  public static <T, U> List<U> convertList(List<T> from, Function<T, U> func) {
+  public static <T, U> List<U> convertList(Collection<T> from, Function<T, U> func) {
     return from.stream().map(func).collect(Collectors.toList());
   }
 
@@ -77,7 +77,7 @@ public final class CollectionUtils {
     return PGArray.arrayOf(String.class, input);
   }
 
-  public static PGArray<UUID> convertToSqlArrayOfUUID(List<String> input) {
+  public static PGArray<UUID> convertToSqlArrayOfUUID(Collection<String> input) {
     List<UUID> uuids = convertList(input, UUID::fromString);
     return PGArray.arrayOf(UUID.class, uuids);
   }

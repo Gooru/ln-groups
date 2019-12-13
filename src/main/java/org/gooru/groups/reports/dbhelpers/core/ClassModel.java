@@ -6,11 +6,20 @@ package org.gooru.groups.reports.dbhelpers.core;
  */
 public class ClassModel {
 
+  private String id;
   private String code;
   private String title;
   private String creatorId;
   private String courseId;
   private String gradeCurrent;
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
 
   public String getCode() {
     return code;

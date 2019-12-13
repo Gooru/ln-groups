@@ -36,8 +36,15 @@ public class CoreService {
     return this.classDao.fetchClass(classId);
   }
 
-  public List<ClassTitleModel> fetchClassTitles(List<String> classIds) {
-    return this.classDao.fetchClassTitles(CollectionUtils.convertToSqlArrayOfUUID(classIds));
+  public Map<String, ClassModel> fetchClassDetails(Set<String> classIds) {
+    Map<String, ClassModel> classModelMap = new HashMap<>();
+
+    List<ClassModel> classModels =
+        this.classDao.fetchClassDetails(CollectionUtils.convertToSqlArrayOfUUID(classIds));
+    classModels.forEach(classModel -> {
+      classModelMap.put(classModel.getId(), classModel);
+    });
+    return classModelMap;
   }
 
   public String fetchCourseTitle(String courseId) {
@@ -91,5 +98,19 @@ public class CoreService {
     });
 
     return groupModelMap;
+  }
+
+  public Map<Long, SchoolModel> fetchSchoolDetails(Set<Long> schoolIds) {
+    Map<Long, SchoolModel> schoolModelMap = new HashMap<>();
+    List<SchoolModel> schoolModels =
+        this.coreDao.fetchSchoolDetails(CollectionUtils.toPostgresArrayLong(schoolIds));
+    schoolModels.forEach(school -> {
+      schoolModelMap.put(school.getId(), school);
+    });
+    return schoolModelMap;
+  }
+
+  public GroupModel fetchGroupById(Long groupId) {
+    return this.coreDao.fetchGroupById(groupId);
   }
 }
