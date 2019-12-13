@@ -4,8 +4,10 @@ package org.gooru.groups.reports.perf.country;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.gooru.groups.reports.dbhelpers.PerformanceAndTSReportByCountryModel;
 import org.gooru.groups.reports.dbhelpers.core.StateModel;
+import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryResponseModel.OverallStats;
 import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryResponseModel.StateLevelPerf;
 
 /**
@@ -21,7 +23,17 @@ public class GroupPerfReportByCountryResponseModelBuilder {
       StateModel state = states.get(perf.getStateId());
       stateLevelPerfs.add(buildStateLevelPerfObject(perf, state));
     });
-
+    
+    OverallStats stats = new OverallStats();
+    if (report != null && !report.isEmpty()) {
+      Double totalPerformance =
+          report.stream().collect(Collectors.summingDouble(o -> o.getPerformance()));
+      stats.setAveragePerformance(totalPerformance / report.size());
+    } else {
+      stats.setAveragePerformance(0d);
+    }
+    
+    responseModel.setOverallStats(stats);    
     responseModel.setData(stateLevelPerfs);
     return responseModel;
   }

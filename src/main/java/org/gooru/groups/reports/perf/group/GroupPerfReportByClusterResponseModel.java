@@ -8,6 +8,7 @@ import java.util.List;
  */
 public class GroupPerfReportByClusterResponseModel {
   private List<ClusterResponseModel> data;
+  private OverallClusterStats overallStats;
 
   public List<ClusterResponseModel> getData() {
     return data;
@@ -15,6 +16,26 @@ public class GroupPerfReportByClusterResponseModel {
 
   public void setData(List<ClusterResponseModel> data) {
     this.data = data;
+  }
+
+  public OverallClusterStats getOverallStats() {
+    return overallStats;
+  }
+
+  public void setOverallStats(OverallClusterStats overallStats) {
+    this.overallStats = overallStats;
+  }
+
+  static class OverallClusterStats {
+    private Double averagePerformance;
+
+    public Double getAveragePerformance() {
+      return averagePerformance;
+    }
+
+    public void setAveragePerformance(Double averagePerformance) {
+      this.averagePerformance = averagePerformance;
+    }
   }
 
   static class ClusterResponseModel {
