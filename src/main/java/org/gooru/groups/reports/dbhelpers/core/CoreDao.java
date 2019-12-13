@@ -2,8 +2,6 @@
 package org.gooru.groups.reports.dbhelpers.core;
 
 import java.util.List;
-import org.gooru.groups.reports.dbhelpers.StateModel;
-import org.gooru.groups.reports.dbhelpers.StateModelMapper;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;

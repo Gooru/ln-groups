@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.school.perf;
+package org.gooru.groups.reports.perf.group;
 
 import org.gooru.groups.constants.HttpConstants;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
@@ -9,24 +9,24 @@ import org.slf4j.LoggerFactory;
 import io.vertx.core.json.JsonObject;
 
 /**
- * @author szgooru Created On 18-Mar-2019
+ * @author szgooru Created On 19-Mar-2019
  */
-public class GroupReportBySchoolCommand {
+public class GroupReportByGroupCommand {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(GroupReportBySchoolCommand.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(GroupReportByGroupCommand.class);
 
-  private Integer schoolId;
+  private Integer groupId;
   private Integer month;
   private Integer year;
 
-  public GroupReportBySchoolCommand(Integer schoolId, Integer month, Integer year) {
-    this.schoolId = schoolId;
+  public GroupReportByGroupCommand(Integer groupId, Integer month, Integer year) {
+    this.groupId = groupId;
     this.month = month;
     this.year = year;
   }
 
-  public Integer getSchoolId() {
-    return schoolId;
+  public Integer getGroupId() {
+    return groupId;
   }
 
   public Integer getMonth() {
@@ -37,17 +37,18 @@ public class GroupReportBySchoolCommand {
     return year;
   }
 
-  public static GroupReportBySchoolCommand build(JsonObject request) {
-    GroupReportBySchoolCommand command = buildFromJson(request);
+  public static GroupReportByGroupCommand build(JsonObject request) {
+    GroupReportByGroupCommand command = buildFromJson(request);
     command.validate();
     return command;
   }
 
-  private static GroupReportBySchoolCommand buildFromJson(JsonObject request) {
-    Integer school = RequestUtils.getAsInt(request, CommandAttributes.SCHOOL_ID);
+  private static GroupReportByGroupCommand buildFromJson(JsonObject request) {
+    Integer groupId = RequestUtils.getAsInt(request, CommandAttributes.GROUP_ID);
+    LOGGER.debug("group id:{}", groupId);
     Integer month = RequestUtils.getAsInt(request, CommandAttributes.MONTH);
     Integer year = RequestUtils.getAsInt(request, CommandAttributes.YEAR);
-    return new GroupReportBySchoolCommand(school, month, year);
+    return new GroupReportByGroupCommand(groupId, month, year);
   }
 
   private void validate() {
@@ -58,25 +59,25 @@ public class GroupReportBySchoolCommand {
     }
   }
 
-  public GroupReportBySchoolCommandBean asBean() {
-    GroupReportBySchoolCommandBean bean = new GroupReportBySchoolCommandBean();
-    bean.schoolId = schoolId;
+  public GroupReportByGroupCommandBean asBean() {
+    GroupReportByGroupCommandBean bean = new GroupReportByGroupCommandBean();
+    bean.groupId = groupId;
     bean.month = month;
     bean.year = year;
     return bean;
   }
 
-  public static class GroupReportBySchoolCommandBean {
-    private Integer schoolId;
+  public static class GroupReportByGroupCommandBean {
+    private Integer groupId;
     private Integer month;
     private Integer year;
-    
-    public Integer getSchoolId() {
-      return schoolId;
+
+    public Integer getGroupId() {
+      return groupId;
     }
 
-    public void setSchoolId(Integer schoolId) {
-      this.schoolId = schoolId;
+    public void setGroupId(Integer groupId) {
+      this.groupId = groupId;
     }
 
     public Integer getMonth() {
@@ -101,7 +102,7 @@ public class GroupReportBySchoolCommand {
       throw new AssertionError();
     }
 
-    private static final String SCHOOL_ID = "schoolId";
+    private static final String GROUP_ID = "groupId";
     private static final String MONTH = "month";
     private static final String YEAR = "year";
   }

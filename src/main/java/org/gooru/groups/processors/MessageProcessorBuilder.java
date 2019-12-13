@@ -6,11 +6,12 @@ import org.gooru.groups.reports.classes.student.detailed.summary.ClassStudentDet
 import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryReportProcessor;
 import org.gooru.groups.reports.classes.student.summary.weekly.ClassStudentSummaryWeeklyReportProcessor;
 import org.gooru.groups.reports.classes.summary.ClassSummaryReportProcessor;
-import org.gooru.groups.reports.country.perf.GroupReportByCountryProcessor;
 import org.gooru.groups.reports.fetchcountries.FetchCountriesForGroupReportProcessor;
-import org.gooru.groups.reports.group.perf.GroupReportByGroupProcessor;
-import org.gooru.groups.reports.school.perf.GroupReportBySchoolProcessor;
-import org.gooru.groups.reports.state.perf.GroupReportByStateProcessor;
+import org.gooru.groups.reports.perf.fetchsubject.country.FetchSubjectsForPerfReportByCountryProcessor;
+import org.gooru.groups.reports.perf.group.GroupReportByGroupProcessor;
+import org.gooru.groups.reports.perf.school.GroupReportBySchoolProcessor;
+import org.gooru.groups.reports.perf.state.GroupReportByStateProcessor;
+import org.gooru.groups.reports.perfcountry.GroupPerfReportByCountryProcessor;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
@@ -37,16 +38,19 @@ public final class MessageProcessorBuilder {
       case Constants.Message.MSG_OP_REPORTS_GROUPS_COUNTRIES:
         return new FetchCountriesForGroupReportProcessor(vertx, message);
         
-      case Constants.Message.MSG_OP_REPORTS_GROUPS_BY_COUNTRY:
-        return new GroupReportByCountryProcessor(vertx, message);
+      case Constants.Message.MSG_OP_PERF_REPORTS_SUBJECTS_BY_COUNTRY:
+        return new FetchSubjectsForPerfReportByCountryProcessor(vertx, message);
         
-      case Constants.Message.MSG_OP_REPORTS_GROUPS_BY_STATE:
+      case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_COUNTRY:
+        return new GroupPerfReportByCountryProcessor(vertx, message);
+        
+      case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_STATE:
         return new GroupReportByStateProcessor(vertx, message);
         
-      case Constants.Message.MSG_OP_REPORTS_GROUPS_BY_GROUP:
+      case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_GROUP:
         return new GroupReportByGroupProcessor(vertx, message);
         
-      case Constants.Message.MSG_OP_REPORTS_GROUPS_BY_SCHOOL:
+      case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_SCHOOL:
         return new GroupReportBySchoolProcessor(vertx, message);
         
       case Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY:

@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.state.perf;
+package org.gooru.groups.reports.perf.state;
 
 import java.util.List;
 import org.gooru.groups.app.data.EventBusMessage;
@@ -9,8 +9,8 @@ import org.gooru.groups.processors.MessageProcessor;
 import org.gooru.groups.reports.auth.AuthorizerBuilder;
 import org.gooru.groups.reports.dbhelpers.GroupReportService;
 import org.gooru.groups.reports.dbhelpers.PerformanceAndTSReportByGroupModel;
-import org.gooru.groups.reports.group.perf.GroupReportByGroupResponseModel;
-import org.gooru.groups.reports.group.perf.GroupReportByGroupResponseModelBuilder;
+import org.gooru.groups.reports.perf.group.GroupReportByGroupResponseModel;
+import org.gooru.groups.reports.perf.group.GroupReportByGroupResponseModelBuilder;
 import org.gooru.groups.responses.MessageResponse;
 import org.gooru.groups.responses.MessageResponseFactory;
 import org.slf4j.Logger;

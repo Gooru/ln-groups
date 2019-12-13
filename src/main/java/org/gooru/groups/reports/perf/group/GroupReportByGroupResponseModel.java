@@ -1,12 +1,12 @@
 
-package org.gooru.groups.reports.state.perf;
+package org.gooru.groups.reports.perf.group;
 
 import java.util.List;
 
 /**
  * @author szgooru Created On 20-Mar-2019
  */
-public class GroupReportByStateResponseModel {
+public class GroupReportByGroupResponseModel {
   private List<GroupResponseModel> groups;
 
   public List<GroupResponseModel> getGroups() {

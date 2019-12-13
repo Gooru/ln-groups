@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.school.perf;
+package org.gooru.groups.reports.perf.school;
 
 import java.util.List;
 

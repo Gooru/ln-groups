@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.state.perf;
+package org.gooru.groups.reports.perfcountry;
 
 import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.constants.HttpConstants;
@@ -10,41 +10,33 @@ import org.slf4j.LoggerFactory;
 import io.vertx.core.json.JsonObject;
 
 /**
- * @author szgooru Created On 19-Mar-2019
+ * @author szgooru Created On 15-Mar-2019
  */
-public class GroupReportByStateCommand {
-  
-  private final static Logger LOGGER = LoggerFactory.getLogger(GroupReportByStateCommand.class);
+public class GroupPerfReportByCountryCommand {
 
-  private Integer stateId;
-  private String frequency;
-  private Integer week;
+  private final static Logger LOGGER = LoggerFactory.getLogger(GroupPerfReportByCountryCommand.class);
+  
+  private Long countryId;
   private Integer month;
   private Integer year;
+  private String frequency;
+  private Integer week;
   private String subject;
   private String framework;
 
-  public GroupReportByStateCommand(Integer stateId, String frequency, Integer week, Integer month,
-      Integer year, String subject, String framework) {
-    this.stateId = stateId;
-    this.frequency = frequency;
-    this.week = week;
+  public GroupPerfReportByCountryCommand(Long countryId, String frequency, Integer week,
+      Integer month, Integer year, String subject, String framework) {
+    this.countryId = countryId;
     this.month = month;
     this.year = year;
+    this.frequency = frequency;
+    this.week = week;
     this.subject = subject;
     this.framework = framework;
   }
 
-  public Integer getStateId() {
-    return stateId;
-  }
-
-  public String getFrequency() {
-    return frequency;
-  }
-
-  public Integer getWeek() {
-    return week;
+  public Long getCountryId() {
+    return countryId;
   }
 
   public Integer getMonth() {
@@ -55,6 +47,14 @@ public class GroupReportByStateCommand {
     return year;
   }
 
+  public String getFrequency() {
+    return frequency;
+  }
+
+  public Integer getWeek() {
+    return week;
+  }
+
   public String getSubject() {
     return subject;
   }
@@ -63,21 +63,21 @@ public class GroupReportByStateCommand {
     return framework;
   }
 
-  public static GroupReportByStateCommand build(JsonObject request) {
-    GroupReportByStateCommand command = buildFromJson(request);
+  public static GroupPerfReportByCountryCommand build(JsonObject request) {
+    GroupPerfReportByCountryCommand command = buildFromJson(request);
     command.validate();
     return command;
   }
 
-  private static GroupReportByStateCommand buildFromJson(JsonObject request) {
-    Integer state = RequestUtils.getAsInt(request, CommandAttributeConstants.STATE_ID);
+  private static GroupPerfReportByCountryCommand buildFromJson(JsonObject request) {
+    Long country = RequestUtils.getAsLong(request, CommandAttributeConstants.COUNTRY_ID);
     String frequency = request.getString(CommandAttributeConstants.FREQUENCY);
     Integer week = RequestUtils.getAsInt(request, CommandAttributeConstants.WEEK);
     Integer month = RequestUtils.getAsInt(request, CommandAttributeConstants.MONTH);
     Integer year = RequestUtils.getAsInt(request, CommandAttributeConstants.YEAR);
     String subject = request.getString(CommandAttributeConstants.SUBJECT);
     String framework = request.getString(CommandAttributeConstants.FRAMEWORK);
-    return new GroupReportByStateCommand(state, frequency, week, month, year, subject, framework);
+    return new GroupPerfReportByCountryCommand(country, frequency, week, month, year, subject, framework);
   }
 
   private void validate() {
@@ -108,9 +108,9 @@ public class GroupReportByStateCommand {
     }
   }
 
-  public GroupReportByStateCommandBean asBean() {
-    GroupReportByStateCommandBean bean = new GroupReportByStateCommandBean();
-    bean.stateId = stateId;
+  public GroupReportByCountryCommandBean asBean() {
+    GroupReportByCountryCommandBean bean = new GroupReportByCountryCommandBean();
+    bean.countryId = countryId;
     bean.frequency = frequency;
     bean.week = week;
     bean.month = month;
@@ -120,37 +120,21 @@ public class GroupReportByStateCommand {
     return bean;
   }
 
-  public static class GroupReportByStateCommandBean {
-    private Integer stateId;
-    private String frequency;
-    private Integer week;
+  public static class GroupReportByCountryCommandBean {
+    private Long countryId;
     private Integer month;
     private Integer year;
+    private String frequency;
+    private Integer week;
     private String subject;
     private String framework;
 
-    public Integer getStateId() {
-      return stateId;
+    public Long getCountryId() {
+      return countryId;
     }
 
-    public void setStateId(Integer stateId) {
-      this.stateId = stateId;
-    }
-    
-    public String getFrequency() {
-      return frequency;
-    }
-
-    public void setFrequency(String frequency) {
-      this.frequency = frequency;
-    }
-
-    public Integer getWeek() {
-      return week;
-    }
-
-    public void setWeek(Integer week) {
-      this.week = week;
+    public void setCountryId(Long countryId) {
+      this.countryId = countryId;
     }
 
     public Integer getMonth() {
@@ -167,6 +151,22 @@ public class GroupReportByStateCommand {
 
     public void setYear(Integer year) {
       this.year = year;
+    }
+
+    public String getFrequency() {
+      return frequency;
+    }
+
+    public void setFrequency(String frequency) {
+      this.frequency = frequency;
+    }
+
+    public Integer getWeek() {
+      return week;
+    }
+
+    public void setWeek(Integer week) {
+      this.week = week;
     }
 
     public String getSubject() {

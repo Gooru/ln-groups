@@ -1,12 +1,12 @@
 
-package org.gooru.groups.reports.country.perf;
+package org.gooru.groups.reports.perfcountry;
 
 import java.util.List;
 
 /**
  * @author szgooru Created On 19-Mar-2019
  */
-public class GroupReportByCountryResponseModel {
+public class GroupPerfReportByCountryResponseModel {
   private List<StateLevelPerf> data;
 
   public List<StateLevelPerf> getData() {

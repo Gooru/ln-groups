@@ -38,6 +38,7 @@ public class RouteReportsConfigurator implements RouteConfigurator {
         .handler(this::getClassStudentDetailedSummary);
 
     router.get(Constants.Route.API_FETCH_COUNTRIES).handler(this::fetchGroupReportCountries);
+    router.get(Constants.Route.API_FETCH_PERF_SUBJECTS_BY_COUNTRY).handler(this::fetchSubjectsForPerfReportByCountry);
     router.get(Constants.Route.API_FETCH_PERF_REPORT_BY_COUNTRY)
         .handler(this::fetchGroupReportByCountry);
     router.get(Constants.Route.API_FETCH_PERF_REPORT_BY_STATE)
@@ -80,28 +81,34 @@ public class RouteReportsConfigurator implements RouteConfigurator {
         Constants.Message.MSG_OP_REPORTS_GROUPS_COUNTRIES, Constants.EventBus.MBEP_DISPATCHER,
         this.mbusTimeout, LOGGER);
   }
+  
+  private void fetchSubjectsForPerfReportByCountry(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_PERF_REPORTS_SUBJECTS_BY_COUNTRY, Constants.EventBus.MBEP_DISPATCHER,
+        this.mbusTimeout, LOGGER);
+  }
 
   private void fetchGroupReportByCountry(RoutingContext routingContext) {
     RouteHandlerUtils.baseHandler(this.eb, routingContext,
-        Constants.Message.MSG_OP_REPORTS_GROUPS_BY_COUNTRY, Constants.EventBus.MBEP_DISPATCHER,
+        Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_COUNTRY, Constants.EventBus.MBEP_DISPATCHER,
         this.mbusTimeout, LOGGER);
   }
 
   private void fetchGroupReportByState(RoutingContext routingContext) {
     RouteHandlerUtils.baseHandler(this.eb, routingContext,
-        Constants.Message.MSG_OP_REPORTS_GROUPS_BY_STATE, Constants.EventBus.MBEP_DISPATCHER,
+        Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_STATE, Constants.EventBus.MBEP_DISPATCHER,
         this.mbusTimeout, LOGGER);
   }
 
   private void fetchGroupReportByGroup(RoutingContext routingContext) {
     RouteHandlerUtils.baseHandler(this.eb, routingContext,
-        Constants.Message.MSG_OP_REPORTS_GROUPS_BY_GROUP, Constants.EventBus.MBEP_DISPATCHER,
+        Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_GROUP, Constants.EventBus.MBEP_DISPATCHER,
         this.mbusTimeout, LOGGER);
   }
 
   private void fetchGroupReportBySchool(RoutingContext routingContext) {
     RouteHandlerUtils.baseHandler(this.eb, routingContext,
-        Constants.Message.MSG_OP_REPORTS_GROUPS_BY_SCHOOL, Constants.EventBus.MBEP_DISPATCHER,
+        Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_SCHOOL, Constants.EventBus.MBEP_DISPATCHER,
         this.mbusTimeout, LOGGER);
   }
   
