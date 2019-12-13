@@ -76,7 +76,7 @@ public class CoreService {
   public Map<Long, StateModel> fetchStateDetails(Set<Long> stateIds) {
     Map<Long, StateModel> stateModelMap = new HashMap<>();
     List<StateModel> stateModels =
-        this.coreDao.fetchStateDetails(CollectionUtils.convertToSqlArrayOfLong(stateIds));
+        this.coreDao.fetchStateDetails(CollectionUtils.toPostgresArrayLong(stateIds));
     stateModels.forEach(state -> {
       stateModelMap.put(state.getId(), state);
     });

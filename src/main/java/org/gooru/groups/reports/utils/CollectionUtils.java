@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -83,5 +84,23 @@ public final class CollectionUtils {
 
   public static PGArray<UUID> convertFromListUUIDToSqlArrayOfUUID(List<UUID> input) {
     return PGArray.arrayOf(UUID.class, input);
+  }
+  
+  public static String toPostgresArrayLong(Collection<Long> input) {
+    Iterator<Long> it = input.iterator();
+    if (!it.hasNext()) {
+      return "{}";
+    }
+
+    StringBuilder sb = new StringBuilder();
+    sb.append('{');
+    for (;;) {
+      Long i = it.next();
+      sb.append(i);
+      if (!it.hasNext()) {
+        return sb.append('}').toString();
+      }
+      sb.append(',');
+    }
   }
 }
