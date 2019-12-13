@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.school.perf;
+package org.gooru.groups.reports.perf.school;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.gooru.groups.reports.dbhelpers.PerformanceAndTSReportBySchoolModel;
 import org.gooru.groups.reports.dbhelpers.core.ClassTitleModel;
-import org.gooru.groups.reports.school.perf.GroupReportBySchoolResponseModel.ClassPerformance;
+import org.gooru.groups.reports.perf.school.GroupReportBySchoolResponseModel.ClassPerformance;
 
 /**
  * @author szgooru Created On 18-Mar-2019

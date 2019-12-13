@@ -1,21 +1,21 @@
 
-package org.gooru.groups.reports.country.perf;
+package org.gooru.groups.reports.perfcountry;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.gooru.groups.reports.country.perf.GroupReportByCountryResponseModel.StateLevelPerf;
 import org.gooru.groups.reports.dbhelpers.PerformanceAndTSReportByCountryModel;
-import org.gooru.groups.reports.dbhelpers.StateModel;
+import org.gooru.groups.reports.dbhelpers.core.StateModel;
+import org.gooru.groups.reports.perfcountry.GroupPerfReportByCountryResponseModel.StateLevelPerf;
 
 /**
  * @author szgooru Created On 19-Mar-2019
  */
-public class GroupReportByCountryResponseModelBuilder {
+public class GroupPerfReportByCountryResponseModelBuilder {
 
-  public static GroupReportByCountryResponseModel build(
+  public static GroupPerfReportByCountryResponseModel build(
       List<PerformanceAndTSReportByCountryModel> report, Map<Long, StateModel> states) {
-    GroupReportByCountryResponseModel responseModel = new GroupReportByCountryResponseModel();
+    GroupPerfReportByCountryResponseModel responseModel = new GroupPerfReportByCountryResponseModel();
     List<StateLevelPerf> stateLevelPerfs = new ArrayList<>();
     report.forEach(perf -> {
       StateModel state = states.get(perf.getStateId());

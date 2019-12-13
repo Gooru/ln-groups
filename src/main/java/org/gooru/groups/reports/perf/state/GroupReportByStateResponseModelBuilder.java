@@ -1,10 +1,10 @@
 
-package org.gooru.groups.reports.state.perf;
+package org.gooru.groups.reports.perf.state;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.gooru.groups.reports.dbhelpers.PerformanceAndTSReportByGroupModel;
-import org.gooru.groups.reports.state.perf.GroupReportByStateResponseModel.GroupResponseModel;
+import org.gooru.groups.reports.perf.state.GroupReportByStateResponseModel.GroupResponseModel;
 
 /**
  * @author szgooru Created On 20-Mar-2019

@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.country.perf;
+package org.gooru.groups.reports.perfcountry;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,8 +12,8 @@ import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.processors.MessageProcessor;
 import org.gooru.groups.reports.dbhelpers.GroupReportService;
 import org.gooru.groups.reports.dbhelpers.PerformanceAndTSReportByCountryModel;
-import org.gooru.groups.reports.dbhelpers.StateModel;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
+import org.gooru.groups.reports.dbhelpers.core.StateModel;
 import org.gooru.groups.responses.MessageResponse;
 import org.gooru.groups.responses.MessageResponseFactory;
 import org.slf4j.Logger;
@@ -27,16 +27,16 @@ import io.vertx.core.json.JsonObject;
 /**
  * @author szgooru Created On 15-Mar-2019
  */
-public class GroupReportByCountryProcessor implements MessageProcessor {
+public class GroupPerfReportByCountryProcessor implements MessageProcessor {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(GroupReportByCountryProcessor.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(GroupPerfReportByCountryProcessor.class);
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
   private final GroupReportService service = new GroupReportService(DBICreator.getDbiForDsdbDS());
   private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
   
-  public GroupReportByCountryProcessor(Vertx vertx, Message<JsonObject> message) {
+  public GroupPerfReportByCountryProcessor(Vertx vertx, Message<JsonObject> message) {
     this.message = message;
     this.result = Future.future();
   }
@@ -51,9 +51,9 @@ public class GroupReportByCountryProcessor implements MessageProcessor {
       //    ebMessage.getSession().getString(Constants.Message.MSG_USER_ID)).authorize();
 
       // Build command object and validate input data
-      GroupReportByCountryCommand command =
-          GroupReportByCountryCommand.build(ebMessage.getRequestBody());
-      GroupReportByCountryCommand.GroupReportByCountryCommandBean bean = command.asBean();
+      GroupPerfReportByCountryCommand command =
+          GroupPerfReportByCountryCommand.build(ebMessage.getRequestBody());
+      GroupPerfReportByCountryCommand.GroupReportByCountryCommandBean bean = command.asBean();
 
       // Extract tenant from the session
       // JsonObject tenantJson =
@@ -74,8 +74,8 @@ public class GroupReportByCountryProcessor implements MessageProcessor {
       Map<Long, StateModel> states = this.coreService.fetchStateDetails(uniqueStateIds);
 
       // Build the response models and complete result
-      GroupReportByCountryResponseModel responseModel =
-          GroupReportByCountryResponseModelBuilder.build(report, states);
+      GroupPerfReportByCountryResponseModel responseModel =
+          GroupPerfReportByCountryResponseModelBuilder.build(report, states);
       String resultString = new ObjectMapper().writeValueAsString(responseModel);
       result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
     } catch (Throwable t) {
