@@ -7,23 +7,28 @@ import java.util.List;
  * @author szgooru Created On 19-Mar-2019
  */
 public class GroupReportByCountryResponseModel {
-  private List<StateLevelPerf> states;
+  private List<StateLevelPerf> data;
 
-  public List<StateLevelPerf> getStates() {
-    return states;
+  public List<StateLevelPerf> getData() {
+    return data;
   }
 
-  public void setStates(List<StateLevelPerf> states) {
-    this.states = states;
+  public void setData(List<StateLevelPerf> data) {
+    this.data = data;
   }
 
   static class StateLevelPerf {
     private Long id;
     private String name;
     private String code;
+    private String type;
+    private String subType;
+
     private Long timespent;
     private Double performance;
-
+    private Long completedCompetencies;
+    private Long inprogressCompetencies;
+    
     public Long getId() {
       return id;
     }
@@ -48,6 +53,22 @@ public class GroupReportByCountryResponseModel {
       this.code = code;
     }
 
+    public String getType() {
+      return type;
+    }
+
+    public void setType(String type) {
+      this.type = type;
+    }
+
+    public String getSubType() {
+      return subType;
+    }
+
+    public void setSubType(String subType) {
+      this.subType = subType;
+    }
+
     public Long getTimespent() {
       return timespent;
     }
@@ -63,5 +84,22 @@ public class GroupReportByCountryResponseModel {
     public void setPerformance(Double performance) {
       this.performance = performance;
     }
+
+    public Long getCompletedCompetencies() {
+      return completedCompetencies;
+    }
+
+    public void setCompletedCompetencies(Long completedCompetencies) {
+      this.completedCompetencies = completedCompetencies;
+    }
+
+    public Long getInprogressCompetencies() {
+      return inprogressCompetencies;
+    }
+
+    public void setInprogressCompetencies(Long inprogressCompetencies) {
+      this.inprogressCompetencies = inprogressCompetencies;
+    }
+    
   }
 }
