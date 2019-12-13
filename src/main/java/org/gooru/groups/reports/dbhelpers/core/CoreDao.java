@@ -14,4 +14,8 @@ public interface CoreDao {
   @Mapper(StateModelMapper.class)
   @SqlQuery("SELECT id, name, code FROM state_ds WHERE id = ANY(:stateIds::bigint[])")
   List<StateModel> fetchStateDetails(@Bind("stateIds") String stateIds);
+
+  @Mapper(GroupModelMapper.class)
+  @SqlQuery("SELECT id, name, code, type, sub_type FROM groups WHERE id = ANY(:groupIds::bigint[])")
+  List<GroupModel> fetchGroupDetails(@Bind("groupIds") String groupIds);
 }

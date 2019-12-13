@@ -1,12 +1,12 @@
 
-package org.gooru.groups.reports.perfcountry;
+package org.gooru.groups.reports.perf.country;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.gooru.groups.reports.dbhelpers.PerformanceAndTSReportByCountryModel;
 import org.gooru.groups.reports.dbhelpers.core.StateModel;
-import org.gooru.groups.reports.perfcountry.GroupPerfReportByCountryResponseModel.StateLevelPerf;
+import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryResponseModel.StateLevelPerf;
 
 /**
  * @author szgooru Created On 19-Mar-2019

@@ -81,4 +81,15 @@ public class CoreService {
     });
     return stateModelMap;
   }
+
+  public Map<Long, GroupModel> fetchGroupDetails(Set<Long> groupIds) {
+    Map<Long, GroupModel> groupModelMap = new HashMap<>();
+    List<GroupModel> groupModels =
+        this.coreDao.fetchGroupDetails(CollectionUtils.toPostgresArrayLong(groupIds));
+    groupModels.forEach(group -> {
+      groupModelMap.put(group.getId(), group);
+    });
+
+    return groupModelMap;
+  }
 }

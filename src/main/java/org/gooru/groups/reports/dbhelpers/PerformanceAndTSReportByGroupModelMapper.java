@@ -16,10 +16,7 @@ public class PerformanceAndTSReportByGroupModelMapper
   public PerformanceAndTSReportByGroupModel map(int index, ResultSet r, StatementContext ctx)
       throws SQLException {
     PerformanceAndTSReportByGroupModel model = new PerformanceAndTSReportByGroupModel();
-    model.setGroupId(r.getInt("group_id"));
-    model.setName(r.getString("name"));
-    model.setCode(r.getString("code"));
-    model.setSubType(r.getString("sub_type"));
+    model.setGroupId(r.getLong("group_id"));
     model.setTimespent(r.getLong("collection_ts"));
     model.setPerformance(r.getDouble("assessment_perf"));
     return model;

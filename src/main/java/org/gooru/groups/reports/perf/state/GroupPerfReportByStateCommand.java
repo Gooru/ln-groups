@@ -12,9 +12,9 @@ import io.vertx.core.json.JsonObject;
 /**
  * @author szgooru Created On 19-Mar-2019
  */
-public class GroupReportByStateCommand {
+public class GroupPerfReportByStateCommand {
   
-  private final static Logger LOGGER = LoggerFactory.getLogger(GroupReportByStateCommand.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(GroupPerfReportByStateCommand.class);
 
   private Integer stateId;
   private String frequency;
@@ -24,7 +24,7 @@ public class GroupReportByStateCommand {
   private String subject;
   private String framework;
 
-  public GroupReportByStateCommand(Integer stateId, String frequency, Integer week, Integer month,
+  public GroupPerfReportByStateCommand(Integer stateId, String frequency, Integer week, Integer month,
       Integer year, String subject, String framework) {
     this.stateId = stateId;
     this.frequency = frequency;
@@ -63,13 +63,13 @@ public class GroupReportByStateCommand {
     return framework;
   }
 
-  public static GroupReportByStateCommand build(JsonObject request) {
-    GroupReportByStateCommand command = buildFromJson(request);
+  public static GroupPerfReportByStateCommand build(JsonObject request) {
+    GroupPerfReportByStateCommand command = buildFromJson(request);
     command.validate();
     return command;
   }
 
-  private static GroupReportByStateCommand buildFromJson(JsonObject request) {
+  private static GroupPerfReportByStateCommand buildFromJson(JsonObject request) {
     Integer state = RequestUtils.getAsInt(request, CommandAttributeConstants.STATE_ID);
     String frequency = request.getString(CommandAttributeConstants.FREQUENCY);
     Integer week = RequestUtils.getAsInt(request, CommandAttributeConstants.WEEK);
@@ -77,7 +77,7 @@ public class GroupReportByStateCommand {
     Integer year = RequestUtils.getAsInt(request, CommandAttributeConstants.YEAR);
     String subject = request.getString(CommandAttributeConstants.SUBJECT);
     String framework = request.getString(CommandAttributeConstants.FRAMEWORK);
-    return new GroupReportByStateCommand(state, frequency, week, month, year, subject, framework);
+    return new GroupPerfReportByStateCommand(state, frequency, week, month, year, subject, framework);
   }
 
   private void validate() {
@@ -108,8 +108,8 @@ public class GroupReportByStateCommand {
     }
   }
 
-  public GroupReportByStateCommandBean asBean() {
-    GroupReportByStateCommandBean bean = new GroupReportByStateCommandBean();
+  public GroupPerformanceReportByStateCommandBean asBean() {
+    GroupPerformanceReportByStateCommandBean bean = new GroupPerformanceReportByStateCommandBean();
     bean.stateId = stateId;
     bean.frequency = frequency;
     bean.week = week;
@@ -120,7 +120,7 @@ public class GroupReportByStateCommand {
     return bean;
   }
 
-  public static class GroupReportByStateCommandBean {
+  public static class GroupPerformanceReportByStateCommandBean {
     private Integer stateId;
     private String frequency;
     private Integer week;

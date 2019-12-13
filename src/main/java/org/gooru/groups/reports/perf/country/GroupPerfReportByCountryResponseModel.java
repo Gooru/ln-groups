@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.perfcountry;
+package org.gooru.groups.reports.perf.country;
 
 import java.util.List;
 

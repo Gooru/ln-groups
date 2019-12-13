@@ -13,6 +13,7 @@ public class CommandAttributeConstants {
     throw new AssertionError();
   }
 
+  public static final String GROUP_ID = "groupId";
   public static final String STATE_ID = "stateId";
   public static final String COUNTRY_ID = "countryId";
   public static final String FREQUENCY = "frequency";
