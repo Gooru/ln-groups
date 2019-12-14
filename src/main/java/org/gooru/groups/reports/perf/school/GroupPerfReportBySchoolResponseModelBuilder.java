@@ -44,10 +44,11 @@ public class GroupPerfReportBySchoolResponseModelBuilder {
     ClassPerformance cp = new ClassPerformance();
     cp.setId(perfModel.getClassId());
     cp.setName(classModel.getTitle());
+    cp.setCode(classModel.getCode());
+    cp.setCourseId(classModel.getCourseId());
     cp.setPerformance(perfModel.getPerformance());
     cp.setTimespent(perfModel.getTimespent());
-
-    cp.setCode(classModel.getCode());
+    
     cp.setType("class");
     cp.setSubType(null);
 
