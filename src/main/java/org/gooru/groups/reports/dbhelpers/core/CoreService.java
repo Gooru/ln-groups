@@ -113,4 +113,14 @@ public class CoreService {
   public GroupModel fetchGroupById(Long groupId) {
     return this.coreDao.fetchGroupById(groupId);
   }
+
+  public Map<String, SubjectModel> fetchSubjectDetails(Set<String> subjectCodes) {
+    Map<String, SubjectModel> subjectModelMap = new HashMap<>();
+    List<SubjectModel> subjectModels =
+        this.coreDao.fetchSubjectDetails(CollectionUtils.convertToSqlArrayOfString(subjectCodes));
+    subjectModels.forEach(model -> {
+      subjectModelMap.put(model.getId(), model);
+    });
+    return subjectModelMap;
+  }
 }
