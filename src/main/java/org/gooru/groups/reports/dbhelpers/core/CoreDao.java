@@ -2,6 +2,7 @@
 package org.gooru.groups.reports.dbhelpers.core;
 
 import java.util.List;
+import org.gooru.groups.app.jdbi.PGArray;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
@@ -26,4 +27,8 @@ public interface CoreDao {
   @Mapper(SchoolModelMapper.class)
   @SqlQuery("SELECT id, name, code FROM school_ds WHERE id = ANY(:schoolIds::bigint[])")
   List<SchoolModel> fetchSchoolDetails(@Bind("schoolIds") String schoolIds);
+  
+  @Mapper(SubjectModelMapper.class)
+  @SqlQuery("SELECT id, title FROM taxonomy_subject WHERE id = ANY(:subjectCodes)")
+  List<SubjectModel> fetchSubjectDetails(@Bind("subjectCodes") PGArray<String> subjectCodes);
 }
