@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.dbhelpers;
+package org.gooru.groups.reports.perf.dbhelpers;
 
 import java.util.List;
 import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryCommand;

@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.gooru.groups.reports.dbhelpers.PerformanceAndTSReportBySchoolModel;
 import org.gooru.groups.reports.dbhelpers.core.ClassModel;
+import org.gooru.groups.reports.perf.dbhelpers.PerformanceAndTSReportBySchoolModel;
 import org.gooru.groups.reports.perf.school.GroupPerfReportBySchoolResponseModel.ClassPerformance;
 import org.gooru.groups.reports.perf.school.GroupPerfReportBySchoolResponseModel.OverallStats;
 

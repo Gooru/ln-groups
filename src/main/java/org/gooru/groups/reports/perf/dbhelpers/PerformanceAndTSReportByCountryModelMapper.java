@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.dbhelpers;
+package org.gooru.groups.reports.perf.dbhelpers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

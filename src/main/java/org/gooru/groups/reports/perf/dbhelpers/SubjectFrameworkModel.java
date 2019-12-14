@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.dbhelpers;
+package org.gooru.groups.reports.perf.dbhelpers;
 
 /**
  * @author szgooru Created On 13-Dec-2019

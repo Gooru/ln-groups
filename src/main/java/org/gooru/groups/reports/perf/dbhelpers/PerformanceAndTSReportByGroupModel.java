@@ -1,21 +1,20 @@
 
-package org.gooru.groups.reports.dbhelpers;
+package org.gooru.groups.reports.perf.dbhelpers;
 
 /**
  * @author szgooru Created On 20-Mar-2019
  */
-public class PerformanceAndTSReportBySchoolModel {
-
-  private String classId;
+public class PerformanceAndTSReportByGroupModel {
+  private Long groupId;
   private Long timespent;
   private Double performance;
 
-  public String getClassId() {
-    return classId;
+  public Long getGroupId() {
+    return groupId;
   }
 
-  public void setClassId(String classId) {
-    this.classId = classId;
+  public void setGroupId(Long groupId) {
+    this.groupId = groupId;
   }
 
   public Long getTimespent() {
@@ -33,5 +32,4 @@ public class PerformanceAndTSReportBySchoolModel {
   public void setPerformance(Double performance) {
     this.performance = performance;
   }
-
 }

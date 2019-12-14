@@ -96,6 +96,11 @@ public final class Constants {
     public static final String MSG_OP_PERF_REPORTS_GROUPS_BY_GROUP = "mb.op.perf.reports.groups.group.get";
     public static final String MSG_OP_PERF_REPORTS_GROUPS_BY_SCHOOL = "mb.op.perf.reports.groups.school.get";
     
+    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_COUNTRY = "mb.op.competency.reports.groups.country.get";
+    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_STATE = "mb.op.competency.reports.groups.state.get";
+    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_GROUP = "mb.op.competency.reports.groups.group.get";
+    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_SCHOOL = "mb.op.competency.reports.groups.school.get";
+    
     public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY =
         "mb.op.reports.class.student.summary";
 
@@ -180,6 +185,7 @@ public final class Constants {
     private static final String ACTIVITIES = "activities";
     private static final String COUNTRIES = "countries";
     private static final String PERFORMANCE = "performance";
+    private static final String COMPETENCY = "competency";
     private static final String STATES = "states";
     private static final String SCHOOLS = "schools";
     private static final String SUBJECTS = "subjects";
@@ -218,7 +224,7 @@ public final class Constants {
     public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_GET =
         API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY;
 
-    // Data Reports
+    // Performance Reports
     public static final String API_FETCH_COUNTRIES = API_REPORTS_BASE_ROUTE + COUNTRIES;
     
     public static final String API_FETCH_PERF_SUBJECTS_BY_COUNTRY = API_REPORTS_BASE_ROUTE
@@ -235,6 +241,20 @@ public final class Constants {
     
     public static final String API_FETCH_PERF_REPORT_BY_SCHOOL =
         API_REPORTS_BASE_ROUTE + PERFORMANCE + SEP + SCHOOLS + SEP + COLON + ID_SCHOOL;
+    
+    // Competency Count Reports
+    public static final String API_FETCH_COMPETENCY_REPORT_BY_COUNTRY =
+        API_REPORTS_BASE_ROUTE + COMPETENCY + SEP + COUNTRIES + SEP + COLON + ID_COUNTRY;
+
+    public static final String API_FETCH_COMPETENCY_REPORT_BY_STATE =
+        API_REPORTS_BASE_ROUTE + COMPETENCY + SEP + COUNTRIES + SEP + COLON + ID_COUNTRY + SEP
+            + STATES + SEP + COLON + ID_STATE;
+
+    public static final String API_FETCH_COMPETENCY_REPORT_BY_GROUP =
+        API_REPORTS_BASE_ROUTE + COMPETENCY + SEP + GROUPS + SEP + COLON + ID_GROUP;
+
+    public static final String API_FETCH_COMPETENCY_REPORT_BY_SCHOOL =
+        API_REPORTS_BASE_ROUTE + COMPETENCY + SEP + SCHOOLS + SEP + COLON + ID_SCHOOL;
     
     private Route() {
       throw new AssertionError();
