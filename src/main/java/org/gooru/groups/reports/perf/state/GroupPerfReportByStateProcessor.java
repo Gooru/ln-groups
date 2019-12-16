@@ -78,7 +78,7 @@ public class GroupPerfReportByStateProcessor implements MessageProcessor {
       String resultString = new ObjectMapper().writeValueAsString(responseModel);
       result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
     } catch (Throwable t) {
-      LOGGER.warn("exception while fetching class summary", t);
+      LOGGER.warn("exception while fetching group performance report by state", t);
       result.fail(t);
     }
 
