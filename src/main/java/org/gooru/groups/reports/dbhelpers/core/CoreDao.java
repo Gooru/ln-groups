@@ -2,6 +2,7 @@
 package org.gooru.groups.reports.dbhelpers.core;
 
 import java.util.List;
+import java.util.Set;
 import org.gooru.groups.app.jdbi.PGArray;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
@@ -36,4 +37,11 @@ public interface CoreDao {
   @SqlQuery("SELECT id, name, code, type, sub_type FROM groups WHERE state_id = :stateId::bigint AND (sub_type = 'school_district' OR"
       + " sub_type = 'district')")
   List<GroupModel> fetchGroupsByState(@Bind("stateId") Long stateId);
+  
+  @SqlQuery("SELECT school_id FROM group_school_mapping WHERE group_id = :groupId::bigint")
+  Set<Long> fetchSchoolsByGroup(@Bind("groupId") Long groupId);
+  
+  @Mapper(GroupModelMapper.class)
+  @SqlQuery("SELECT id, name, code, type, sub_type FROM groups WHERE parent_id = :groupId::bigint")
+  List<GroupModel> fetchGroupsByParent(@Bind("groupId") Long groupId);
 }
