@@ -100,6 +100,15 @@ public class CoreService {
     return groupModelMap;
   }
 
+  public Map<Long, GroupModel> fetchGroupsByState(Long stateId) {
+    Map<Long, GroupModel> groupModelMap = new HashMap<>();
+    List<GroupModel> groupModels = this.coreDao.fetchGroupsByState(stateId);
+    groupModels.forEach(group -> {
+      groupModelMap.put(group.getId(), group);
+    });
+    return groupModelMap;
+  }
+
   public Map<Long, SchoolModel> fetchSchoolDetails(Set<Long> schoolIds) {
     Map<Long, SchoolModel> schoolModelMap = new HashMap<>();
     List<SchoolModel> schoolModels =
