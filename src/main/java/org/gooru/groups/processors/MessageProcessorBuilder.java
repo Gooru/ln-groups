@@ -7,6 +7,9 @@ import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryRepor
 import org.gooru.groups.reports.classes.student.summary.weekly.ClassStudentSummaryWeeklyReportProcessor;
 import org.gooru.groups.reports.classes.summary.ClassSummaryReportProcessor;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryProcessor;
+import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupProcessor;
+import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolProcessor;
+import org.gooru.groups.reports.competency.state.GroupCompetencyReportByStateProcessor;
 import org.gooru.groups.reports.fetchcountries.FetchCountriesForGroupReportProcessor;
 import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryProcessor;
 import org.gooru.groups.reports.perf.fetchsubject.country.FetchSubjectsForPerfReportByCountryProcessor;
@@ -38,28 +41,37 @@ public final class MessageProcessorBuilder {
         return new ClassStudentDetailedSummaryProcessor(vertx, message);
       case Constants.Message.MSG_OP_REPORTS_GROUPS_COUNTRIES:
         return new FetchCountriesForGroupReportProcessor(vertx, message);
-        
+
       case Constants.Message.MSG_OP_PERF_REPORTS_SUBJECTS_BY_COUNTRY:
         return new FetchSubjectsForPerfReportByCountryProcessor(vertx, message);
-        
+
       case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_COUNTRY:
         return new GroupPerfReportByCountryProcessor(vertx, message);
-        
+
       case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_STATE:
         return new GroupPerfReportByStateProcessor(vertx, message);
-        
+
       case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_GROUP:
         return new GroupPerfReportByGroupProcessor(vertx, message);
-        
+
       case Constants.Message.MSG_OP_PERF_REPORTS_GROUPS_BY_SCHOOL:
         return new GroupPerfReportBySchoolProcessor(vertx, message);
-        
+
       case Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY:
         return new ClassStudentSummaryReportProcessor(vertx, message);
-        
+
       case Constants.Message.MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_COUNTRY:
         return new GroupCompetencyReportByCountryProcessor(vertx, message);
-        
+
+      case Constants.Message.MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_STATE:
+        return new GroupCompetencyReportByStateProcessor(vertx, message);
+
+      case Constants.Message.MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_GROUP:
+        return new GroupCompetencyReportByGroupProcessor(vertx, message);
+
+      case Constants.Message.MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_SCHOOL:
+        return new GroupCompetencyReportBySchoolProcessor(vertx, message);
+
       default:
         return null;
     }

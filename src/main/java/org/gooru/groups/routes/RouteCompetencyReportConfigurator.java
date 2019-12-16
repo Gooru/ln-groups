@@ -28,11 +28,36 @@ public class RouteCompetencyReportConfigurator implements RouteConfigurator {
 
     router.get(Constants.Route.API_FETCH_COMPETENCY_REPORT_BY_COUNTRY)
         .handler(this::fetchCompetencyReportByCountry);
+    router.get(Constants.Route.API_FETCH_COMPETENCY_REPORT_BY_STATE)
+        .handler(this::fetchCompetencyReportByState);
+    router.get(Constants.Route.API_FETCH_COMPETENCY_REPORT_BY_GROUP)
+        .handler(this::fetchCompetencyReportByGroup);
+    router.get(Constants.Route.API_FETCH_COMPETENCY_REPORT_BY_SCHOOL)
+        .handler(this::fetchCompetencyReportBySchool);
+
   }
 
   private void fetchCompetencyReportByCountry(RoutingContext routingContext) {
     RouteHandlerUtils.baseHandler(this.eb, routingContext,
         Constants.Message.MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_COUNTRY,
+        Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
+  }
+
+  private void fetchCompetencyReportByState(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_STATE,
+        Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
+  }
+
+  private void fetchCompetencyReportByGroup(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_GROUP,
+        Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
+  }
+
+  private void fetchCompetencyReportBySchool(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_SCHOOL,
         Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
   }
 }

@@ -63,7 +63,7 @@ public interface GroupReportsDao {
   // ---- Performance and Time spent report by state
   @Mapper(PerformanceAndTSReportByGroupModelMapper.class)
   @SqlQuery("SELECT group_id, SUM(collection_timespent) AS collection_ts, AVG(assessment_performance) AS assessment_perf FROM"
-      + " group_performance_data_reports WHERE state_id = :stateId AND  AND week = :week AND month = :month AND year = :year AND subject = :subject"
+      + " group_performance_data_reports WHERE state_id = :stateId AND week = :week AND month = :month AND year = :year AND subject = :subject"
       + " AND framework = :framework GROUP BY group_id")
   List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByState(
       @BindBean GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean);
