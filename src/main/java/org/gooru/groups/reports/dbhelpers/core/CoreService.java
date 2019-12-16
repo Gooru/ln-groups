@@ -132,4 +132,17 @@ public class CoreService {
     });
     return subjectModelMap;
   }
+
+  public Set<Long> fetchSchoolsByGroup(Long groupId) {
+    return this.coreDao.fetchSchoolsByGroup(groupId);
+  }
+
+  public Map<Long, GroupModel> fetchGroupsByParent(Long groupId) {
+    Map<Long, GroupModel> groupModelMap = new HashMap<>();
+    List<GroupModel> groupModels = this.coreDao.fetchGroupsByParent(groupId);
+    groupModels.forEach(group -> {
+      groupModelMap.put(group.getId(), group);
+    });
+    return groupModelMap;
+  }
 }

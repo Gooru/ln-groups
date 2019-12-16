@@ -28,6 +28,9 @@ public class CommandAttributeConstants {
   public final static String FREQUENCY_MONTHLY = "monthly";
   public final static List<String> VALID_FREQUENCY = Arrays.asList(FREQUENCY_WEEKLY, FREQUENCY_MONTHLY);
   
+  public final static String GROUP_TYPE_SCHOOL_DISTRICT = "school_district";
+  public final static String GROUP_TYPE_DISTRICT = "district";
+  public final static String GROUP_TYPE_BLOCK = "block";
   public final static String GROUP_TYPE_CLUSTER = "cluster";
 
 }
