@@ -43,6 +43,7 @@ public class GroupPerfReportBySchoolResponseModel {
     private String id;
     private String name;
     private String code;
+    private String courseId;
     private String type;
     private String subType;
     private Long timespent;
@@ -72,6 +73,14 @@ public class GroupPerfReportBySchoolResponseModel {
 
     public void setCode(String code) {
       this.code = code;
+    }
+    
+    public String getCourseId() {
+      return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+      this.courseId = courseId;
     }
 
     public String getType() {
