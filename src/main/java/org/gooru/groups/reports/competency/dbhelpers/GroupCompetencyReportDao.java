@@ -23,8 +23,8 @@ public interface GroupCompetencyReportDao {
       @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
 
   @Mapper(GroupCompetencyStateWiseReportByCountryModelMapper.class)
-  @SqlQuery("SELECT state_id, SUM(completed_count) as completed_competencies FROM class_competency_data_reports WHERE country_id = :countryId AND"
-      + " month = :month AND year = :year GROUP BY state_id")
+  @SqlQuery("SELECT state_id, SUM(completed_count) as completed_competencies, SUM(inprogress_count) as inprogress_competencies FROM"
+      + " class_competency_data_reports WHERE country_id = :countryId AND month = :month AND year = :year GROUP BY state_id")
   List<GroupCompetencyStateWiseReportByCountryModel> fetchGroupCompetencyStateWiseReportByCountry(
       @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
 }

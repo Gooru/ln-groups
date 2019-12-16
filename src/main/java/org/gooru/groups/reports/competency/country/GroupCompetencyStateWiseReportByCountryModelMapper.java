@@ -19,6 +19,7 @@ public class GroupCompetencyStateWiseReportByCountryModelMapper
         new GroupCompetencyStateWiseReportByCountryModel();
     model.setStateId(r.getLong("state_id"));
     model.setCompletedCompetencies(r.getLong("completed_competencies"));
+    model.setInprogressCompetencies(r.getLong("inprogress_competencies"));
     return model;
   }
 

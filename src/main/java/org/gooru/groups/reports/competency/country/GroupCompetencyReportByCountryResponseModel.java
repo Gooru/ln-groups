@@ -78,6 +78,7 @@ public class GroupCompetencyReportByCountryResponseModel {
     private String type;
     private String subType;
     private Long completedCompetencies;
+    private Long inprogressCompetencies;
 
     public Long getId() {
       return id;
@@ -127,6 +128,14 @@ public class GroupCompetencyReportByCountryResponseModel {
       this.completedCompetencies = completedCompetencies;
     }
 
+    public Long getInprogressCompetencies() {
+      return inprogressCompetencies;
+    }
+
+    public void setInprogressCompetencies(Long inprogressCompetencies) {
+      this.inprogressCompetencies = inprogressCompetencies;
+    }
+    
   }
 
 }

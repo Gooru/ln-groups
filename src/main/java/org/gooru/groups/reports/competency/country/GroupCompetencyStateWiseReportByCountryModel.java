@@ -8,6 +8,7 @@ public class GroupCompetencyStateWiseReportByCountryModel {
 
   private Long stateId;
   private Long completedCompetencies;
+  private Long inprogressCompetencies;
 
   public Long getStateId() {
     return stateId;
@@ -25,4 +26,12 @@ public class GroupCompetencyStateWiseReportByCountryModel {
     this.completedCompetencies = completedCompetencies;
   }
 
+  public Long getInprogressCompetencies() {
+    return inprogressCompetencies;
+  }
+
+  public void setInprogressCompetencies(Long inprogressCompetencies) {
+    this.inprogressCompetencies = inprogressCompetencies;
+  }
+  
 }
