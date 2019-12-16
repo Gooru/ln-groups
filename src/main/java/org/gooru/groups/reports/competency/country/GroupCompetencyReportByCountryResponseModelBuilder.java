@@ -59,6 +59,7 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
     drilldownModel.setType("state");
     drilldownModel.setSubType(null);
     drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
+    drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
     return drilldownModel;
   }
 }
