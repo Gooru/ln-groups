@@ -6,6 +6,9 @@ import java.util.Set;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryCommand;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryModel;
 import org.gooru.groups.reports.competency.country.GroupCompetencyStateWiseReportByCountryModel;
+import org.gooru.groups.reports.competency.school.GroupCompetencyClassWiseReportBySchoolModel;
+import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolCommand;
+import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolModel;
 import org.gooru.groups.reports.competency.state.GroupCompetencyGroupWiseReportByStateModel;
 import org.gooru.groups.reports.competency.state.GroupCompetencyReportByStateCommand;
 import org.gooru.groups.reports.competency.state.GroupCompetencyReportByStateModel;
@@ -45,6 +48,16 @@ public class GroupCompetencyReportService {
       GroupCompetencyReportByStateCommand.GroupCompetencyReportByStateCommandBean bean) {
     return this.dao.fetchGroupCompetencyGroupWiseReportByState(
         CollectionUtils.toPostgresArrayLong(groupIds), bean);
+  }
+
+  public List<GroupCompetencyReportBySchoolModel> fetchGroupCompetencyReportBySchool(
+      GroupCompetencyReportBySchoolCommand.GroupCompetencyReportBySchoolCommandBean bean) {
+    return this.dao.fetchGroupCompetencyReportBySchool(bean);
+  }
+
+  public List<GroupCompetencyClassWiseReportBySchoolModel> fetchGroupCompetencyClassWiseReportBySchool(
+      GroupCompetencyReportBySchoolCommand.GroupCompetencyReportBySchoolCommandBean bean) {
+    return this.dao.fetchGroupCompetencyClassWiseReportBySchool(bean);
   }
 
 }

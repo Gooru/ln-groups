@@ -7,6 +7,7 @@ import org.gooru.groups.reports.perf.fetchsubject.country.FetchSubjectsForPerfRe
 import org.gooru.groups.reports.perf.group.GroupPerfReportByGroupCommand;
 import org.gooru.groups.reports.perf.school.GroupPerfReportBySchoolCommand;
 import org.gooru.groups.reports.perf.state.GroupPerfReportByStateCommand;
+import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
@@ -63,16 +64,16 @@ public interface GroupReportsDao {
   // ---- Performance and Time spent report by state
   @Mapper(PerformanceAndTSReportByGroupModelMapper.class)
   @SqlQuery("SELECT group_id, SUM(collection_timespent) AS collection_ts, AVG(assessment_performance) AS assessment_perf FROM"
-      + " group_performance_data_reports WHERE state_id = :stateId AND week = :week AND month = :month AND year = :year AND subject = :subject"
-      + " AND framework = :framework GROUP BY group_id")
-  List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByState(
+      + " group_performance_data_reports WHERE group_id = ANY(:groupIds::bigint[]) AND state_id = :stateId AND week = :week AND month = :month AND"
+      + " year = :year AND subject = :subject AND framework = :framework GROUP BY group_id")
+  List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByState(@Bind("groupIds") String groupIds,
       @BindBean GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean);
 
   @Mapper(PerformanceAndTSReportByGroupModelMapper.class)
   @SqlQuery("SELECT group_id, SUM(collection_timespent) AS collection_ts, AVG(assessment_performance) AS assessment_perf FROM"
-      + " group_performance_data_reports WHERE state_id = :stateId AND month = :month AND year = :year AND subject = :subject AND framework ="
-      + " :framework GROUP BY group_id")
-  List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByState(
+      + " group_performance_data_reports WHERE group_id = ANY(:groupIds::bigint[]) AND state_id = :stateId AND month = :month AND year = :year AND"
+      + " subject = :subject AND framework = :framework GROUP BY group_id")
+  List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByState(@Bind("groupIds") String groupIds,
       @BindBean GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean);
 
   // ---- Performance and Time spent report by country

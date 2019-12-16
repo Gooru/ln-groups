@@ -1,8 +1,16 @@
 
 package org.gooru.groups.reports.competency.school;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
+import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.processors.MessageProcessor;
+import org.gooru.groups.reports.competency.dbhelpers.GroupCompetencyReportService;
+import org.gooru.groups.reports.dbhelpers.core.ClassModel;
+import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.responses.MessageResponse;
 import org.gooru.groups.responses.MessageResponseFactory;
 import org.slf4j.Logger;
@@ -23,6 +31,10 @@ public class GroupCompetencyReportBySchoolProcessor implements MessageProcessor 
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
+  private final GroupCompetencyReportService reportService =
+      new GroupCompetencyReportService(DBICreator.getDbiForDsdbDS());
+  private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
+
   public GroupCompetencyReportBySchoolProcessor(Vertx vertx, Message<JsonObject> message) {
     this.message = message;
     this.result = Future.future();
@@ -32,6 +44,25 @@ public class GroupCompetencyReportBySchoolProcessor implements MessageProcessor 
   public Future<MessageResponse> process() {
     try {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
+      GroupCompetencyReportBySchoolCommand command =
+          GroupCompetencyReportBySchoolCommand.build(ebMessage.getRequestBody());
+      GroupCompetencyReportBySchoolCommand.GroupCompetencyReportBySchoolCommandBean bean =
+          command.asBean();
+
+      List<GroupCompetencyReportBySchoolModel> competencyReportByWeek =
+          this.reportService.fetchGroupCompetencyReportBySchool(bean);
+      List<GroupCompetencyClassWiseReportBySchoolModel> competencyReportByClass =
+          this.reportService.fetchGroupCompetencyClassWiseReportBySchool(bean);
+
+      // Fetch class ids from the report data
+      Set<String> classIds = new HashSet<>(competencyReportByClass.size());
+      competencyReportByClass.forEach(model -> {
+        classIds.add(model.getClassId());
+      });
+
+      // Fetch the titles of the classes from core db
+      Map<String, ClassModel> classDetails = this.coreService.fetchClassDetails(classIds);
+
       String resultString = new ObjectMapper().writeValueAsString(null);
       result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
     } catch (Throwable t) {

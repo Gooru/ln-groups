@@ -7,6 +7,11 @@ import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountr
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryModelMapper;
 import org.gooru.groups.reports.competency.country.GroupCompetencyStateWiseReportByCountryModel;
 import org.gooru.groups.reports.competency.country.GroupCompetencyStateWiseReportByCountryModelMapper;
+import org.gooru.groups.reports.competency.school.GroupCompetencyClassWiseReportBySchoolModel;
+import org.gooru.groups.reports.competency.school.GroupCompetencyClassWiseReportBySchoolModelMapper;
+import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolCommand;
+import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolModel;
+import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolModelMapper;
 import org.gooru.groups.reports.competency.state.GroupCompetencyGroupWiseReportByStateModel;
 import org.gooru.groups.reports.competency.state.GroupCompetencyGroupWiseReportByStateModelMapper;
 import org.gooru.groups.reports.competency.state.GroupCompetencyReportByStateCommand;
@@ -21,6 +26,8 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
  * @author szgooru Created On 16-Dec-2019
  */
 public interface GroupCompetencyReportDao {
+  
+  // Group Competency report by Country
 
   @Mapper(GroupCompetencyReportByCountryModelMapper.class)
   @SqlQuery("SELECT week, SUM(completed_count) as completed_competencies FROM class_competency_data_reports WHERE country_id = :countryId AND"
@@ -34,6 +41,8 @@ public interface GroupCompetencyReportDao {
   List<GroupCompetencyStateWiseReportByCountryModel> fetchGroupCompetencyStateWiseReportByCountry(
       @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
 
+  // Group Competency report by State
+  
   @Mapper(GroupCompetencyReportByStateModelMapper.class)
   @SqlQuery("SELECT week, SUM(completed_count) as completed_competencies FROM group_competency_data_reports WHERE group_id = ANY(:groupIds::bigint[])"
       + " AND state_id = :stateId AND month = :month AND year = :year GROUP BY week")
@@ -48,6 +57,19 @@ public interface GroupCompetencyReportDao {
   List<GroupCompetencyGroupWiseReportByStateModel> fetchGroupCompetencyGroupWiseReportByState(
       @Bind("groupIds") String groupIds,
       @BindBean GroupCompetencyReportByStateCommand.GroupCompetencyReportByStateCommandBean bean);
+  
+  // Group Competency report by School
 
+  @Mapper(GroupCompetencyReportBySchoolModelMapper.class)
+  @SqlQuery("SELECT week, SUM(completed_count) as completed_competencies FROM class_competency_data_reports WHERE school_id = :schoolId AND"
+      + " month = :month AND year = :year GROUP BY week")
+  List<GroupCompetencyReportBySchoolModel> fetchGroupCompetencyReportBySchool(
+      @BindBean GroupCompetencyReportBySchoolCommand.GroupCompetencyReportBySchoolCommandBean bean);
+
+  @Mapper(GroupCompetencyClassWiseReportBySchoolModelMapper.class)
+  @SqlQuery("SELECT class_id, SUM(completed_count) as completed_competencies, SUM(inprogress_count) as inprogress_competencies FROM"
+      + " class_competency_data_reports WHERE school_id = :schoolId AND month = :month AND year = :year GROUP BY class_id")
+  List<GroupCompetencyClassWiseReportBySchoolModel> fetchGroupCompetencyClassWiseReportBySchool(
+      @BindBean GroupCompetencyReportBySchoolCommand.GroupCompetencyReportBySchoolCommandBean bean);
 }
 

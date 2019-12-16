@@ -16,7 +16,7 @@ public class GroupPerfReportByStateCommand {
   
   private final static Logger LOGGER = LoggerFactory.getLogger(GroupPerfReportByStateCommand.class);
 
-  private Integer stateId;
+  private Long stateId;
   private String frequency;
   private Integer week;
   private Integer month;
@@ -24,7 +24,7 @@ public class GroupPerfReportByStateCommand {
   private String subject;
   private String framework;
 
-  public GroupPerfReportByStateCommand(Integer stateId, String frequency, Integer week, Integer month,
+  public GroupPerfReportByStateCommand(Long stateId, String frequency, Integer week, Integer month,
       Integer year, String subject, String framework) {
     this.stateId = stateId;
     this.frequency = frequency;
@@ -35,7 +35,7 @@ public class GroupPerfReportByStateCommand {
     this.framework = framework;
   }
 
-  public Integer getStateId() {
+  public Long getStateId() {
     return stateId;
   }
 
@@ -70,7 +70,7 @@ public class GroupPerfReportByStateCommand {
   }
 
   private static GroupPerfReportByStateCommand buildFromJson(JsonObject request) {
-    Integer state = RequestUtils.getAsInt(request, CommandAttributeConstants.STATE_ID);
+    Long state = RequestUtils.getAsLong(request, CommandAttributeConstants.STATE_ID);
     String frequency = request.getString(CommandAttributeConstants.FREQUENCY);
     Integer week = RequestUtils.getAsInt(request, CommandAttributeConstants.WEEK);
     Integer month = RequestUtils.getAsInt(request, CommandAttributeConstants.MONTH);
@@ -121,7 +121,7 @@ public class GroupPerfReportByStateCommand {
   }
 
   public static class GroupPerformanceReportByStateCommandBean {
-    private Integer stateId;
+    private Long stateId;
     private String frequency;
     private Integer week;
     private Integer month;
@@ -129,11 +129,11 @@ public class GroupPerfReportByStateCommand {
     private String subject;
     private String framework;
 
-    public Integer getStateId() {
+    public Long getStateId() {
       return stateId;
     }
 
-    public void setStateId(Integer stateId) {
+    public void setStateId(Long stateId) {
       this.stateId = stateId;
     }
     

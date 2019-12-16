@@ -2,11 +2,13 @@
 package org.gooru.groups.reports.perf.dbhelpers;
 
 import java.util.List;
+import java.util.Set;
 import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryCommand;
 import org.gooru.groups.reports.perf.fetchsubject.country.FetchSubjectsForPerfReportByCountryCommand;
 import org.gooru.groups.reports.perf.group.GroupPerfReportByGroupCommand;
 import org.gooru.groups.reports.perf.school.GroupPerfReportBySchoolCommand;
 import org.gooru.groups.reports.perf.state.GroupPerfReportByStateCommand;
+import org.gooru.groups.reports.utils.CollectionUtils;
 import org.skife.jdbi.v2.DBI;
 
 /**
@@ -51,13 +53,17 @@ public class GroupReportService {
   }
 
   public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByState(
+      Set<Long> groupIds,
       GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean) {
-    return this.reportDao.fetchPerformanceAndTSWeekReportByState(bean);
+    return this.reportDao.fetchPerformanceAndTSWeekReportByState(
+        CollectionUtils.toPostgresArrayLong(groupIds), bean);
   }
 
   public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByState(
+      Set<Long> groupIds,
       GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean) {
-    return this.reportDao.fetchPerformanceAndTSMonthReportByState(bean);
+    return this.reportDao.fetchPerformanceAndTSMonthReportByState(
+        CollectionUtils.toPostgresArrayLong(groupIds), bean);
   }
 
   public List<PerformanceAndTSReportByCountryModel> fetchPerformanceAndTSMonthReportByCountry(
