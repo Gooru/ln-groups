@@ -47,6 +47,16 @@ public class CoreService {
     return classModelMap;
   }
 
+  public Map<String, ClassModel> fetchClassesBySchool(Long schoolId) {
+    Map<String, ClassModel> classModelMap = new HashMap<>();
+
+    List<ClassModel> classModels = this.classDao.fetchClassesBySchool(schoolId);
+    classModels.forEach(classModel -> {
+      classModelMap.put(classModel.getId(), classModel);
+    });
+    return classModelMap;
+  }
+
   public String fetchCourseTitle(String courseId) {
     return this.courseDao.fetchCourse(courseId);
   }
