@@ -2,6 +2,7 @@
 package org.gooru.groups.reports.perf.group;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,13 +18,20 @@ public class GroupPerfReportByClusterResponseModelBuilder {
 
   public static GroupPerfReportByClusterResponseModel build(
       List<PerformanceAndTSReportByClusterModel> perfModels, Map<Long, SchoolModel> schoolModels) {
-    List<ClusterResponseModel> clusterResponseModels = new ArrayList<>(perfModels.size());
-    perfModels.forEach(perfModel -> {
-      SchoolModel schoolModel = schoolModels.get(perfModel.getSchoolId());
-      clusterResponseModels.add(buildSchoolModel(perfModel, schoolModel));
+
+    Map<Long, PerformanceAndTSReportByClusterModel> perfReportMap = new HashMap<>();
+    perfModels.forEach(model -> {
+      perfReportMap.put(model.getSchoolId(), model);
     });
 
-    GroupPerfReportByClusterResponseModel responseModel = new GroupPerfReportByClusterResponseModel();
+    List<ClusterResponseModel> clusterResponseModels = new ArrayList<>();
+    for (Map.Entry<Long, SchoolModel> entry : schoolModels.entrySet()) {
+      clusterResponseModels
+          .add(buildSchoolModel(perfReportMap.get(entry.getKey()), entry.getValue()));
+    }
+
+    GroupPerfReportByClusterResponseModel responseModel =
+        new GroupPerfReportByClusterResponseModel();
     OverallClusterStats stats = new OverallClusterStats();
     if (perfModels != null && !perfModels.isEmpty()) {
       Double totalPerformance =
@@ -32,22 +40,27 @@ public class GroupPerfReportByClusterResponseModelBuilder {
     } else {
       stats.setAveragePerformance(0d);
     }
-    
-    responseModel.setOverallStats(stats);  
+
+    responseModel.setOverallStats(stats);
     responseModel.setData(clusterResponseModels);
     return responseModel;
   }
 
-  private static ClusterResponseModel buildSchoolModel(PerformanceAndTSReportByClusterModel perfModel,
-      SchoolModel schoolModel) {
+  private static ClusterResponseModel buildSchoolModel(
+      PerformanceAndTSReportByClusterModel perfModel, SchoolModel schoolModel) {
     ClusterResponseModel model = new ClusterResponseModel();
-    model.setId(perfModel.getSchoolId());
+    model.setId(schoolModel.getId());
     model.setName(schoolModel.getName());
     model.setCode(schoolModel.getCode());
     model.setType("school");
     model.setSubType(null);
-    model.setTimespent(perfModel.getTimespent());
-    model.setPerformance(perfModel.getPerformance());
+    if (perfModel != null) {
+      model.setTimespent(perfModel.getTimespent());
+      model.setPerformance(perfModel.getPerformance());
+    } else {
+      model.setTimespent(0l);
+      model.setPerformance(0d);
+    }
     return model;
   }
 }

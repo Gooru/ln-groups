@@ -53,7 +53,7 @@ public class FetchSubjectsForPerfReportByCountryProcessor implements MessageProc
 
       List<SubjectFrameworkModel> subjects = new ArrayList<>();
       if (command.getFrequency().equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
-        subjects = this.service.fetchSubjectsForPerfReportMonthByCountry(bean);
+        subjects = this.service.fetchSubjectsForPerfReportWeekByCountry(bean);
       } else {
         subjects = this.service.fetchSubjectsForPerfReportMonthByCountry(bean);
       }

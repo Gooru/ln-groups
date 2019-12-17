@@ -50,27 +50,25 @@ public class GroupPerfReportByGroupProcessor implements MessageProcessor {
     try {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
 
-      // User role authorization
-      // AuthorizerBuilder.buildGroupReportAuthorizer(
-      // ebMessage.getSession().getString(Constants.Message.MSG_USER_ID)).authorize();
-
       GroupPerfReportByGroupCommand command =
           GroupPerfReportByGroupCommand.build(ebMessage.getRequestBody());
       GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean = command.asBean();
-
-      // Extract tenant from the session
-      // JsonObject tenantJson =
-      // ebMessage.getSession().getJsonObject(Constants.Message.MSG_SESSION_TENANT);
 
       // fetch the group details to check for which type of group the data is requested for. For
       // district/school_distrinct and block the data will be fetched and grouped by the groups.
       // However for the cluster type of the group, data will be grouped by the schools because
       // school falls under cluster as per groups hierarchy
       GroupModel group = this.coreService.fetchGroupById(command.getGroupId());
-      if (group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_CLUSTER)) {
-        fetchReportBYCluster(bean);
-      } else {
-        fetchReportByGroup(bean);
+      if (group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_SCHOOL_DISTRICT)
+          || group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_CLUSTER)) {
+        // Fetch group to school mapping
+        Set<Long> schoolIds = this.coreService.fetchSchoolsByGroup(command.getGroupId());
+        fetchReportBYCluster(schoolIds, bean);
+      } else if (group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_DISTRICT)
+          || group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_BLOCK)) {
+        Map<Long, GroupModel> groupModels =
+            this.coreService.fetchGroupsByParent(command.getGroupId());
+        fetchReportByGroup(groupModels, bean);
       }
     } catch (Throwable t) {
       LOGGER.warn("exception while fetching class summary", t);
@@ -80,44 +78,34 @@ public class GroupPerfReportByGroupProcessor implements MessageProcessor {
     return this.result;
   }
 
-  private void fetchReportBYCluster(
+  private void fetchReportBYCluster(Set<Long> schoolIds,
       GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean)
       throws JsonProcessingException {
     List<PerformanceAndTSReportByClusterModel> report = new ArrayList<>();
     if (bean.getFrequency().equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
-      report = this.service.fetchPerformanceAndTSWeekReportByCluster(bean);
+      report = this.service.fetchPerformanceAndTSWeekReportBySDorCluster(schoolIds, bean);
     } else {
-      report = this.service.fetchPerformanceAndTSMonthReportByCluster(bean);
+      report = this.service.fetchPerformanceAndTSMonthReportBySDorCluster(schoolIds, bean);
     }
 
-    Set<Long> uniqueSchoolIds = new HashSet<>();
-    report.forEach(record -> {
-      uniqueSchoolIds.add(record.getSchoolId());
-    });
-
-    Map<Long, SchoolModel> schoolModels = this.coreService.fetchSchoolDetails(uniqueSchoolIds);
+    Map<Long, SchoolModel> schoolModels = this.coreService.fetchSchoolDetails(schoolIds);
     GroupPerfReportByClusterResponseModel responseModel =
         GroupPerfReportByClusterResponseModelBuilder.build(report, schoolModels);
     String resultString = new ObjectMapper().writeValueAsString(responseModel);
     result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
   }
 
-  private void fetchReportByGroup(
+  private void fetchReportByGroup(Map<Long, GroupModel> groupModels,
       GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean)
       throws JsonProcessingException {
     List<PerformanceAndTSReportByGroupModel> report = new ArrayList<>();
     if (bean.getFrequency().equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
-      report = this.service.fetchPerformanceAndTSWeekReportByGroup(bean);
+      report =
+          this.service.fetchPerformanceAndTSWeekReportByDistrictOrBlock(groupModels.keySet(), bean);
     } else {
-      report = this.service.fetchPerformanceAndTSMonthReportByGroup(bean);
+      report = this.service.fetchPerformanceAndTSMonthReportByDistrictOrBlock(groupModels.keySet(),
+          bean);
     }
-
-    Set<Long> uniqueGroupIds = new HashSet<>();
-    report.forEach(record -> {
-      uniqueGroupIds.add(record.getGroupId());
-    });
-
-    Map<Long, GroupModel> groupModels = this.coreService.fetchGroupDetails(uniqueGroupIds);
 
     GroupPerfReportByGroupResponseModel responseModel =
         GroupPerfReportByGroupResponseModelBuilder.build(report, groupModels);
