@@ -1,10 +1,8 @@
 
 package org.gooru.groups.reports.competency.country;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.processors.MessageProcessor;
@@ -62,11 +60,12 @@ public class GroupCompetencyReportByCountryProcessor implements MessageProcessor
       //  uniqueStateIds.add(record.getStateId());
       //});
       Map<Long, StateModel> states = this.coreService.fetchStatesByCountry(bean.getCountryId());
-
+      Double averagePerformance = this.reportService.fetchAveragePerformanceByCountry(bean);
+      
       LOGGER.debug("prepare the response model");
       GroupCompetencyReportByCountryResponseModel responseModel =
           new GroupCompetencyReportByCountryResponseModelBuilder().build(competencyReportByWeek,
-              competencyReportByState, states);
+              competencyReportByState, states, averagePerformance);
 
       String resultString = new ObjectMapper().writeValueAsString(responseModel);
       result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));

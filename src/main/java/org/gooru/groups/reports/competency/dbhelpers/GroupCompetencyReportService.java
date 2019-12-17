@@ -28,6 +28,10 @@ public class GroupCompetencyReportService {
   public GroupCompetencyReportService(DBI dbi) {
     this.dao = dbi.onDemand(GroupCompetencyReportDao.class);
   }
+  
+  public Double fetchAveragePerformanceByCountry(GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
+    return this.dao.fetchAveragePerformanceByCountty(bean);
+  }
 
   public List<GroupCompetencyReportByCountryModel> fetchGroupCompetencyReportByCountry(
       GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
