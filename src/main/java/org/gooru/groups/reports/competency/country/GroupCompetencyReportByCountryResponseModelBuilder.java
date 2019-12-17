@@ -2,6 +2,7 @@
 package org.gooru.groups.reports.competency.country;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryResponseModel.Data;
@@ -14,7 +15,7 @@ import org.gooru.groups.reports.dbhelpers.core.StateModel;
  */
 public class GroupCompetencyReportByCountryResponseModelBuilder {
 
-  public static GroupCompetencyReportByCountryResponseModel build(
+  public GroupCompetencyReportByCountryResponseModel build(
       List<GroupCompetencyReportByCountryModel> competencyReportByWeek,
       List<GroupCompetencyStateWiseReportByCountryModel> competencyReportByState,
       Map<Long, StateModel> states) {
@@ -28,11 +29,15 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
       totalCompetencies = totalCompetencies + weekReport.getCompletedCompetencies();
     }
 
-    List<Drilldown> drilldownList = new ArrayList<>();
+    Map<Long, GroupCompetencyStateWiseReportByCountryModel> stateReportMap = new HashMap<>();
     competencyReportByState.forEach(stateReport -> {
-      StateModel stateModel = states.get(stateReport.getStateId());
-      drilldownList.add(prepareDrilldownModel(stateReport, stateModel));
+      stateReportMap.put(stateReport.getStateId(), stateReport);
     });
+    
+    List<Drilldown> drilldownList = new ArrayList<>();
+    for (Map.Entry<Long, StateModel> entry : states.entrySet()) {
+      drilldownList.add(prepareDrilldownModel(stateReportMap.get(entry.getKey()), entry.getValue()));
+    }
 
     OverallStats overallStats = new OverallStats();
     overallStats.setTotalCompetencies(totalCompetencies);
@@ -43,23 +48,30 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
     return responseModel;
   }
 
-  private static Data prepareDataModel(GroupCompetencyReportByCountryModel reportModel) {
+  private Data prepareDataModel(GroupCompetencyReportByCountryModel reportModel) {
     Data dataModel = new Data();
     dataModel.setWeek(reportModel.getWeek());
     dataModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
     return dataModel;
   }
 
-  private static Drilldown prepareDrilldownModel(
+  private Drilldown prepareDrilldownModel(
       GroupCompetencyStateWiseReportByCountryModel reportModel, StateModel stateModel) {
     Drilldown drilldownModel = new Drilldown();
-    drilldownModel.setId(reportModel.getStateId());
+    if (reportModel != null) {
+      drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
+      drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
+    } else {
+      drilldownModel.setCompletedCompetencies(0l);
+      drilldownModel.setInprogressCompetencies(0l);
+    }
+    
+    drilldownModel.setId(stateModel.getId());
     drilldownModel.setName(stateModel.getName());
     drilldownModel.setCode(stateModel.getCode());
     drilldownModel.setType("state");
     drilldownModel.setSubType(null);
-    drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
-    drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
+
     return drilldownModel;
   }
 }

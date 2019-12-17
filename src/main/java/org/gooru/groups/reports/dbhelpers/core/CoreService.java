@@ -88,6 +88,15 @@ public class CoreService {
     });
     return stateModelMap;
   }
+  
+  public Map<Long, StateModel> fetchStatesByCountry(Long countryId) {
+    Map<Long, StateModel> stateModelMap = new HashMap<>();
+    List<StateModel> stateModels = this.coreDao.fetchStatesByCountry(countryId);
+    stateModels.forEach(state -> {
+      stateModelMap.put(state.getId(), state);
+    });
+    return stateModelMap;
+  }
 
   public Map<Long, GroupModel> fetchGroupDetails(Set<Long> groupIds) {
     Map<Long, GroupModel> groupModelMap = new HashMap<>();

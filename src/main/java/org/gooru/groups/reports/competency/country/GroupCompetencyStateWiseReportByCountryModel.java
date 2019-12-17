@@ -33,5 +33,12 @@ public class GroupCompetencyStateWiseReportByCountryModel {
   public void setInprogressCompetencies(Long inprogressCompetencies) {
     this.inprogressCompetencies = inprogressCompetencies;
   }
+
+  @Override
+  public String toString() {
+    return "GroupCompetencyStateWiseReportByCountryModel [stateId=" + stateId
+        + ", completedCompetencies=" + completedCompetencies + ", inprogressCompetencies="
+        + inprogressCompetencies + "]";
+  }
   
 }
