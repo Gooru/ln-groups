@@ -33,6 +33,10 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 public interface GroupCompetencyReportDao {
   
   // Group Competency report by Country
+  
+  @SqlQuery("SELECT AVG(assessment_performance) AS average_performance FROM class_performance_data_reports WHERE country_id = :countryId AND"
+      + " month = :month AND year = :year")
+  Double fetchAveragePerformanceByCountty(@BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
 
   @Mapper(GroupCompetencyReportByCountryModelMapper.class)
   @SqlQuery("SELECT week, SUM(completed_count) as completed_competencies FROM class_competency_data_reports WHERE country_id = :countryId AND"

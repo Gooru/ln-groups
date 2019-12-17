@@ -18,7 +18,7 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
   public GroupCompetencyReportByCountryResponseModel build(
       List<GroupCompetencyReportByCountryModel> competencyReportByWeek,
       List<GroupCompetencyStateWiseReportByCountryModel> competencyReportByState,
-      Map<Long, StateModel> states) {
+      Map<Long, StateModel> states, Double averagePerformance) {
     GroupCompetencyReportByCountryResponseModel responseModel =
         new GroupCompetencyReportByCountryResponseModel();
 
@@ -33,14 +33,16 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
     competencyReportByState.forEach(stateReport -> {
       stateReportMap.put(stateReport.getStateId(), stateReport);
     });
-    
+
     List<Drilldown> drilldownList = new ArrayList<>();
     for (Map.Entry<Long, StateModel> entry : states.entrySet()) {
-      drilldownList.add(prepareDrilldownModel(stateReportMap.get(entry.getKey()), entry.getValue()));
+      drilldownList
+          .add(prepareDrilldownModel(stateReportMap.get(entry.getKey()), entry.getValue()));
     }
 
     OverallStats overallStats = new OverallStats();
     overallStats.setTotalCompetencies(totalCompetencies);
+    overallStats.setAveragePerformance(averagePerformance != null ? averagePerformance : 0d);
 
     responseModel.setOverallStats(overallStats);
     responseModel.setData(dataList);
@@ -55,8 +57,8 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
     return dataModel;
   }
 
-  private Drilldown prepareDrilldownModel(
-      GroupCompetencyStateWiseReportByCountryModel reportModel, StateModel stateModel) {
+  private Drilldown prepareDrilldownModel(GroupCompetencyStateWiseReportByCountryModel reportModel,
+      StateModel stateModel) {
     Drilldown drilldownModel = new Drilldown();
     if (reportModel != null) {
       drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
@@ -65,7 +67,7 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
       drilldownModel.setCompletedCompetencies(0l);
       drilldownModel.setInprogressCompetencies(0l);
     }
-    
+
     drilldownModel.setId(stateModel.getId());
     drilldownModel.setName(stateModel.getName());
     drilldownModel.setCode(stateModel.getCode());
