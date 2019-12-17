@@ -57,21 +57,21 @@ public class GroupCompetencyReportByCountryProcessor implements MessageProcessor
       List<GroupCompetencyStateWiseReportByCountryModel> competencyReportByState =
           this.reportService.fethcGroupCompetencyStateWiseReportByCountry(bean);
 
-      Set<Long> uniqueStateIds = new HashSet<>();
-      competencyReportByState.forEach(record -> {
-        uniqueStateIds.add(record.getStateId());
-      });
-      Map<Long, StateModel> states = this.coreService.fetchStateDetails(uniqueStateIds);
+      //Set<Long> uniqueStateIds = new HashSet<>();
+      //competencyReportByState.forEach(record -> {
+      //  uniqueStateIds.add(record.getStateId());
+      //});
+      Map<Long, StateModel> states = this.coreService.fetchStatesByCountry(bean.getCountryId());
 
       LOGGER.debug("prepare the response model");
       GroupCompetencyReportByCountryResponseModel responseModel =
-          GroupCompetencyReportByCountryResponseModelBuilder.build(competencyReportByWeek,
+          new GroupCompetencyReportByCountryResponseModelBuilder().build(competencyReportByWeek,
               competencyReportByState, states);
 
       String resultString = new ObjectMapper().writeValueAsString(responseModel);
       result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
     } catch (Throwable t) {
-      LOGGER.warn("exception while fetching class summary", t);
+      LOGGER.warn("exception while fetching competency report by country", t);
       result.fail(t);
     }
 
