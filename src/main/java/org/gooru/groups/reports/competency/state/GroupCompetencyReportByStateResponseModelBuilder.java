@@ -2,6 +2,7 @@
 package org.gooru.groups.reports.competency.state;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.gooru.groups.reports.competency.state.GroupCompetencyReportByStateResponseModel.Data;
@@ -28,11 +29,16 @@ public class GroupCompetencyReportByStateResponseModelBuilder {
       totalCompetencies = totalCompetencies + weekReport.getCompletedCompetencies();
     }
 
-    List<Drilldown> drilldownList = new ArrayList<>();
+    Map<Long, GroupCompetencyGroupWiseReportByStateModel> groupReportMap = new HashMap<>();
     competencyReportByGroup.forEach(groupReport -> {
-      GroupModel groupModel = groups.get(groupReport.getGroupId());
-      drilldownList.add(prepareDrilldownModel(groupReport, groupModel));
+      groupReportMap.put(groupReport.getGroupId(), groupReport);
     });
+
+    List<Drilldown> drilldownList = new ArrayList<>();
+    for (Map.Entry<Long, GroupModel> entry : groups.entrySet()) {
+      drilldownList
+          .add(prepareDrilldownModel(groupReportMap.get(entry.getKey()), entry.getValue()));
+    }
 
     OverallStats overallStats = new OverallStats();
     overallStats.setTotalCompetencies(totalCompetencies);
@@ -53,13 +59,18 @@ public class GroupCompetencyReportByStateResponseModelBuilder {
   private static Drilldown prepareDrilldownModel(
       GroupCompetencyGroupWiseReportByStateModel reportModel, GroupModel groupModel) {
     Drilldown drilldownModel = new Drilldown();
-    drilldownModel.setId(reportModel.getGroupId());
+    drilldownModel.setId(groupModel.getId());
     drilldownModel.setName(groupModel.getName());
     drilldownModel.setCode(groupModel.getCode());
     drilldownModel.setType(groupModel.getType());
     drilldownModel.setSubType(groupModel.getSubType());
-    drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
-    drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
+    if (reportModel != null) {
+      drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
+      drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
+    } else {
+      drilldownModel.setCompletedCompetencies(0l);
+      drilldownModel.setInprogressCompetencies(0l);
+    }
     return drilldownModel;
   }
 }

@@ -2,6 +2,7 @@
 package org.gooru.groups.reports.competency.school;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolResponseModel.Data;
@@ -17,10 +18,10 @@ public class GroupCompetencyReportBySchoolResponseModelBuilder {
   public static GroupCompetencyReportBySchoolResponseModel build(
       List<GroupCompetencyReportBySchoolModel> competencyReportByWeek,
       List<GroupCompetencyClassWiseReportBySchoolModel> competencyReportByClass,
-      Map<String, ClassModel> classModels) {
+      Map<String, ClassModel> classes) {
     GroupCompetencyReportBySchoolResponseModel responseModel =
         new GroupCompetencyReportBySchoolResponseModel();
-    
+
     List<Data> dataList = new ArrayList<>();
     Long totalCompetencies = 0l;
     for (GroupCompetencyReportBySchoolModel weekReport : competencyReportByWeek) {
@@ -28,11 +29,16 @@ public class GroupCompetencyReportBySchoolResponseModelBuilder {
       totalCompetencies = totalCompetencies + weekReport.getCompletedCompetencies();
     }
 
-    List<Drilldown> drilldownList = new ArrayList<>();
+    Map<String, GroupCompetencyClassWiseReportBySchoolModel> groupReportByClass = new HashMap<>();
     competencyReportByClass.forEach(classReport -> {
-      ClassModel classModel = classModels.get(classReport.getClassId());
-      drilldownList.add(prepareDrilldownModel(classReport, classModel));
+      groupReportByClass.put(classReport.getClassId(), classReport);
     });
+
+    List<Drilldown> drilldownList = new ArrayList<>();
+    for (Map.Entry<String, ClassModel> entry : classes.entrySet()) {
+      drilldownList
+          .add(prepareDrilldownModel(groupReportByClass.get(entry.getKey()), entry.getValue()));
+    }
 
     OverallStats overallStats = new OverallStats();
     overallStats.setTotalCompetencies(totalCompetencies);
@@ -53,14 +59,19 @@ public class GroupCompetencyReportBySchoolResponseModelBuilder {
   private static Drilldown prepareDrilldownModel(
       GroupCompetencyClassWiseReportBySchoolModel reportModel, ClassModel classModel) {
     Drilldown drilldownModel = new Drilldown();
-    drilldownModel.setId(reportModel.getClassId());
+    drilldownModel.setId(classModel.getId());
     drilldownModel.setName(classModel.getTitle());
     drilldownModel.setCode(classModel.getCode());
     drilldownModel.setClassId(classModel.getCourseId());
     drilldownModel.setType("class");
     drilldownModel.setSubType(null);
-    drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
-    drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
+    if (reportModel != null) {
+      drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
+      drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
+    } else {
+      drilldownModel.setCompletedCompetencies(0l);
+      drilldownModel.setInprogressCompetencies(0l);
+    }
     return drilldownModel;
   }
 }

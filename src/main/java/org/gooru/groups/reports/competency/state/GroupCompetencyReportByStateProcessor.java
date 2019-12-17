@@ -1,10 +1,8 @@
 
 package org.gooru.groups.reports.competency.state;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.processors.MessageProcessor;

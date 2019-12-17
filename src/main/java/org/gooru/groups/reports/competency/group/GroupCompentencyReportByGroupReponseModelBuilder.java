@@ -2,6 +2,7 @@
 package org.gooru.groups.reports.competency.group;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.gooru.groups.reports.competency.group.GroupCompentencyReportByGroupReponseModel.Data;
@@ -18,7 +19,7 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
   public static GroupCompentencyReportByGroupReponseModel buildReponseForSDorCluster(
       List<GroupCompetencyReportByGroupModel> competencyReportByWeek,
       List<GroupCompetencyDrillDownReportByGroupOrSchoolModel> competencyReportBySchool,
-      Map<Long, SchoolModel> schoolModels) {
+      Map<Long, SchoolModel> schools) {
     GroupCompentencyReportByGroupReponseModel responseModel =
         new GroupCompentencyReportByGroupReponseModel();
     List<Data> dataList = new ArrayList<>();
@@ -28,11 +29,16 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
       totalCompetencies = totalCompetencies + weekReport.getCompletedCompetencies();
     }
 
-    List<Drilldown> drilldownList = new ArrayList<>();
+    Map<Long, GroupCompetencyDrillDownReportByGroupOrSchoolModel> schoolReportMap = new HashMap<>();
     competencyReportBySchool.forEach(schoolReport -> {
-      SchoolModel schoolModel = schoolModels.get(schoolReport.getId());
-      drilldownList.add(prepareDrilldownModelForSDorCluster(schoolReport, schoolModel));
+      schoolReportMap.put(schoolReport.getId(), schoolReport);
     });
+
+    List<Drilldown> drilldownList = new ArrayList<>();
+    for (Map.Entry<Long, SchoolModel> entry : schools.entrySet()) {
+      drilldownList.add(prepareDrilldownModelForSDorCluster(schoolReportMap.get(entry.getKey()),
+          entry.getValue()));
+    }
 
     OverallStats overallStats = new OverallStats();
     overallStats.setTotalCompetencies(totalCompetencies);
@@ -46,7 +52,7 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
   public static GroupCompentencyReportByGroupReponseModel buildReponseForDistrictorBlock(
       List<GroupCompetencyReportByGroupModel> competencyReportByWeek,
       List<GroupCompetencyDrillDownReportByGroupOrSchoolModel> competencyReportByGroup,
-      Map<Long, GroupModel> groupModels) {
+      Map<Long, GroupModel> groups) {
     GroupCompentencyReportByGroupReponseModel responseModel =
         new GroupCompentencyReportByGroupReponseModel();
     List<Data> dataList = new ArrayList<>();
@@ -56,11 +62,16 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
       totalCompetencies = totalCompetencies + weekReport.getCompletedCompetencies();
     }
 
-    List<Drilldown> drilldownList = new ArrayList<>();
+    Map<Long, GroupCompetencyDrillDownReportByGroupOrSchoolModel> groupReportMap = new HashMap<>();
     competencyReportByGroup.forEach(groupReport -> {
-      GroupModel groupModel = groupModels.get(groupReport.getId());
-      drilldownList.add(prepareDrilldownModelForDistrictorBlock(groupReport, groupModel));
+      groupReportMap.put(groupReport.getId(), groupReport);
     });
+
+    List<Drilldown> drilldownList = new ArrayList<>();
+    for (Map.Entry<Long, GroupModel> entry : groups.entrySet()) {
+      drilldownList.add(prepareDrilldownModelForDistrictorBlock(groupReportMap.get(entry.getKey()),
+          entry.getValue()));
+    }
 
     OverallStats overallStats = new OverallStats();
     overallStats.setTotalCompetencies(totalCompetencies);
@@ -81,26 +92,36 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
   private static Drilldown prepareDrilldownModelForSDorCluster(
       GroupCompetencyDrillDownReportByGroupOrSchoolModel reportModel, SchoolModel schoolModel) {
     Drilldown drilldownModel = new Drilldown();
-    drilldownModel.setId(reportModel.getId());
+    drilldownModel.setId(schoolModel.getId());
     drilldownModel.setName(schoolModel.getName());
     drilldownModel.setCode(schoolModel.getCode());
     drilldownModel.setType("school");
     drilldownModel.setSubType(null);
-    drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
-    drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
+    if (reportModel != null) {
+      drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
+      drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
+    } else {
+      drilldownModel.setCompletedCompetencies(0l);
+      drilldownModel.setInprogressCompetencies(0l);
+    }
     return drilldownModel;
   }
 
   private static Drilldown prepareDrilldownModelForDistrictorBlock(
       GroupCompetencyDrillDownReportByGroupOrSchoolModel reportModel, GroupModel groupModel) {
     Drilldown drilldownModel = new Drilldown();
-    drilldownModel.setId(reportModel.getId());
+    drilldownModel.setId(groupModel.getId());
     drilldownModel.setName(groupModel.getName());
     drilldownModel.setCode(groupModel.getCode());
     drilldownModel.setType(groupModel.getType());
     drilldownModel.setSubType(groupModel.getSubType());
-    drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
-    drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
+    if (reportModel != null) {
+      drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
+      drilldownModel.setInprogressCompetencies(reportModel.getInprogressCompetencies());
+    } else {
+      drilldownModel.setCompletedCompetencies(0l);
+      drilldownModel.setInprogressCompetencies(0l);
+    }
     return drilldownModel;
   }
 }
