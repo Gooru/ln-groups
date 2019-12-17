@@ -52,6 +52,8 @@ public class GroupCompetencyReportByGroupProcessor implements MessageProcessor {
           command.asBean();
 
       GroupModel group = this.coreService.fetchGroupById(command.getGroupId());
+      Double averagePerformance = this.reportService.fetchAveragePerformanceByGroup(bean);
+      
       GroupCompentencyReportByGroupReponseModel responseModel = null;
 
       if (group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_SCHOOL_DISTRICT)
@@ -64,7 +66,7 @@ public class GroupCompetencyReportByGroupProcessor implements MessageProcessor {
             this.reportService.fetchGroupCompetencySchoolWiseReportBySDorCluster(schoolIds, bean);
         Map<Long, SchoolModel> schoolModels = this.coreService.fetchSchoolDetails(schoolIds);
         responseModel = GroupCompentencyReportByGroupReponseModelBuilder.buildReponseForSDorCluster(
-            competencyReportByWeek, competencyReportBySchool, schoolModels);
+            competencyReportByWeek, competencyReportBySchool, schoolModels, averagePerformance);
       } else if (group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_DISTRICT)
           || group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_BLOCK)) {
         Map<Long, GroupModel> groupModels =
@@ -76,7 +78,7 @@ public class GroupCompetencyReportByGroupProcessor implements MessageProcessor {
             .fetchGroupCompetencyReportByDistrictOrBlock(groupModels.keySet(), bean);
         responseModel =
             GroupCompentencyReportByGroupReponseModelBuilder.buildReponseForDistrictorBlock(
-                competencyReportByWeek, competencyReportByGroup, groupModels);
+                competencyReportByWeek, competencyReportByGroup, groupModels, averagePerformance);
       }
 
       String resultString = new ObjectMapper().writeValueAsString(responseModel);

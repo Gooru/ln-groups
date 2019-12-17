@@ -52,6 +52,10 @@ public interface GroupCompetencyReportDao {
 
   // Group Competency report by State
   
+  @SqlQuery("SELECT AVG(assessment_performance) AS average_performance FROM class_performance_data_reports WHERE state_id = :stateId AND"
+      + " month = :month AND year = :year")
+  Double fetchAveragePerformanceByState(@BindBean GroupCompetencyReportByStateCommand.GroupCompetencyReportByStateCommandBean bean);
+  
   @Mapper(GroupCompetencyReportByStateModelMapper.class)
   @SqlQuery("SELECT week, SUM(completed_count) as completed_competencies FROM group_competency_data_reports WHERE group_id = ANY(:groupIds::bigint[])"
       + " AND state_id = :stateId AND month = :month AND year = :year GROUP BY week")
@@ -69,6 +73,10 @@ public interface GroupCompetencyReportDao {
   
   // Group Competency report by Group
   
+  @SqlQuery("SELECT AVG(assessment_performance) AS average_performance FROM group_performance_data_reports WHERE group_id = :groupId AND"
+      + " month = :month AND year = :year")
+  Double fetchAveragePerformanceByGroup(@BindBean GroupCompetencyReportByGroupCommand.GroupCompetencyReportByGroupCommandBean bean);
+
   // Fetch drill down report by District Or Block
   @Mapper(GroupCompetencyReportBySDorClusterModelMapper.class)
   @SqlQuery("SELECT week, SUM(completed_count) as completed_competencies FROM group_competency_data_reports WHERE group_id = ANY(:groupIds::bigint[])"
@@ -99,6 +107,10 @@ public interface GroupCompetencyReportDao {
       @BindBean GroupCompetencyReportByGroupCommand.GroupCompetencyReportByGroupCommandBean bean);
 
   // Group Competency report by School
+  
+  @SqlQuery("SELECT AVG(assessment_performance) AS average_performance FROM class_performance_data_reports WHERE school_id = :schoolId AND"
+      + " month = :month AND year = :year")
+  Double fetchAveragePerformanceBySchool(@BindBean GroupCompetencyReportBySchoolCommand.GroupCompetencyReportBySchoolCommandBean bean);
 
   @Mapper(GroupCompetencyReportBySchoolModelMapper.class)
   @SqlQuery("SELECT week, SUM(completed_count) as completed_competencies FROM class_competency_data_reports WHERE school_id = :schoolId AND"

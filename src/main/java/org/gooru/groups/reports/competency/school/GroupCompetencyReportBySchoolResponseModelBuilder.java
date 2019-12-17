@@ -18,7 +18,7 @@ public class GroupCompetencyReportBySchoolResponseModelBuilder {
   public static GroupCompetencyReportBySchoolResponseModel build(
       List<GroupCompetencyReportBySchoolModel> competencyReportByWeek,
       List<GroupCompetencyClassWiseReportBySchoolModel> competencyReportByClass,
-      Map<String, ClassModel> classes) {
+      Map<String, ClassModel> classes, Double averagePerformance) {
     GroupCompetencyReportBySchoolResponseModel responseModel =
         new GroupCompetencyReportBySchoolResponseModel();
 
@@ -42,7 +42,8 @@ public class GroupCompetencyReportBySchoolResponseModelBuilder {
 
     OverallStats overallStats = new OverallStats();
     overallStats.setTotalCompetencies(totalCompetencies);
-
+    overallStats.setAveragePerformance(averagePerformance != null ? averagePerformance : 0d);
+    
     responseModel.setOverallStats(overallStats);
     responseModel.setData(dataList);
     responseModel.setDrilldown(drilldownList);

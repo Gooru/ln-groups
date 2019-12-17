@@ -28,8 +28,9 @@ public class GroupCompetencyReportService {
   public GroupCompetencyReportService(DBI dbi) {
     this.dao = dbi.onDemand(GroupCompetencyReportDao.class);
   }
-  
-  public Double fetchAveragePerformanceByCountry(GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
+
+  public Double fetchAveragePerformanceByCountry(
+      GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
     return this.dao.fetchAveragePerformanceByCountty(bean);
   }
 
@@ -41,6 +42,11 @@ public class GroupCompetencyReportService {
   public List<GroupCompetencyStateWiseReportByCountryModel> fethcGroupCompetencyStateWiseReportByCountry(
       GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
     return this.dao.fetchGroupCompetencyStateWiseReportByCountry(bean);
+  }
+
+  public Double fetchAveragePerformanceByState(
+      GroupCompetencyReportByStateCommand.GroupCompetencyReportByStateCommandBean bean) {
+    return this.dao.fetchAveragePerformanceByState(bean);
   }
 
   public List<GroupCompetencyReportByStateModel> fetchGroupCompetencyReportByState(
@@ -55,6 +61,11 @@ public class GroupCompetencyReportService {
       GroupCompetencyReportByStateCommand.GroupCompetencyReportByStateCommandBean bean) {
     return this.dao.fetchGroupCompetencyGroupWiseReportByState(
         CollectionUtils.toPostgresArrayLong(groupIds), bean);
+  }
+
+  public Double fetchAveragePerformanceByGroup(
+      GroupCompetencyReportByGroupCommand.GroupCompetencyReportByGroupCommandBean bean) {
+    return this.dao.fetchAveragePerformanceByGroup(bean);
   }
 
   public List<GroupCompetencyReportByGroupModel> fetchGroupCompetencyReportByDistrictOrBlock(
@@ -83,6 +94,11 @@ public class GroupCompetencyReportService {
       GroupCompetencyReportByGroupCommand.GroupCompetencyReportByGroupCommandBean bean) {
     return this.dao.fetchGroupCompetencySchoolWiseReportBySDorCluster(
         CollectionUtils.toPostgresArrayLong(schoolIds), bean);
+  }
+
+  public Double fetchAveragePerformanceBySchool(
+      GroupCompetencyReportBySchoolCommand.GroupCompetencyReportBySchoolCommandBean bean) {
+    return this.dao.fetchAveragePerformanceBySchool(bean);
   }
 
   public List<GroupCompetencyReportBySchoolModel> fetchGroupCompetencyReportBySchool(

@@ -19,7 +19,7 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
   public static GroupCompentencyReportByGroupReponseModel buildReponseForSDorCluster(
       List<GroupCompetencyReportByGroupModel> competencyReportByWeek,
       List<GroupCompetencyDrillDownReportByGroupOrSchoolModel> competencyReportBySchool,
-      Map<Long, SchoolModel> schools) {
+      Map<Long, SchoolModel> schools, Double averagePerformance) {
     GroupCompentencyReportByGroupReponseModel responseModel =
         new GroupCompentencyReportByGroupReponseModel();
     List<Data> dataList = new ArrayList<>();
@@ -42,6 +42,7 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
 
     OverallStats overallStats = new OverallStats();
     overallStats.setTotalCompetencies(totalCompetencies);
+    overallStats.setAveragePerformance(averagePerformance != null ? averagePerformance : 0d);
 
     responseModel.setOverallStats(overallStats);
     responseModel.setData(dataList);
@@ -52,7 +53,7 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
   public static GroupCompentencyReportByGroupReponseModel buildReponseForDistrictorBlock(
       List<GroupCompetencyReportByGroupModel> competencyReportByWeek,
       List<GroupCompetencyDrillDownReportByGroupOrSchoolModel> competencyReportByGroup,
-      Map<Long, GroupModel> groups) {
+      Map<Long, GroupModel> groups, Double averagePerformance) {
     GroupCompentencyReportByGroupReponseModel responseModel =
         new GroupCompentencyReportByGroupReponseModel();
     List<Data> dataList = new ArrayList<>();
@@ -75,6 +76,7 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
 
     OverallStats overallStats = new OverallStats();
     overallStats.setTotalCompetencies(totalCompetencies);
+    overallStats.setAveragePerformance(averagePerformance != null ? averagePerformance : 0d);
 
     responseModel.setOverallStats(overallStats);
     responseModel.setData(dataList);

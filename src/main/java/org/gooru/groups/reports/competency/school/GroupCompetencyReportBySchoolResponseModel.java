@@ -38,13 +38,22 @@ public class GroupCompetencyReportBySchoolResponseModel {
 
   static class OverallStats {
     private Long totalCompetencies;
-
+    private Double averagePerformance;
+    
     public Long getTotalCompetencies() {
       return totalCompetencies;
     }
 
     public void setTotalCompetencies(Long totalCompetencies) {
       this.totalCompetencies = totalCompetencies;
+    }
+
+    public Double getAveragePerformance() {
+      return averagePerformance;
+    }
+
+    public void setAveragePerformance(Double averagePerformance) {
+      this.averagePerformance = averagePerformance;
     }
 
   }
