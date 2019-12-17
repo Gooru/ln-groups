@@ -2,6 +2,7 @@
 package org.gooru.groups.reports.perf.school;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,12 +20,18 @@ public class GroupPerfReportBySchoolResponseModelBuilder {
       List<PerformanceAndTSReportBySchoolModel> perfModels, Map<String, ClassModel> classDetails) {
 
     GroupPerfReportBySchoolResponseModel response = new GroupPerfReportBySchoolResponseModel();
-    List<ClassPerformance> classPerformances = new ArrayList<>();
+
+    Map<String, PerformanceAndTSReportBySchoolModel> perfReportModel = new HashMap<>();
     perfModels.forEach(clsPerformance -> {
-      classPerformances.add(buildClassPerfResponseModel(clsPerformance,
-          classDetails.get(clsPerformance.getClassId())));
+      perfReportModel.put(clsPerformance.getClassId(), clsPerformance);
     });
-    
+
+    List<ClassPerformance> classPerformances = new ArrayList<>();
+    for (Map.Entry<String, ClassModel> entry : classDetails.entrySet()) {
+      classPerformances
+          .add(buildClassPerfResponseModel(perfReportModel.get(entry.getKey()), entry.getValue()));
+    }
+
     OverallStats stats = new OverallStats();
     if (perfModels != null && !perfModels.isEmpty()) {
       Double totalPerformance =
@@ -33,8 +40,8 @@ public class GroupPerfReportBySchoolResponseModelBuilder {
     } else {
       stats.setAveragePerformance(0d);
     }
-    
-    response.setOverallStats(stats);  
+
+    response.setOverallStats(stats);
     response.setData(classPerformances);
     return response;
   }
@@ -42,13 +49,17 @@ public class GroupPerfReportBySchoolResponseModelBuilder {
   private static ClassPerformance buildClassPerfResponseModel(
       PerformanceAndTSReportBySchoolModel perfModel, ClassModel classModel) {
     ClassPerformance cp = new ClassPerformance();
-    cp.setId(perfModel.getClassId());
+    cp.setId(classModel.getId());
     cp.setName(classModel.getTitle());
     cp.setCode(classModel.getCode());
     cp.setCourseId(classModel.getCourseId());
-    cp.setPerformance(perfModel.getPerformance());
-    cp.setTimespent(perfModel.getTimespent());
-    
+    if (perfModel != null) {
+      cp.setPerformance(perfModel.getPerformance());
+      cp.setTimespent(perfModel.getTimespent());
+    } else {
+      cp.setPerformance(0d);
+      cp.setTimespent(0l);
+    }
     cp.setType("class");
     cp.setSubType(null);
 

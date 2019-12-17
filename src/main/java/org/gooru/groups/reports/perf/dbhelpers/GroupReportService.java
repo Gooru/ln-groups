@@ -32,24 +32,28 @@ public class GroupReportService {
     return this.reportDao.fetchPerformanceAndTSMonthReportBySchool(bean);
   }
 
-  public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByGroup(
-      GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
-    return this.reportDao.fetchPerformanceAndTSWeekReportByGroup(bean);
+  public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByDistrictOrBlock(
+      Set<Long> groupIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
+    return this.reportDao.fetchPerformanceAndTSWeekReportByDistrictOrBlock(
+        CollectionUtils.toPostgresArrayLong(groupIds), bean);
   }
 
-  public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByGroup(
-      GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
-    return this.reportDao.fetchPerformanceAndTSMonthReportByGroup(bean);
+  public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByDistrictOrBlock(
+      Set<Long> groupIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
+    return this.reportDao.fetchPerformanceAndTSMonthReportByDistrictOrBlock(
+        CollectionUtils.toPostgresArrayLong(groupIds), bean);
   }
 
-  public List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSWeekReportByCluster(
-      GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
-    return this.reportDao.fetchPerformanceAndTSWeekReportByCluster(bean);
+  public List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSWeekReportBySDorCluster(
+      Set<Long> schoolIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
+    return this.reportDao.fetchPerformanceAndTSWeekReportBySDorCluster(
+        CollectionUtils.toPostgresArrayLong(schoolIds), bean);
   }
 
-  public List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSMonthReportByCluster(
-      GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
-    return this.reportDao.fetchPerformanceAndTSMonthReportByCluster(bean);
+  public List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSMonthReportBySDorCluster(
+      Set<Long> schoolIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
+    return this.reportDao.fetchPerformanceAndTSMonthReportBySDorCluster(
+        CollectionUtils.toPostgresArrayLong(schoolIds), bean);
   }
 
   public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByState(

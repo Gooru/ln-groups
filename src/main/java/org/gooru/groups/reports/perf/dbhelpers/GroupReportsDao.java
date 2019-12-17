@@ -31,34 +31,34 @@ public interface GroupReportsDao {
   List<PerformanceAndTSReportBySchoolModel> fetchPerformanceAndTSMonthReportBySchool(
       @BindBean GroupPerfReportBySchoolCommand.GroupPerfReportBySchoolCommandBean bean);
 
-  // ---- Performance and Time spent report by group
+  // ---- Performance and Time spent report by district or block
   @Mapper(PerformanceAndTSReportByGroupModelMapper.class)
   @SqlQuery("SELECT group_id, SUM(collection_timespent) AS collection_ts, AVG(assessment_performance) AS assessment_perf FROM"
-      + " group_performance_data_reports WHERE group_id = :groupId AND week = :week AND month = :month AND year = :year AND subject = :subject AND"
-      + " framework = :framework GROUP BY group_id")
-  List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByGroup(
+      + " group_performance_data_reports WHERE group_id = ANY(:groupIds::bigint[]) AND week = :week AND month = :month AND year = :year AND"
+      + " subject = :subject AND framework = :framework GROUP BY group_id")
+  List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByDistrictOrBlock(@Bind("groupIds") String groupIds,
       @BindBean GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean);
 
   @Mapper(PerformanceAndTSReportByGroupModelMapper.class)
   @SqlQuery("SELECT group_id, SUM(collection_timespent) AS collection_ts, AVG(assessment_performance) AS assessment_perf FROM"
-      + " group_performance_data_reports WHERE group_id = :groupId AND month = :month AND year = :year AND subject = :subject AND"
+      + " group_performance_data_reports WHERE group_id = ANY(:groupIds::bigint[]) AND month = :month AND year = :year AND subject = :subject AND"
       + " framework = :framework GROUP BY group_id")
-  List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByGroup(
+  List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByDistrictOrBlock(@Bind("groupIds") String groupIds,
       @BindBean GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean);
 
-  // ---- Performance and Time spent report by cluster
+  // ---- Performance and Time spent report by school district or cluster
   @Mapper(PerformanceAndTSReportByClusterModelMapper.class)
   @SqlQuery("SELECT school_id, SUM(collection_timespent) AS collection_ts, AVG(assessment_performance) AS assessment_perf FROM"
-      + " group_performance_data_reports WHERE group_id = :groupId AND week = :week AND month = :month AND year = :year AND subject = :subject AND"
-      + " framework = :framework GROUP BY school_id")
-  List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSWeekReportByCluster(
+      + " class_performance_data_reports WHERE school_id = ANY(:schoolIds::bigint[]) AND week = :week AND month = :month AND year = :year AND subject"
+      + " = :subject AND framework = :framework GROUP BY school_id")
+  List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSWeekReportBySDorCluster(@Bind("schoolIds") String schoolIds,
       @BindBean GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean);
 
   @Mapper(PerformanceAndTSReportByClusterModelMapper.class)
   @SqlQuery("SELECT school_id, SUM(collection_timespent) AS collection_ts, AVG(assessment_performance) AS assessment_perf FROM"
-      + " group_performance_data_reports WHERE group_id = :groupId AND month = :month AND year = :year AND subject = :subject AND"
+      + " class_performance_data_reports WHERE school_id = ANY(:schoolIds::bigint[]) AND month = :month AND year = :year AND subject = :subject AND"
       + " framework = :framework GROUP BY school_id")
-  List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSMonthReportByCluster(
+  List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSMonthReportBySDorCluster(@Bind("schoolIds") String schoolIds,
       @BindBean GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean);
 
   // ---- Performance and Time spent report by state

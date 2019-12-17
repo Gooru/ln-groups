@@ -2,6 +2,7 @@
 package org.gooru.groups.reports.perf.group;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,11 +18,16 @@ public class GroupPerfReportByGroupResponseModelBuilder {
 
   public static GroupPerfReportByGroupResponseModel build(
       List<PerformanceAndTSReportByGroupModel> perfModels, Map<Long, GroupModel> groupModels) {
-    List<GroupResponseModel> groupResponseModels = new ArrayList<>(perfModels.size());
+
+    Map<Long, PerformanceAndTSReportByGroupModel> perfReportMap = new HashMap<>();
     perfModels.forEach(perfModel -> {
-      GroupModel groupModel = groupModels.get(perfModel.getGroupId());
-      groupResponseModels.add(buildGroupModel(perfModel, groupModel));
+      perfReportMap.put(perfModel.getGroupId(), perfModel);
     });
+
+    List<GroupResponseModel> groupResponseModels = new ArrayList<>();
+    for (Map.Entry<Long, GroupModel> entry : groupModels.entrySet()) {
+      groupResponseModels.add(buildGroupModel(perfReportMap.get(entry.getKey()), entry.getValue()));
+    }
 
     GroupPerfReportByGroupResponseModel responseModel = new GroupPerfReportByGroupResponseModel();
     OverallStats stats = new OverallStats();
@@ -32,8 +38,8 @@ public class GroupPerfReportByGroupResponseModelBuilder {
     } else {
       stats.setAveragePerformance(0d);
     }
-    
-    responseModel.setOverallStats(stats);  
+
+    responseModel.setOverallStats(stats);
     responseModel.setData(groupResponseModels);
     return responseModel;
   }
@@ -41,14 +47,18 @@ public class GroupPerfReportByGroupResponseModelBuilder {
   private static GroupResponseModel buildGroupModel(PerformanceAndTSReportByGroupModel perfModel,
       GroupModel groupModel) {
     GroupResponseModel model = new GroupResponseModel();
-    model.setId(perfModel.getGroupId());
+    model.setId(groupModel.getId());
     model.setName(groupModel.getName());
     model.setCode(groupModel.getCode());
     model.setType(groupModel.getType());
     model.setSubType(groupModel.getSubType());
-    model.setTimespent(perfModel.getTimespent());
-    model.setPerformance(perfModel.getPerformance());
-    
+    if (perfModel != null) {
+      model.setTimespent(perfModel.getTimespent());
+      model.setPerformance(perfModel.getPerformance());
+    } else {
+      model.setTimespent(0l);
+      model.setPerformance(0d);
+    }
     model.setInprogressCompetencies(0l);
     model.setCompletedCompetencies(0l);
     return model;
