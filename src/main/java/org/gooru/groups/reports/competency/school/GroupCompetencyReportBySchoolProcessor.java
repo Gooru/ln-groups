@@ -54,9 +54,11 @@ public class GroupCompetencyReportBySchoolProcessor implements MessageProcessor 
 
       // Fetch the titles of the classes from core db
       Map<String, ClassModel> classDetails = this.coreService.fetchClassesBySchool(bean.getSchoolId());
+      Double averagePerformance = this.reportService.fetchAveragePerformanceBySchool(bean);
+      
       GroupCompetencyReportBySchoolResponseModel responseModel =
           GroupCompetencyReportBySchoolResponseModelBuilder.build(competencyReportByWeek,
-              competencyReportByClass, classDetails);
+              competencyReportByClass, classDetails, averagePerformance);
 
       String resultString = new ObjectMapper().writeValueAsString(responseModel);
       result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));

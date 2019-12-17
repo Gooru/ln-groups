@@ -58,10 +58,12 @@ public class GroupCompetencyReportByStateProcessor implements MessageProcessor {
       List<GroupCompetencyGroupWiseReportByStateModel> groupWiseReport = this.reportService
           .fetchGroupCompetencyGroupWiseReportByState(groupsByState.keySet(), bean);
 
+      Double averagePerformance = this.reportService.fetchAveragePerformanceByState(bean);
+      
       // Prepare response models
       GroupCompetencyReportByStateResponseModel responseModel =
           GroupCompetencyReportByStateResponseModelBuilder.build(weekReport, groupWiseReport,
-              groupsByState);
+              groupsByState, averagePerformance);
 
       // Send the response
       String resultString = new ObjectMapper().writeValueAsString(responseModel);

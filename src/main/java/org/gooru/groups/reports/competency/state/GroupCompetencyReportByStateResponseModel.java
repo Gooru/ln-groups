@@ -37,7 +37,8 @@ public class GroupCompetencyReportByStateResponseModel {
 
   static class OverallStats {
     private Long totalCompetencies;
-
+    private Double averagePerformance;
+    
     public Long getTotalCompetencies() {
       return totalCompetencies;
     }
@@ -46,6 +47,14 @@ public class GroupCompetencyReportByStateResponseModel {
       this.totalCompetencies = totalCompetencies;
     }
 
+    public Double getAveragePerformance() {
+      return averagePerformance;
+    }
+
+    public void setAveragePerformance(Double averagePerformance) {
+      this.averagePerformance = averagePerformance;
+    }
+    
   }
 
   static class Data {
