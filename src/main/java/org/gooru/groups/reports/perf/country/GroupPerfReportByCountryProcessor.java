@@ -2,10 +2,8 @@
 package org.gooru.groups.reports.perf.country;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.constants.CommandAttributeConstants;
@@ -29,13 +27,14 @@ import io.vertx.core.json.JsonObject;
  */
 public class GroupPerfReportByCountryProcessor implements MessageProcessor {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(GroupPerfReportByCountryProcessor.class);
+  private final static Logger LOGGER =
+      LoggerFactory.getLogger(GroupPerfReportByCountryProcessor.class);
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
   private final GroupReportService service = new GroupReportService(DBICreator.getDbiForDsdbDS());
   private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
-  
+
   public GroupPerfReportByCountryProcessor(Vertx vertx, Message<JsonObject> message) {
     this.message = message;
     this.result = Future.future();
@@ -46,18 +45,10 @@ public class GroupPerfReportByCountryProcessor implements MessageProcessor {
     try {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
 
-      // User role authorization
-      //AuthorizerBuilder.buildGroupReportAuthorizer(
-      //    ebMessage.getSession().getString(Constants.Message.MSG_USER_ID)).authorize();
-
       // Build command object and validate input data
       GroupPerfReportByCountryCommand command =
           GroupPerfReportByCountryCommand.build(ebMessage.getRequestBody());
       GroupPerfReportByCountryCommand.GroupReportByCountryCommandBean bean = command.asBean();
-
-      // Extract tenant from the session
-      // JsonObject tenantJson =
-      // ebMessage.getSession().getJsonObject(Constants.Message.MSG_SESSION_TENANT);
 
       // Fetch performance and timespent report by country
       List<PerformanceAndTSReportByCountryModel> report = new ArrayList<>();
@@ -66,12 +57,8 @@ public class GroupPerfReportByCountryProcessor implements MessageProcessor {
       } else {
         report = this.service.fetchPerformanceAndTSMonthReportByCountry(bean);
       }
-      
-      Set<Long> uniqueStateIds = new HashSet<>();
-      report.forEach(record -> {
-        uniqueStateIds.add(record.getStateId());
-      });
-      Map<Long, StateModel> states = this.coreService.fetchStateDetails(uniqueStateIds);
+
+      Map<Long, StateModel> states = this.coreService.fetchStatesByCountry(bean.getCountryId());
 
       // Build the response models and complete result
       GroupPerfReportByCountryResponseModel responseModel =

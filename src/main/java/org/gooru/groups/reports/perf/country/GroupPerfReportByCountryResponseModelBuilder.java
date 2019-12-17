@@ -2,6 +2,7 @@
 package org.gooru.groups.reports.perf.country;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,13 +18,20 @@ public class GroupPerfReportByCountryResponseModelBuilder {
 
   public static GroupPerfReportByCountryResponseModel build(
       List<PerformanceAndTSReportByCountryModel> report, Map<Long, StateModel> states) {
-    GroupPerfReportByCountryResponseModel responseModel = new GroupPerfReportByCountryResponseModel();
-    List<StateLevelPerf> stateLevelPerfs = new ArrayList<>();
+    GroupPerfReportByCountryResponseModel responseModel =
+        new GroupPerfReportByCountryResponseModel();
+
+    Map<Long, PerformanceAndTSReportByCountryModel> perfReportMap = new HashMap<>();
     report.forEach(perf -> {
-      StateModel state = states.get(perf.getStateId());
-      stateLevelPerfs.add(buildStateLevelPerfObject(perf, state));
+      perfReportMap.put(perf.getStateId(), perf);
     });
-    
+
+    List<StateLevelPerf> stateLevelPerfs = new ArrayList<>();
+    for (Map.Entry<Long, StateModel> entry : states.entrySet()) {
+      stateLevelPerfs
+          .add(buildStateLevelPerfObject(perfReportMap.get(entry.getKey()), entry.getValue()));
+    }
+
     OverallStats stats = new OverallStats();
     if (report != null && !report.isEmpty()) {
       Double totalPerformance =
@@ -32,22 +40,27 @@ public class GroupPerfReportByCountryResponseModelBuilder {
     } else {
       stats.setAveragePerformance(0d);
     }
-    
-    responseModel.setOverallStats(stats);    
+
+    responseModel.setOverallStats(stats);
     responseModel.setData(stateLevelPerfs);
     return responseModel;
   }
 
-  private static StateLevelPerf buildStateLevelPerfObject(
-      PerformanceAndTSReportByCountryModel perf, StateModel state) {
+  private static StateLevelPerf buildStateLevelPerfObject(PerformanceAndTSReportByCountryModel perf,
+      StateModel state) {
     StateLevelPerf stateLevelPerf = new StateLevelPerf();
-    stateLevelPerf.setId(perf.getStateId());
+    stateLevelPerf.setId(state.getId());
     stateLevelPerf.setName(state.getName());
     stateLevelPerf.setCode(state.getCode());
     stateLevelPerf.setType("state");
     stateLevelPerf.setSubType(null);
-    stateLevelPerf.setTimespent(perf.getTimespent());
-    stateLevelPerf.setPerformance(perf.getPerformance());
+    if (perf != null) {
+      stateLevelPerf.setTimespent(perf.getTimespent());
+      stateLevelPerf.setPerformance(perf.getPerformance());
+    } else {
+      stateLevelPerf.setTimespent(0l);
+      stateLevelPerf.setPerformance(0d);
+    }
     stateLevelPerf.setCompletedCompetencies(0l);
     stateLevelPerf.setInprogressCompetencies(0l);
     return stateLevelPerf;

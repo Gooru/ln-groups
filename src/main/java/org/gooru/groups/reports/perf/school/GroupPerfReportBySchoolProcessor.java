@@ -2,10 +2,8 @@
 package org.gooru.groups.reports.perf.school;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.constants.CommandAttributeConstants;
@@ -47,17 +45,9 @@ public class GroupPerfReportBySchoolProcessor implements MessageProcessor {
     try {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
 
-      // User role authorization
-      // AuthorizerBuilder.buildGroupReportAuthorizer(
-      // ebMessage.getSession().getString(Constants.Message.MSG_USER_ID)).authorize();
-
       GroupPerfReportBySchoolCommand command =
           GroupPerfReportBySchoolCommand.build(ebMessage.getRequestBody());
       GroupPerfReportBySchoolCommand.GroupPerfReportBySchoolCommandBean bean = command.asBean();
-
-      // Extract tenant from the session
-      // JsonObject tenantJson =
-      // ebMessage.getSession().getJsonObject(Constants.Message.MSG_SESSION_TENANT);
 
       List<PerformanceAndTSReportBySchoolModel> report = new ArrayList<>();
       if (bean.getFrequency().equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
@@ -66,14 +56,9 @@ public class GroupPerfReportBySchoolProcessor implements MessageProcessor {
         report = this.service.fetchPerformanceAndTSMonthReportBySchool(bean);
       }
 
-      // Fetch class ids from the report data
-      Set<String> classIds = new HashSet<>(report.size());
-      report.forEach(model -> {
-        classIds.add(model.getClassId());
-      });
-
       // Fetch the titles of the classes from core db
-      Map<String, ClassModel> classDetails = this.coreService.fetchClassDetails(classIds);
+      Map<String, ClassModel> classDetails =
+          this.coreService.fetchClassesBySchool(bean.getSchoolId());
 
       // Build response
       GroupPerfReportBySchoolResponseModel responseModel =

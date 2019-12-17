@@ -61,6 +61,8 @@ public class GroupPerfReportByClusterResponseModelBuilder {
       model.setTimespent(0l);
       model.setPerformance(0d);
     }
+    model.setInprogressCompetencies(0l);
+    model.setCompletedCompetencies(0l);
     return model;
   }
 }
