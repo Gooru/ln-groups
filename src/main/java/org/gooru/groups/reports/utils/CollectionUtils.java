@@ -3,7 +3,9 @@ package org.gooru.groups.reports.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +53,7 @@ public final class CollectionUtils {
     return result;
   }
 
-  public static <T, U> List<U> convertList(List<T> from, Function<T, U> func) {
+  public static <T, U> List<U> convertList(Collection<T> from, Function<T, U> func) {
     return from.stream().map(func).collect(Collectors.toList());
   }
 
@@ -66,17 +68,39 @@ public final class CollectionUtils {
   public static PGArray<Integer> convertToSqlArrayOfInteger(List<Integer> input) {
     return PGArray.arrayOf(Integer.class, input);
   }
+  
+  public static PGArray<Long> convertToSqlArrayOfLong(Collection<Long> input) {
+    return PGArray.arrayOf(Long.class, input);
+  }
 
   public static PGArray<String> convertToSqlArrayOfString(Set<String> input) {
     return PGArray.arrayOf(String.class, input);
   }
 
-  public static PGArray<UUID> convertToSqlArrayOfUUID(List<String> input) {
+  public static PGArray<UUID> convertToSqlArrayOfUUID(Collection<String> input) {
     List<UUID> uuids = convertList(input, UUID::fromString);
     return PGArray.arrayOf(UUID.class, uuids);
   }
 
   public static PGArray<UUID> convertFromListUUIDToSqlArrayOfUUID(List<UUID> input) {
     return PGArray.arrayOf(UUID.class, input);
+  }
+  
+  public static String toPostgresArrayLong(Collection<Long> input) {
+    Iterator<Long> it = input.iterator();
+    if (!it.hasNext()) {
+      return "{}";
+    }
+
+    StringBuilder sb = new StringBuilder();
+    sb.append('{');
+    for (;;) {
+      Long i = it.next();
+      sb.append(i);
+      if (!it.hasNext()) {
+        return sb.append('}').toString();
+      }
+      sb.append(',');
+    }
   }
 }

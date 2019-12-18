@@ -33,4 +33,22 @@ public final class RequestUtils {
     }
     return result;
   }
+  
+  public static Long getAsLong(JsonObject requestBody, String key) {
+    String value = requestBody.getString(key);
+    if (value == null || value.isEmpty()) {
+      return null;
+    }
+
+    Long result = null;
+    if (key != null) {
+      try {
+        result = Long.valueOf(value);
+      } catch (NumberFormatException e) {
+        LOGGER.info("Invalid number format for {}", key);
+        result = null;
+      }
+    }
+    return result;
+  }
 }

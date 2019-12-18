@@ -1,6 +1,9 @@
 package org.gooru.groups.reports.dbhelpers.core;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.gooru.groups.reports.utils.CollectionUtils;
 import org.skife.jdbi.v2.DBI;
 
@@ -16,6 +19,7 @@ public class CoreService {
   private final CoreLessonDao lessonDao;
   private final CoreCollectionDao collectionDao;
   private final CoreUserDao userDao;
+  private final CoreDao coreDao;
 
   public CoreService(DBI dbi) {
     this.classDao = dbi.onDemand(CoreClassDao.class);
@@ -25,14 +29,32 @@ public class CoreService {
     this.lessonDao = dbi.onDemand(CoreLessonDao.class);
     this.collectionDao = dbi.onDemand(CoreCollectionDao.class);
     this.userDao = dbi.onDemand(CoreUserDao.class);
+    this.coreDao = dbi.onDemand(CoreDao.class);
   }
 
   public ClassModel fetchClass(String classId) {
     return this.classDao.fetchClass(classId);
   }
-  
-  public List<ClassTitleModel> fetchClassTitles(List<String> classIds) {
-    return this.classDao.fetchClassTitles(CollectionUtils.convertToSqlArrayOfUUID(classIds));
+
+  public Map<String, ClassModel> fetchClassDetails(Set<String> classIds) {
+    Map<String, ClassModel> classModelMap = new HashMap<>();
+
+    List<ClassModel> classModels =
+        this.classDao.fetchClassDetails(CollectionUtils.convertToSqlArrayOfUUID(classIds));
+    classModels.forEach(classModel -> {
+      classModelMap.put(classModel.getId(), classModel);
+    });
+    return classModelMap;
+  }
+
+  public Map<String, ClassModel> fetchClassesBySchool(Long schoolId) {
+    Map<String, ClassModel> classModelMap = new HashMap<>();
+
+    List<ClassModel> classModels = this.classDao.fetchClassesBySchool(schoolId);
+    classModels.forEach(classModel -> {
+      classModelMap.put(classModel.getId(), classModel);
+    });
+    return classModelMap;
   }
 
   public String fetchCourseTitle(String courseId) {
@@ -50,7 +72,7 @@ public class CoreService {
   public String fetchCollectionTitleByLessonId(String collectionId, String lessonId) {
     return this.collectionDao.fetchCollectionByLessonId(collectionId, lessonId);
   }
-  
+
   public String fetchCollectionTitle(String collectionId) {
     return this.collectionDao.fetchCollection(collectionId);
   }
@@ -65,5 +87,81 @@ public class CoreService {
 
   public List<CompetencyModel> findCompetenciesForCollection(String collectionId) {
     return this.collectionDao.findCompetenciesForCollection(collectionId);
+  }
+
+  public Map<Long, StateModel> fetchStateDetails(Set<Long> stateIds) {
+    Map<Long, StateModel> stateModelMap = new HashMap<>();
+    List<StateModel> stateModels =
+        this.coreDao.fetchStateDetails(CollectionUtils.toPostgresArrayLong(stateIds));
+    stateModels.forEach(state -> {
+      stateModelMap.put(state.getId(), state);
+    });
+    return stateModelMap;
+  }
+  
+  public Map<Long, StateModel> fetchStatesByCountry(Long countryId) {
+    Map<Long, StateModel> stateModelMap = new HashMap<>();
+    List<StateModel> stateModels = this.coreDao.fetchStatesByCountry(countryId);
+    stateModels.forEach(state -> {
+      stateModelMap.put(state.getId(), state);
+    });
+    return stateModelMap;
+  }
+
+  public Map<Long, GroupModel> fetchGroupDetails(Set<Long> groupIds) {
+    Map<Long, GroupModel> groupModelMap = new HashMap<>();
+    List<GroupModel> groupModels =
+        this.coreDao.fetchGroupDetails(CollectionUtils.toPostgresArrayLong(groupIds));
+    groupModels.forEach(group -> {
+      groupModelMap.put(group.getId(), group);
+    });
+
+    return groupModelMap;
+  }
+
+  public Map<Long, GroupModel> fetchGroupsByState(Long stateId) {
+    Map<Long, GroupModel> groupModelMap = new HashMap<>();
+    List<GroupModel> groupModels = this.coreDao.fetchGroupsByState(stateId);
+    groupModels.forEach(group -> {
+      groupModelMap.put(group.getId(), group);
+    });
+    return groupModelMap;
+  }
+
+  public Map<Long, SchoolModel> fetchSchoolDetails(Set<Long> schoolIds) {
+    Map<Long, SchoolModel> schoolModelMap = new HashMap<>();
+    List<SchoolModel> schoolModels =
+        this.coreDao.fetchSchoolDetails(CollectionUtils.toPostgresArrayLong(schoolIds));
+    schoolModels.forEach(school -> {
+      schoolModelMap.put(school.getId(), school);
+    });
+    return schoolModelMap;
+  }
+
+  public GroupModel fetchGroupById(Long groupId) {
+    return this.coreDao.fetchGroupById(groupId);
+  }
+
+  public Map<String, SubjectModel> fetchSubjectDetails(Set<String> subjectCodes) {
+    Map<String, SubjectModel> subjectModelMap = new HashMap<>();
+    List<SubjectModel> subjectModels =
+        this.coreDao.fetchSubjectDetails(CollectionUtils.convertToSqlArrayOfString(subjectCodes));
+    subjectModels.forEach(model -> {
+      subjectModelMap.put(model.getId(), model);
+    });
+    return subjectModelMap;
+  }
+
+  public Set<Long> fetchSchoolsByGroup(Long groupId) {
+    return this.coreDao.fetchSchoolsByGroup(groupId);
+  }
+
+  public Map<Long, GroupModel> fetchGroupsByParent(Long groupId) {
+    Map<Long, GroupModel> groupModelMap = new HashMap<>();
+    List<GroupModel> groupModels = this.coreDao.fetchGroupsByParent(groupId);
+    groupModels.forEach(group -> {
+      groupModelMap.put(group.getId(), group);
+    });
+    return groupModelMap;
   }
 }

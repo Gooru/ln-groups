@@ -28,7 +28,7 @@ public class GroupReportAuthorizer implements Authorizer {
   @Override
   public void authorize() {
     String userRole = this.service.fetchUserRole(this.userId);
-    if (userRole == null || !userRole.isEmpty()) {
+    if (userRole == null || userRole.isEmpty()) {
       LOGGER.warn("user '{}' does not have role associated", this.userId);
       throw new HttpResponseWrapperException(HttpConstants.HttpStatus.UNAUTHORIZED,
           RESOURCE_BUNDLE.getString("no.user.role"));

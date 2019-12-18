@@ -23,6 +23,7 @@ public final class AppConfiguration implements Initializer {
   
   @Override
   public void initializeComponent(Vertx vertx, JsonObject config) {
+    LOGGER.debug("config : {}", config.toString());
     if (!initialized) {
       synchronized (Holder.INSTANCE) {
         if (!initialized) {
