@@ -43,16 +43,32 @@ CREATE TABLE group_hierarchy (
 	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')
 );
 
+INSERT INTO group_hierarchy(name, description) VALUES ('India', 'Group hierarchy for India'), ('US', 'Group hierarchy for US'), ('SAP', 'Group hierarchy for SAP');
 
 CREATE TABLE group_hierarchy_details (
 	id bigserial PRIMARY KEY,
 	name text NOT NULL,
-	type text NOT NULL,
+	type text NOT NULL CHECK (type::varchar = ANY(ARRAY['school_district'::varchar, 'district'::varchar, 'block'::varchar, 'cluster'::varchar, 'school'::varchar, 'country'::varchar, 'state'::varchar])),
 	hierarchy_id bigint NOT NULL REFERENCES group_hierarchy(id),
 	sequence int NOT NULL,
 	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
 	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')	
 );
+
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('Country', 'country', 1, 1);
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('State', 'state', 1, 2);
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('District', 'district', 1, 3);
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('Block', 'block', 1, 4);
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('Cluster', 'cluster', 1, 5);
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('School', 'school', 1, 6);
+
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('Country', 'country', 2, 1);
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('State', 'state', 2, 2);
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('School District', 'school_district', 2, 3);
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('School', 'school', 2, 4);
+
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('Country', 'country', 3, 1);
+INSERT INTO group_hierarchy_details(name, type, hierarchy_id, sequence) VALUES ('School', 'school', 3, 2);
 
 CREATE TABLE user_competency_data_reports ( 
 	id bigserial PRIMARY KEY,
@@ -63,4 +79,25 @@ CREATE TABLE user_competency_data_reports (
 	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')	
 );
 
+We will store the country and school mapping just to resolve the SAP hierarchy. This will be temporary table until we have flexible group hierarchy changes in place.
+
+CREATE TABLE country_school_mapping (
+	country_id bigint NOT NULL REFERENCES country_ds(id),
+	school_id bigint NOT NULL REFERENCES school_ds(id),
+	tenant text NOT NULL
+);
+
 Add new key in tenant_settings table 'applicable_group_hierarchy' which should be set to the corresponding hierarchy id from the group_hierarchy table.
+
+#####DAP Changes
+
+DAP will process the aggregation of the data based on the selected tenant hierarchy. There will be data aggregation processor for each hierarchy type and new processor will be added for new hierarchy.
+
+##### Read API Changes
+
+Reports APIs will also work based on the tenant hierarchy to return the data. We are not storing the aggregated counts for all the groups levels. Some of them are aggregated at read time.
+
+##### User Competency Count Computation
+
+We are planning to store the status of each competency for the user to arrive at different competency counts. This data will be stored on a day, user, competency basis where status will be updated for multiple activities on the same competency. From this table we will compute the daily competency counts of the users. which will then aggregated at class levels 
+

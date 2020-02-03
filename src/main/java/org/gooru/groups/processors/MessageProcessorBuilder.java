@@ -7,10 +7,10 @@ import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryRepor
 import org.gooru.groups.reports.classes.student.summary.weekly.ClassStudentSummaryWeeklyReportProcessor;
 import org.gooru.groups.reports.classes.summary.ClassSummaryReportProcessor;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryProcessor;
+import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportProcessor;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupProcessor;
 import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolProcessor;
 import org.gooru.groups.reports.competency.state.GroupCompetencyReportByStateProcessor;
-import org.gooru.groups.reports.fetchcountries.FetchCountriesForGroupReportProcessor;
 import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryProcessor;
 import org.gooru.groups.reports.perf.fetchsubject.country.FetchSubjectsForPerfReportByCountryProcessor;
 import org.gooru.groups.reports.perf.group.GroupPerfReportByGroupProcessor;
@@ -40,7 +40,7 @@ public final class MessageProcessorBuilder {
       case Constants.Message.MSG_OP_REPORTS_GET_CLASS_STUDENT_DETAILED_SUMMARY_WEEKLY:
         return new ClassStudentDetailedSummaryProcessor(vertx, message);
       case Constants.Message.MSG_OP_REPORTS_GROUPS_COUNTRIES:
-        return new FetchCountriesForGroupReportProcessor(vertx, message);
+        return new FetchCountriesForReportProcessor(vertx, message);
 
       case Constants.Message.MSG_OP_PERF_REPORTS_SUBJECTS_BY_COUNTRY:
         return new FetchSubjectsForPerfReportByCountryProcessor(vertx, message);

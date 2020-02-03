@@ -6,9 +6,11 @@ import java.util.Set;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryCommand;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryModel;
 import org.gooru.groups.reports.competency.country.GroupCompetencyStateWiseReportByCountryModel;
+import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportCommand;
+import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportModel;
+import org.gooru.groups.reports.competency.group.GroupCompetencyDrillDownReportByGroupOrSchoolModel;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupCommand;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupModel;
-import org.gooru.groups.reports.competency.group.GroupCompetencyDrillDownReportByGroupOrSchoolModel;
 import org.gooru.groups.reports.competency.school.GroupCompetencyClassWiseReportBySchoolModel;
 import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolCommand;
 import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolModel;
@@ -32,6 +34,16 @@ public class GroupCompetencyReportService {
   public Double fetchAveragePerformanceByCountry(
       GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
     return this.dao.fetchAveragePerformanceByCountty(bean);
+  }
+
+  public List<FetchCountriesForReportModel> fetchCompetencyCounts(
+      FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean) {
+    return this.dao.fetchCompetencyCounts(bean);
+  }
+  
+  public List<FetchCountriesForReportModel> fetchCompetencyCountsByTenant(
+      FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean) {
+    return this.dao.fetchCompetencyCountsByTenant(bean);
   }
 
   public List<GroupCompetencyReportByCountryModel> fetchGroupCompetencyReportByCountry(

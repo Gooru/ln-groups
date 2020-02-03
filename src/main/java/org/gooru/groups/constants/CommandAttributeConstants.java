@@ -32,5 +32,8 @@ public class CommandAttributeConstants {
   public final static String GROUP_TYPE_DISTRICT = "district";
   public final static String GROUP_TYPE_BLOCK = "block";
   public final static String GROUP_TYPE_CLUSTER = "cluster";
+  
+  public final static String TENANT_ID = "tenant_id";
+  public final static String TENANT_ROOT = "tenant_root";
 
 }
