@@ -17,8 +17,11 @@ public class FetchCountriesForReportResponseModelBuilder {
     FetchCountriesForReportResponseModel responseModel = new FetchCountriesForReportResponseModel();
     List<Country> countries = new ArrayList<>();
     compCounts.forEach(reportModel -> {
+      CountryModel countryModel = countryModelMap.get(reportModel.getCountryId());
+      if (countryModel != null) {
       countries.add(
-          populateCountryWithData(reportModel, countryModelMap.get(reportModel.getCountryId())));
+          populateCountryWithData(reportModel, countryModel));
+      }
     });
     responseModel.setCountries(countries);
     return responseModel;
@@ -28,8 +31,8 @@ public class FetchCountriesForReportResponseModelBuilder {
       CountryModel countryModel) {
     Country country = new Country();
     country.setId(countryModel.getId());
-    country.setName(country.getName());
-    country.setCode(country.getCode());
+    country.setName(countryModel.getName());
+    country.setCode(countryModel.getCode());
 
     if (reportModel != null) {
       country.setCompletedCompetencies(reportModel.getCompletedCompetencies());

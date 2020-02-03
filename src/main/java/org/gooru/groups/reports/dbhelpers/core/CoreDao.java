@@ -15,7 +15,7 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 public interface CoreDao {
 
   @Mapper(CountryModelMapper.class)
-  @SqlQuery("SELECT id, name, code FROM country_ds WHERE id = ANY(:countryIds::bigint[]")
+  @SqlQuery("SELECT id, name, code FROM country_ds WHERE id = ANY(:countryIds::bigint[])")
   List<CountryModel> fetchCountryDetails(@Bind("countryIds") String countryIds);
 
   @Mapper(StateModelMapper.class)

@@ -46,8 +46,8 @@ public class FetchCountriesForReportCommand {
     this.year = year;
   }
 
-  public static FetchCountriesForReportCommand build(JsonObject request) {
-    FetchCountriesForReportCommand command = buildFromJson(request);
+  public static FetchCountriesForReportCommand build(JsonObject tenantJson, JsonObject requestBody) {
+    FetchCountriesForReportCommand command = buildFromJson(tenantJson, requestBody);
     command.validate();
     return command;
   }
@@ -66,11 +66,11 @@ public class FetchCountriesForReportCommand {
     }
   }
 
-  private static FetchCountriesForReportCommand buildFromJson(JsonObject request) {
-    String tenantId = request.getString(CommandAttributeConstants.TENANT_ID);
-    String tenantRoot = request.getString(CommandAttributeConstants.TENANT_ROOT);
-    Integer month = RequestUtils.getAsInt(request, CommandAttributeConstants.MONTH);
-    Integer year = RequestUtils.getAsInt(request, CommandAttributeConstants.YEAR);
+  private static FetchCountriesForReportCommand buildFromJson(JsonObject tenantJson, JsonObject requestBody) {
+    String tenantId = tenantJson.getString(CommandAttributeConstants.TENANT_ID);
+    String tenantRoot = tenantJson.getString(CommandAttributeConstants.TENANT_ROOT);
+    Integer month = RequestUtils.getAsInt(requestBody, CommandAttributeConstants.MONTH);
+    Integer year = RequestUtils.getAsInt(requestBody, CommandAttributeConstants.YEAR);
     return new FetchCountriesForReportCommand(tenantId, tenantRoot, month, year);
   }
 

@@ -1,6 +1,7 @@
 
 package org.gooru.groups.reports.competency.fetchcountries;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,7 +47,7 @@ public class FetchCountriesForReportProcessor implements MessageProcessor {
     try {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
       FetchCountriesForReportCommand command =
-          FetchCountriesForReportCommand.build(ebMessage.getTenant());
+          FetchCountriesForReportCommand.build(ebMessage.getTenant(), ebMessage.getRequestBody());
 
       UUID userId = ebMessage.getUserId().get();
       List<Integer> userRoles = CORE_SERVICE.fetchUserRoles(userId);
@@ -61,12 +62,12 @@ public class FetchCountriesForReportProcessor implements MessageProcessor {
       JsonArray globalRoles = AppConfiguration.getInstance().getGlobalReportAccessRoles();
       for (Object role : globalRoles) {
         try {
-          Integer roleId = Integer.parseInt((String) role);
+          Integer roleId = (Integer) role;
           if (userRoles.contains(roleId)) {
             isGlobalAccess = true;
             break;
           }
-        } catch (NumberFormatException nfe) {
+        } catch (Exception ex) {
           LOGGER.warn("invalid role present in the configuration");
         }
       }
@@ -74,24 +75,33 @@ public class FetchCountriesForReportProcessor implements MessageProcessor {
       List<FetchCountriesForReportModel> competencyCounts = null;
       if (isGlobalAccess) {
         // Fetch data for all tenants
+        LOGGER.debug("user has global access, returning report for all tenants");
         competencyCounts = GROUP_REPORT_SERVICE.fetchCompetencyCounts(command.asBean());
       } else {
         // Filter by tenant
+        LOGGER.debug("user does not have global access, returning report for specific tenants");
         competencyCounts = GROUP_REPORT_SERVICE.fetchCompetencyCountsByTenant(command.asBean());
       }
+      
+      FetchCountriesForReportResponseModel responseModel = null;
+      if (competencyCounts != null && !competencyCounts.isEmpty()) {
+        Set<Long> countryIds = new HashSet<>();
+        competencyCounts.forEach(model -> {
+          countryIds.add(model.getCountryId());
+        });
+        
+        responseModel =
+            new FetchCountriesForReportResponseModelBuilder().build(competencyCounts,
+                CORE_SERVICE.fetchCountryDetails(countryIds));
+      } else {
+        responseModel = new FetchCountriesForReportResponseModel();
+        responseModel.setCountries(new ArrayList<>());
+      }
 
-      Set<Long> countryIds = new HashSet<>();
-      competencyCounts.forEach(model -> {
-        countryIds.add(model.getCountryId());
-      });
-
-      FetchCountriesForReportResponseModel responseModel =
-          new FetchCountriesForReportResponseModelBuilder().build(competencyCounts,
-              CORE_SERVICE.fetchCountryDetails(countryIds));
       String resultString = new ObjectMapper().writeValueAsString(responseModel);
       result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
     } catch (Throwable t) {
-      LOGGER.warn("exception while fetching competency report by group", t);
+      LOGGER.warn("exception while fetching countries for report", t);
       result.fail(t);
     }
 
