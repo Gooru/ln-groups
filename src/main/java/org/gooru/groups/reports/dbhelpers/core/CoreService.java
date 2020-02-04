@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.gooru.groups.reports.utils.CollectionUtils;
 import org.skife.jdbi.v2.DBI;
 
@@ -89,6 +90,16 @@ public class CoreService {
     return this.collectionDao.findCompetenciesForCollection(collectionId);
   }
 
+  public Map<Long, CountryModel> fetchCountryDetails(Set<Long> countryIds) {
+    Map<Long, CountryModel> countryModelMap = new HashMap<>();
+    List<CountryModel> counrtyModels =
+        this.coreDao.fetchCountryDetails(CollectionUtils.toPostgresArrayLong(countryIds));
+    counrtyModels.forEach(state -> {
+      countryModelMap.put(state.getId(), state);
+    });
+    return countryModelMap;
+  }
+
   public Map<Long, StateModel> fetchStateDetails(Set<Long> stateIds) {
     Map<Long, StateModel> stateModelMap = new HashMap<>();
     List<StateModel> stateModels =
@@ -98,7 +109,7 @@ public class CoreService {
     });
     return stateModelMap;
   }
-  
+
   public Map<Long, StateModel> fetchStatesByCountry(Long countryId) {
     Map<Long, StateModel> stateModelMap = new HashMap<>();
     List<StateModel> stateModels = this.coreDao.fetchStatesByCountry(countryId);
@@ -163,5 +174,9 @@ public class CoreService {
       groupModelMap.put(group.getId(), group);
     });
     return groupModelMap;
+  }
+
+  public List<Integer> fetchUserRoles(UUID userId) {
+    return this.coreDao.fetchUserRoles(userId);
   }
 }

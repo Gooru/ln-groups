@@ -7,6 +7,9 @@ import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountr
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryModelMapper;
 import org.gooru.groups.reports.competency.country.GroupCompetencyStateWiseReportByCountryModel;
 import org.gooru.groups.reports.competency.country.GroupCompetencyStateWiseReportByCountryModelMapper;
+import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportCommand;
+import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportModel;
+import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportModelMapper;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupCommand;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupModel;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportBySDorClusterModelMapper;
@@ -33,11 +36,20 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 public interface GroupCompetencyReportDao {
   
   // Group Competency report by Country
-  
   @SqlQuery("SELECT AVG(assessment_performance) AS average_performance FROM class_performance_data_reports WHERE country_id = :countryId AND"
       + " month = :month AND year = :year")
   Double fetchAveragePerformanceByCountty(@BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
 
+  @Mapper(FetchCountriesForReportModelMapper.class)
+  @SqlQuery("SELECT SUM(completed_count) AS completed_competencies, country_id FROM class_competency_data_reports WHERE month = :month AND"
+      + " year = :year GROUP BY country_id")
+  List<FetchCountriesForReportModel> fetchCompetencyCounts(@BindBean FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean);
+  
+  @Mapper(FetchCountriesForReportModelMapper.class)
+  @SqlQuery("SELECT SUM(completed_count) AS completed_competencies, country_id FROM class_competency_data_reports WHERE month = :month AND"
+      + " year = :year AND tenant = :tenantId GROUP BY country_id")
+  List<FetchCountriesForReportModel> fetchCompetencyCountsByTenant(@BindBean FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean);
+  
   @Mapper(GroupCompetencyReportByCountryModelMapper.class)
   @SqlQuery("SELECT week, SUM(completed_count) as completed_competencies FROM class_competency_data_reports WHERE country_id = :countryId AND"
       + " month = :month AND year = :year GROUP BY week")

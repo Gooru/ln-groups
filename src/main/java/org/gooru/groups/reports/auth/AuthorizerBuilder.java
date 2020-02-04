@@ -9,7 +9,4 @@ public class AuthorizerBuilder {
     throw new AssertionError();
   }
 
-  public static Authorizer buildGroupReportAuthorizer(String userId) {
-    return new GroupReportAuthorizer(userId);
-  }
 }
