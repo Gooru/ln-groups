@@ -38,7 +38,11 @@ public interface GroupCompetencyReportDao {
   // Group Competency report by Country
   @SqlQuery("SELECT AVG(assessment_performance) AS average_performance FROM class_performance_data_reports WHERE country_id = :countryId AND"
       + " month = :month AND year = :year")
-  Double fetchAveragePerformanceByCountty(@BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
+  Double fetchAveragePerformanceByCountry(@BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
+  
+  @SqlQuery("SELECT AVG(assessment_performance) AS average_performance FROM class_performance_data_reports WHERE country_id = :countryId AND"
+      + " month = :month AND year = :year AND tenant = :tenantId")
+  Double fetchAveragePerformanceByCountryAndTenant(@BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
 
   @Mapper(FetchCountriesForReportModelMapper.class)
   @SqlQuery("SELECT SUM(completed_count) AS completed_competencies, country_id FROM class_competency_data_reports WHERE month = :month AND"
@@ -55,11 +59,24 @@ public interface GroupCompetencyReportDao {
       + " month = :month AND year = :year GROUP BY week")
   List<GroupCompetencyReportByCountryModel> fetchGroupCompetencyReportByCountry(
       @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
+  
+  @Mapper(GroupCompetencyReportByCountryModelMapper.class)
+  @SqlQuery("SELECT week, SUM(completed_count) as completed_competencies FROM class_competency_data_reports WHERE country_id = :countryId AND"
+      + " month = :month AND year = :year AND tenant = :tenantId GROUP BY week")
+  List<GroupCompetencyReportByCountryModel> fetchGroupCompetencyReportByCountryAndTenant(
+      @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
+  
 
   @Mapper(GroupCompetencyStateWiseReportByCountryModelMapper.class)
   @SqlQuery("SELECT state_id, SUM(completed_count) as completed_competencies, SUM(inprogress_count) as inprogress_competencies FROM"
       + " class_competency_data_reports WHERE country_id = :countryId AND month = :month AND year = :year GROUP BY state_id")
   List<GroupCompetencyStateWiseReportByCountryModel> fetchGroupCompetencyStateWiseReportByCountry(
+      @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
+  
+  @Mapper(GroupCompetencyStateWiseReportByCountryModelMapper.class)
+  @SqlQuery("SELECT state_id, SUM(completed_count) as completed_competencies, SUM(inprogress_count) as inprogress_competencies FROM"
+      + " class_competency_data_reports WHERE country_id = :countryId AND month = :month AND year = :year AND tenant = :tenantId GROUP BY state_id")
+  List<GroupCompetencyStateWiseReportByCountryModel> fetchGroupCompetencyStateWiseReportByCountryAndTenant(
       @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
 
   // Group Competency report by State

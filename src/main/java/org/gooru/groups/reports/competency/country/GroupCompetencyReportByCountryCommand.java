@@ -21,13 +21,17 @@ public class GroupCompetencyReportByCountryCommand {
   private Integer month;
   private Integer year;
   private String frequency;
+  private String tenantId;
+  private String tenantRoot;
 
   public GroupCompetencyReportByCountryCommand(Long countryId, Integer month, Integer year,
-      String frequency) {
+      String frequency, String tenantId, String tenantRoot) {
     this.countryId = countryId;
     this.month = month;
     this.year = year;
     this.frequency = frequency;
+    this.tenantId = tenantId;
+    this.tenantRoot = tenantRoot;
   }
 
   public Long getCountryId() {
@@ -46,21 +50,40 @@ public class GroupCompetencyReportByCountryCommand {
     return frequency;
   }
 
-  public static GroupCompetencyReportByCountryCommand build(JsonObject request) {
-    GroupCompetencyReportByCountryCommand command = buildFromJson(request);
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public String getTenantRoot() {
+    return tenantRoot;
+  }
+
+  public static GroupCompetencyReportByCountryCommand build(JsonObject request,
+      JsonObject tenantJson) {
+    GroupCompetencyReportByCountryCommand command = buildFromJson(request, tenantJson);
     command.validate();
     return command;
   }
 
-  private static GroupCompetencyReportByCountryCommand buildFromJson(JsonObject request) {
+  private static GroupCompetencyReportByCountryCommand buildFromJson(JsonObject request,
+      JsonObject tenantJson) {
+    String tenantId = tenantJson.getString(CommandAttributeConstants.TENANT_ID);
+    String tenantRoot = tenantJson.getString(CommandAttributeConstants.TENANT_ROOT);
     Long country = RequestUtils.getAsLong(request, CommandAttributeConstants.COUNTRY_ID);
     String frequency = request.getString(CommandAttributeConstants.FREQUENCY);
     Integer month = RequestUtils.getAsInt(request, CommandAttributeConstants.MONTH);
     Integer year = RequestUtils.getAsInt(request, CommandAttributeConstants.YEAR);
-    return new GroupCompetencyReportByCountryCommand(country, month, year, frequency);
+    return new GroupCompetencyReportByCountryCommand(country, month, year, frequency, tenantId,
+        tenantRoot);
   }
 
   private void validate() {
+    if (this.tenantId == null) {
+      LOGGER.warn("Invalid tenant provided");
+      throw new HttpResponseWrapperException(HttpConstants.HttpStatus.BAD_REQUEST,
+          "Invalid tenantId provided");
+    }
+
     if (frequency == null
         || !frequency.equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_MONTHLY)) {
       LOGGER.warn("invalid value of frequency provided in the request");
@@ -82,6 +105,8 @@ public class GroupCompetencyReportByCountryCommand {
     bean.frequency = frequency;
     bean.month = month;
     bean.year = year;
+    bean.tenantId = tenantId;
+    bean.tenantRoot = tenantRoot;
     return bean;
   }
 
@@ -90,6 +115,8 @@ public class GroupCompetencyReportByCountryCommand {
     private Integer month;
     private Integer year;
     private String frequency;
+    private String tenantId;
+    private String tenantRoot;
 
     public Long getCountryId() {
       return countryId;
@@ -121,6 +148,22 @@ public class GroupCompetencyReportByCountryCommand {
 
     public void setFrequency(String frequency) {
       this.frequency = frequency;
+    }
+
+    public String getTenantId() {
+      return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+      this.tenantId = tenantId;
+    }
+
+    public String getTenantRoot() {
+      return tenantRoot;
+    }
+
+    public void setTenantRoot(String tenantRoot) {
+      this.tenantRoot = tenantRoot;
     }
 
   }
