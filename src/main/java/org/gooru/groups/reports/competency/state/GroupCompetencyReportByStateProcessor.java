@@ -1,8 +1,10 @@
 
 package org.gooru.groups.reports.competency.state;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.processors.MessageProcessor;
@@ -52,23 +54,30 @@ public class GroupCompetencyReportByStateProcessor implements MessageProcessor {
       // Fetch all the groups falls below the state
       Map<Long, GroupModel> groupsByState = this.coreService.fetchGroupsByState(bean.getStateId());
 
-      // Fetch the reports for the groups 
+      // Fetch the reports for the groups
       List<GroupCompetencyReportByStateModel> weekReport =
           this.reportService.fetchGroupCompetencyReportByState(groupsByState.keySet(), bean);
       List<GroupCompetencyGroupWiseReportByStateModel> groupWiseReport = this.reportService
           .fetchGroupCompetencyGroupWiseReportByState(groupsByState.keySet(), bean);
 
+      // Extract the group ids and fetch the group details for which we have data
+      Set<Long> groupIds = new HashSet<>();
+      groupWiseReport.forEach(model -> {
+        groupIds.add(model.getGroupId());
+      });
+      Map<Long, GroupModel> groupsDetails = this.coreService.fetchGroupDetails(groupIds);
+
       Double averagePerformance = this.reportService.fetchAveragePerformanceByState(bean);
-      
+
       // Prepare response models
       GroupCompetencyReportByStateResponseModel responseModel =
           GroupCompetencyReportByStateResponseModelBuilder.build(weekReport, groupWiseReport,
-              groupsByState, averagePerformance);
+              groupsDetails, averagePerformance);
 
       // Send the response
       String resultString = new ObjectMapper().writeValueAsString(responseModel);
       result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
-      
+
     } catch (Throwable t) {
       LOGGER.warn("exception while fetching competency report by state", t);
       result.fail(t);

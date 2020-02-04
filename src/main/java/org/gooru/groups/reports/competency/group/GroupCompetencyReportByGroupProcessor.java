@@ -1,6 +1,7 @@
 
 package org.gooru.groups.reports.competency.group;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,32 +54,43 @@ public class GroupCompetencyReportByGroupProcessor implements MessageProcessor {
 
       GroupModel group = this.coreService.fetchGroupById(command.getGroupId());
       Double averagePerformance = this.reportService.fetchAveragePerformanceByGroup(bean);
-      
+
       GroupCompentencyReportByGroupReponseModel responseModel = null;
 
       if (group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_SCHOOL_DISTRICT)
           || group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_CLUSTER)) {
         // Fetch group to school mapping
-        Set<Long> schoolIds = this.coreService.fetchSchoolsByGroup(command.getGroupId());
+        Set<Long> allSchoolsByGroup = this.coreService.fetchSchoolsByGroup(command.getGroupId());
         List<GroupCompetencyReportByGroupModel> competencyReportByWeek =
-            this.reportService.fetchGroupCompetencyReportBySDorCluster(schoolIds, bean);
+            this.reportService.fetchGroupCompetencyReportBySDorCluster(allSchoolsByGroup, bean);
         List<GroupCompetencyDrillDownReportByGroupOrSchoolModel> competencyReportBySchool =
-            this.reportService.fetchGroupCompetencySchoolWiseReportBySDorCluster(schoolIds, bean);
+            this.reportService.fetchGroupCompetencySchoolWiseReportBySDorCluster(allSchoolsByGroup,
+                bean);
+        Set<Long> schoolIds = new HashSet<>();
+        competencyReportBySchool.forEach(model -> {
+          schoolIds.add(model.getId());
+        });
         Map<Long, DrilldownModel> schoolModels = this.coreService.fetchSchoolDetails(schoolIds);
         responseModel = GroupCompentencyReportByGroupReponseModelBuilder.buildReponseForSDorCluster(
             competencyReportByWeek, competencyReportBySchool, schoolModels, averagePerformance);
       } else if (group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_DISTRICT)
           || group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_BLOCK)) {
-        Map<Long, GroupModel> groupModels =
+        Map<Long, GroupModel> allGroupsByParent =
             this.coreService.fetchGroupsByParent(command.getGroupId());
         List<GroupCompetencyDrillDownReportByGroupOrSchoolModel> competencyReportByGroup =
-            this.reportService
-                .fetchGroupCompetencyGroupWiseReportByDistrictOrBlock(groupModels.keySet(), bean);
+            this.reportService.fetchGroupCompetencyGroupWiseReportByDistrictOrBlock(
+                allGroupsByParent.keySet(), bean);
         List<GroupCompetencyReportByGroupModel> competencyReportByWeek = this.reportService
-            .fetchGroupCompetencyReportByDistrictOrBlock(groupModels.keySet(), bean);
+            .fetchGroupCompetencyReportByDistrictOrBlock(allGroupsByParent.keySet(), bean);
+        Set<Long> groupIds = new HashSet<>();
+        competencyReportByGroup.forEach(model -> {
+          groupIds.add(model.getId());
+        });
+        Map<Long, GroupModel> groupDetails = this.coreService.fetchGroupDetails(groupIds);
+
         responseModel =
             GroupCompentencyReportByGroupReponseModelBuilder.buildReponseForDistrictorBlock(
-                competencyReportByWeek, competencyReportByGroup, groupModels, averagePerformance);
+                competencyReportByWeek, competencyReportByGroup, groupDetails, averagePerformance);
       }
 
       String resultString = new ObjectMapper().writeValueAsString(responseModel);
