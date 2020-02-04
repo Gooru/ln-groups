@@ -58,12 +58,6 @@ public class FetchCountriesForReportCommand {
       throw new HttpResponseWrapperException(HttpConstants.HttpStatus.BAD_REQUEST,
           "Invalid tenantId provided");
     }
-
-    if (month == null || year == null) {
-      LOGGER.warn("invalid month or year provided");
-      throw new HttpResponseWrapperException(HttpConstants.HttpStatus.BAD_REQUEST,
-          "Invalid month or year provided");
-    }
   }
 
   private static FetchCountriesForReportCommand buildFromJson(JsonObject tenantJson, JsonObject requestBody) {

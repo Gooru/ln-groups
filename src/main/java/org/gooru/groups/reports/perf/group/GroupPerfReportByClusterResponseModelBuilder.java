@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.gooru.groups.reports.dbhelpers.core.SchoolModel;
+import org.gooru.groups.reports.dbhelpers.core.DrilldownModel;
 import org.gooru.groups.reports.perf.dbhelpers.PerformanceAndTSReportByClusterModel;
 import org.gooru.groups.reports.perf.group.GroupPerfReportByClusterResponseModel.ClusterResponseModel;
 import org.gooru.groups.reports.perf.group.GroupPerfReportByClusterResponseModel.OverallClusterStats;
@@ -17,7 +17,7 @@ import org.gooru.groups.reports.perf.group.GroupPerfReportByClusterResponseModel
 public class GroupPerfReportByClusterResponseModelBuilder {
 
   public static GroupPerfReportByClusterResponseModel build(
-      List<PerformanceAndTSReportByClusterModel> perfModels, Map<Long, SchoolModel> schoolModels) {
+      List<PerformanceAndTSReportByClusterModel> perfModels, Map<Long, DrilldownModel> schoolModels) {
 
     Map<Long, PerformanceAndTSReportByClusterModel> perfReportMap = new HashMap<>();
     perfModels.forEach(model -> {
@@ -25,7 +25,7 @@ public class GroupPerfReportByClusterResponseModelBuilder {
     });
 
     List<ClusterResponseModel> clusterResponseModels = new ArrayList<>();
-    for (Map.Entry<Long, SchoolModel> entry : schoolModels.entrySet()) {
+    for (Map.Entry<Long, DrilldownModel> entry : schoolModels.entrySet()) {
       clusterResponseModels
           .add(buildSchoolModel(perfReportMap.get(entry.getKey()), entry.getValue()));
     }
@@ -47,7 +47,7 @@ public class GroupPerfReportByClusterResponseModelBuilder {
   }
 
   private static ClusterResponseModel buildSchoolModel(
-      PerformanceAndTSReportByClusterModel perfModel, SchoolModel schoolModel) {
+      PerformanceAndTSReportByClusterModel perfModel, DrilldownModel schoolModel) {
     ClusterResponseModel model = new ClusterResponseModel();
     model.setId(schoolModel.getId());
     model.setName(schoolModel.getName());

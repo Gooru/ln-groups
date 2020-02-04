@@ -9,7 +9,7 @@ import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.processors.MessageProcessor;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
-import org.gooru.groups.reports.dbhelpers.core.StateModel;
+import org.gooru.groups.reports.dbhelpers.core.DrilldownModel;
 import org.gooru.groups.reports.perf.dbhelpers.GroupReportService;
 import org.gooru.groups.reports.perf.dbhelpers.PerformanceAndTSReportByCountryModel;
 import org.gooru.groups.responses.MessageResponse;
@@ -58,7 +58,7 @@ public class GroupPerfReportByCountryProcessor implements MessageProcessor {
         report = this.service.fetchPerformanceAndTSMonthReportByCountry(bean);
       }
 
-      Map<Long, StateModel> states = this.coreService.fetchStatesByCountry(bean.getCountryId());
+      Map<Long, DrilldownModel> states = this.coreService.fetchStatesByCountry(bean.getCountryId());
 
       // Build the response models and complete result
       GroupPerfReportByCountryResponseModel responseModel =

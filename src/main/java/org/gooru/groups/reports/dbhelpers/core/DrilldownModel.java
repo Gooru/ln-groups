@@ -4,7 +4,7 @@ package org.gooru.groups.reports.dbhelpers.core;
 /**
  * @author szgooru Created On 13-Dec-2019
  */
-public class StateModel {
+public class DrilldownModel {
 
   private Long id;
   private String name;

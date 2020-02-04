@@ -2,7 +2,6 @@
 package org.gooru.groups.reports.perf.group;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,8 +10,8 @@ import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.processors.MessageProcessor;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
+import org.gooru.groups.reports.dbhelpers.core.DrilldownModel;
 import org.gooru.groups.reports.dbhelpers.core.GroupModel;
-import org.gooru.groups.reports.dbhelpers.core.SchoolModel;
 import org.gooru.groups.reports.perf.dbhelpers.GroupReportService;
 import org.gooru.groups.reports.perf.dbhelpers.PerformanceAndTSReportByClusterModel;
 import org.gooru.groups.reports.perf.dbhelpers.PerformanceAndTSReportByGroupModel;
@@ -88,7 +87,7 @@ public class GroupPerfReportByGroupProcessor implements MessageProcessor {
       report = this.service.fetchPerformanceAndTSMonthReportBySDorCluster(schoolIds, bean);
     }
 
-    Map<Long, SchoolModel> schoolModels = this.coreService.fetchSchoolDetails(schoolIds);
+    Map<Long, DrilldownModel> schoolModels = this.coreService.fetchSchoolDetails(schoolIds);
     GroupPerfReportByClusterResponseModel responseModel =
         GroupPerfReportByClusterResponseModelBuilder.build(report, schoolModels);
     String resultString = new ObjectMapper().writeValueAsString(responseModel);

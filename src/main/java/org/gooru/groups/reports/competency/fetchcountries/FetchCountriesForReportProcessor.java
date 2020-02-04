@@ -10,7 +10,6 @@ import org.gooru.groups.app.components.AppConfiguration;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.processors.MessageProcessor;
-import org.gooru.groups.reports.competency.dbhelpers.GroupCompetencyReportService;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.responses.MessageResponse;
 import org.gooru.groups.responses.MessageResponseFactory;
@@ -34,8 +33,8 @@ public class FetchCountriesForReportProcessor implements MessageProcessor {
   private final Future<MessageResponse> result;
 
   private final CoreService CORE_SERVICE = new CoreService(DBICreator.getDbiForDefaultDS());
-  private final GroupCompetencyReportService GROUP_REPORT_SERVICE =
-      new GroupCompetencyReportService(DBICreator.getDbiForDsdbDS());
+  private final FetchCountriesForReportService REPORT_SERVICE =
+      new FetchCountriesForReportService(DBICreator.getDbiForDsdbDS());
 
   public FetchCountriesForReportProcessor(Vertx vertx, Message<JsonObject> message) {
     this.message = message;
@@ -76,11 +75,11 @@ public class FetchCountriesForReportProcessor implements MessageProcessor {
       if (isGlobalAccess) {
         // Fetch data for all tenants
         LOGGER.debug("user has global access, returning report for all tenants");
-        competencyCounts = GROUP_REPORT_SERVICE.fetchCompetencyCounts(command.asBean());
+        competencyCounts = REPORT_SERVICE.fetchCompetencyCounts(command.asBean());
       } else {
         // Filter by tenant
         LOGGER.debug("user does not have global access, returning report for specific tenants");
-        competencyCounts = GROUP_REPORT_SERVICE.fetchCompetencyCountsByTenant(command.asBean());
+        competencyCounts = REPORT_SERVICE.fetchCompetencyCountsByTenant(command.asBean());
       }
       
       FetchCountriesForReportResponseModel responseModel = null;
