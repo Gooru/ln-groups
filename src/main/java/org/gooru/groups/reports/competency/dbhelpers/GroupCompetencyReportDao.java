@@ -2,18 +2,15 @@
 package org.gooru.groups.reports.competency.dbhelpers;
 
 import java.util.List;
+import org.gooru.groups.reports.competency.country.GroupCompetencyDrilldownReportByCountryModel;
+import org.gooru.groups.reports.competency.country.GroupCompetencyDrilldownReportByCountryModelMapper;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryCommand;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryModel;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryModelMapper;
-import org.gooru.groups.reports.competency.country.GroupCompetencyStateWiseReportByCountryModel;
-import org.gooru.groups.reports.competency.country.GroupCompetencyStateWiseReportByCountryModelMapper;
-import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportCommand;
-import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportModel;
-import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportModelMapper;
+import org.gooru.groups.reports.competency.group.GroupCompetencyDrillDownReportByGroupOrSchoolModel;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupCommand;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupModel;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportBySDorClusterModelMapper;
-import org.gooru.groups.reports.competency.group.GroupCompetencyDrillDownReportByGroupOrSchoolModel;
 import org.gooru.groups.reports.competency.group.GroupCompetencySchoolWiseReportBySDorClusterModelMapper;
 import org.gooru.groups.reports.competency.school.GroupCompetencyClassWiseReportBySchoolModel;
 import org.gooru.groups.reports.competency.school.GroupCompetencyClassWiseReportBySchoolModelMapper;
@@ -44,16 +41,6 @@ public interface GroupCompetencyReportDao {
       + " month = :month AND year = :year AND tenant = :tenantId")
   Double fetchAveragePerformanceByCountryAndTenant(@BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
 
-  @Mapper(FetchCountriesForReportModelMapper.class)
-  @SqlQuery("SELECT SUM(completed_count) AS completed_competencies, country_id FROM class_competency_data_reports WHERE month = :month AND"
-      + " year = :year GROUP BY country_id")
-  List<FetchCountriesForReportModel> fetchCompetencyCounts(@BindBean FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean);
-  
-  @Mapper(FetchCountriesForReportModelMapper.class)
-  @SqlQuery("SELECT SUM(completed_count) AS completed_competencies, country_id FROM class_competency_data_reports WHERE month = :month AND"
-      + " year = :year AND tenant = :tenantId GROUP BY country_id")
-  List<FetchCountriesForReportModel> fetchCompetencyCountsByTenant(@BindBean FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean);
-  
   @Mapper(GroupCompetencyReportByCountryModelMapper.class)
   @SqlQuery("SELECT week, SUM(completed_count) as completed_competencies FROM class_competency_data_reports WHERE country_id = :countryId AND"
       + " month = :month AND year = :year GROUP BY week")
@@ -65,18 +52,31 @@ public interface GroupCompetencyReportDao {
       + " month = :month AND year = :year AND tenant = :tenantId GROUP BY week")
   List<GroupCompetencyReportByCountryModel> fetchGroupCompetencyReportByCountryAndTenant(
       @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
-  
 
-  @Mapper(GroupCompetencyStateWiseReportByCountryModelMapper.class)
-  @SqlQuery("SELECT state_id, SUM(completed_count) as completed_competencies, SUM(inprogress_count) as inprogress_competencies FROM"
+  @Mapper(GroupCompetencyDrilldownReportByCountryModelMapper.class)
+  @SqlQuery("SELECT state_id as id, SUM(completed_count) as completed_competencies, SUM(inprogress_count) as inprogress_competencies FROM"
       + " class_competency_data_reports WHERE country_id = :countryId AND month = :month AND year = :year GROUP BY state_id")
-  List<GroupCompetencyStateWiseReportByCountryModel> fetchGroupCompetencyStateWiseReportByCountry(
+  List<GroupCompetencyDrilldownReportByCountryModel> fetchGroupCompetencyStateWiseReportByCountry(
       @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
   
-  @Mapper(GroupCompetencyStateWiseReportByCountryModelMapper.class)
-  @SqlQuery("SELECT state_id, SUM(completed_count) as completed_competencies, SUM(inprogress_count) as inprogress_competencies FROM"
+  @Mapper(GroupCompetencyDrilldownReportByCountryModelMapper.class)
+  @SqlQuery("SELECT state_id as id, SUM(completed_count) as completed_competencies, SUM(inprogress_count) as inprogress_competencies FROM"
       + " class_competency_data_reports WHERE country_id = :countryId AND month = :month AND year = :year AND tenant = :tenantId GROUP BY state_id")
-  List<GroupCompetencyStateWiseReportByCountryModel> fetchGroupCompetencyStateWiseReportByCountryAndTenant(
+  List<GroupCompetencyDrilldownReportByCountryModel> fetchGroupCompetencyStateWiseReportByCountryAndTenant(
+      @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
+  
+  // School wise report by Country
+  
+  @Mapper(GroupCompetencyDrilldownReportByCountryModelMapper.class)
+  @SqlQuery("SELECT school_id as id, SUM(completed_count) as completed_competencies, SUM(inprogress_count) as inprogress_competencies FROM"
+      + " class_competency_data_reports WHERE country_id = :countryId AND month = :month AND year = :year GROUP BY school_id")
+  List<GroupCompetencyDrilldownReportByCountryModel> fetchGroupCompetencySchoolWiseReportByCountry(
+      @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
+  
+  @Mapper(GroupCompetencyDrilldownReportByCountryModelMapper.class)
+  @SqlQuery("SELECT school_id as id, SUM(completed_count) as completed_competencies, SUM(inprogress_count) as inprogress_competencies FROM"
+      + " class_competency_data_reports WHERE country_id = :countryId AND month = :month AND year = :year AND tenant = :tenantId GROUP BY school_id")
+  List<GroupCompetencyDrilldownReportByCountryModel> fetchGroupCompetencySchoolWiseReportByCountryAndTenant(
       @BindBean GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean);
 
   // Group Competency report by State

@@ -100,9 +100,9 @@ public class CoreService {
     return countryModelMap;
   }
 
-  public Map<Long, StateModel> fetchStateDetails(Set<Long> stateIds) {
-    Map<Long, StateModel> stateModelMap = new HashMap<>();
-    List<StateModel> stateModels =
+  public Map<Long, DrilldownModel> fetchStateDetails(Set<Long> stateIds) {
+    Map<Long, DrilldownModel> stateModelMap = new HashMap<>();
+    List<DrilldownModel> stateModels =
         this.coreDao.fetchStateDetails(CollectionUtils.toPostgresArrayLong(stateIds));
     stateModels.forEach(state -> {
       stateModelMap.put(state.getId(), state);
@@ -110,9 +110,9 @@ public class CoreService {
     return stateModelMap;
   }
 
-  public Map<Long, StateModel> fetchStatesByCountry(Long countryId) {
-    Map<Long, StateModel> stateModelMap = new HashMap<>();
-    List<StateModel> stateModels = this.coreDao.fetchStatesByCountry(countryId);
+  public Map<Long, DrilldownModel> fetchStatesByCountry(Long countryId) {
+    Map<Long, DrilldownModel> stateModelMap = new HashMap<>();
+    List<DrilldownModel> stateModels = this.coreDao.fetchStatesByCountry(countryId);
     stateModels.forEach(state -> {
       stateModelMap.put(state.getId(), state);
     });
@@ -139,9 +139,9 @@ public class CoreService {
     return groupModelMap;
   }
 
-  public Map<Long, SchoolModel> fetchSchoolDetails(Set<Long> schoolIds) {
-    Map<Long, SchoolModel> schoolModelMap = new HashMap<>();
-    List<SchoolModel> schoolModels =
+  public Map<Long, DrilldownModel> fetchSchoolDetails(Set<Long> schoolIds) {
+    Map<Long, DrilldownModel> schoolModelMap = new HashMap<>();
+    List<DrilldownModel> schoolModels =
         this.coreDao.fetchSchoolDetails(CollectionUtils.toPostgresArrayLong(schoolIds));
     schoolModels.forEach(school -> {
       schoolModelMap.put(school.getId(), school);

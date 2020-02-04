@@ -8,7 +8,7 @@ import java.util.Map;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryResponseModel.Data;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryResponseModel.Drilldown;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryResponseModel.OverallStats;
-import org.gooru.groups.reports.dbhelpers.core.StateModel;
+import org.gooru.groups.reports.dbhelpers.core.DrilldownModel;
 
 /**
  * @author szgooru Created On 14-Dec-2019
@@ -17,8 +17,8 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
 
   public GroupCompetencyReportByCountryResponseModel build(
       List<GroupCompetencyReportByCountryModel> competencyReportByWeek,
-      List<GroupCompetencyStateWiseReportByCountryModel> competencyReportByState,
-      Map<Long, StateModel> states, Double averagePerformance) {
+      List<GroupCompetencyDrilldownReportByCountryModel> competencyReportByState,
+      Map<Long, DrilldownModel> states, Double averagePerformance, String type) {
     GroupCompetencyReportByCountryResponseModel responseModel =
         new GroupCompetencyReportByCountryResponseModel();
 
@@ -29,15 +29,15 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
       totalCompetencies = totalCompetencies + weekReport.getCompletedCompetencies();
     }
 
-    Map<Long, GroupCompetencyStateWiseReportByCountryModel> stateReportMap = new HashMap<>();
+    Map<Long, GroupCompetencyDrilldownReportByCountryModel> stateReportMap = new HashMap<>();
     competencyReportByState.forEach(stateReport -> {
-      stateReportMap.put(stateReport.getStateId(), stateReport);
+      stateReportMap.put(stateReport.getId(), stateReport);
     });
 
     List<Drilldown> drilldownList = new ArrayList<>();
-    for (Map.Entry<Long, StateModel> entry : states.entrySet()) {
+    for (Map.Entry<Long, DrilldownModel> entry : states.entrySet()) {
       drilldownList
-          .add(prepareDrilldownModel(stateReportMap.get(entry.getKey()), entry.getValue()));
+          .add(prepareDrilldownModel(stateReportMap.get(entry.getKey()), entry.getValue(), type));
     }
 
     OverallStats overallStats = new OverallStats();
@@ -57,8 +57,8 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
     return dataModel;
   }
 
-  private Drilldown prepareDrilldownModel(GroupCompetencyStateWiseReportByCountryModel reportModel,
-      StateModel stateModel) {
+  private Drilldown prepareDrilldownModel(GroupCompetencyDrilldownReportByCountryModel reportModel,
+      DrilldownModel stateModel, String type) {
     Drilldown drilldownModel = new Drilldown();
     if (reportModel != null) {
       drilldownModel.setCompletedCompetencies(reportModel.getCompletedCompetencies());
@@ -71,7 +71,7 @@ public class GroupCompetencyReportByCountryResponseModelBuilder {
     drilldownModel.setId(stateModel.getId());
     drilldownModel.setName(stateModel.getName());
     drilldownModel.setCode(stateModel.getCode());
-    drilldownModel.setType("state");
+    drilldownModel.setType(type);
     drilldownModel.setSubType(null);
 
     return drilldownModel;

@@ -18,13 +18,13 @@ public interface CoreDao {
   @SqlQuery("SELECT id, name, code FROM country_ds WHERE id = ANY(:countryIds::bigint[])")
   List<CountryModel> fetchCountryDetails(@Bind("countryIds") String countryIds);
 
-  @Mapper(StateModelMapper.class)
+  @Mapper(DrilldownModelMapper.class)
   @SqlQuery("SELECT id, name, code FROM state_ds WHERE id = ANY(:stateIds::bigint[])")
-  List<StateModel> fetchStateDetails(@Bind("stateIds") String stateIds);
+  List<DrilldownModel> fetchStateDetails(@Bind("stateIds") String stateIds);
 
-  @Mapper(StateModelMapper.class)
+  @Mapper(DrilldownModelMapper.class)
   @SqlQuery("SELECT id, name, code FROM state_ds WHERE country_id = :countryId::bigint")
-  List<StateModel> fetchStatesByCountry(@Bind("countryId") Long countryId);
+  List<DrilldownModel> fetchStatesByCountry(@Bind("countryId") Long countryId);
 
   @Mapper(GroupModelMapper.class)
   @SqlQuery("SELECT id, name, code, type, sub_type FROM groups WHERE id = ANY(:groupIds::bigint[])")
@@ -34,9 +34,9 @@ public interface CoreDao {
   @SqlQuery("SELECT id, name, code, type, sub_type FROM groups WHERE id = :groupId::bigint")
   GroupModel fetchGroupById(@Bind("groupId") Long groupId);
 
-  @Mapper(SchoolModelMapper.class)
+  @Mapper(DrilldownModelMapper.class)
   @SqlQuery("SELECT id, name, code FROM school_ds WHERE id = ANY(:schoolIds::bigint[])")
-  List<SchoolModel> fetchSchoolDetails(@Bind("schoolIds") String schoolIds);
+  List<DrilldownModel> fetchSchoolDetails(@Bind("schoolIds") String schoolIds);
 
   @Mapper(SubjectModelMapper.class)
   @SqlQuery("SELECT id, title FROM taxonomy_subject WHERE id = ANY(:subjectCodes)")

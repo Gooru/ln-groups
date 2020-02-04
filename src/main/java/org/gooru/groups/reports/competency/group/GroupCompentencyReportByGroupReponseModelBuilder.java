@@ -8,8 +8,8 @@ import java.util.Map;
 import org.gooru.groups.reports.competency.group.GroupCompentencyReportByGroupReponseModel.Data;
 import org.gooru.groups.reports.competency.group.GroupCompentencyReportByGroupReponseModel.Drilldown;
 import org.gooru.groups.reports.competency.group.GroupCompentencyReportByGroupReponseModel.OverallStats;
+import org.gooru.groups.reports.dbhelpers.core.DrilldownModel;
 import org.gooru.groups.reports.dbhelpers.core.GroupModel;
-import org.gooru.groups.reports.dbhelpers.core.SchoolModel;
 
 /**
  * @author szgooru Created On 17-Dec-2019
@@ -19,7 +19,7 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
   public static GroupCompentencyReportByGroupReponseModel buildReponseForSDorCluster(
       List<GroupCompetencyReportByGroupModel> competencyReportByWeek,
       List<GroupCompetencyDrillDownReportByGroupOrSchoolModel> competencyReportBySchool,
-      Map<Long, SchoolModel> schools, Double averagePerformance) {
+      Map<Long, DrilldownModel> schools, Double averagePerformance) {
     GroupCompentencyReportByGroupReponseModel responseModel =
         new GroupCompentencyReportByGroupReponseModel();
     List<Data> dataList = new ArrayList<>();
@@ -35,7 +35,7 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
     });
 
     List<Drilldown> drilldownList = new ArrayList<>();
-    for (Map.Entry<Long, SchoolModel> entry : schools.entrySet()) {
+    for (Map.Entry<Long, DrilldownModel> entry : schools.entrySet()) {
       drilldownList.add(prepareDrilldownModelForSDorCluster(schoolReportMap.get(entry.getKey()),
           entry.getValue()));
     }
@@ -92,7 +92,7 @@ public class GroupCompentencyReportByGroupReponseModelBuilder {
   }
 
   private static Drilldown prepareDrilldownModelForSDorCluster(
-      GroupCompetencyDrillDownReportByGroupOrSchoolModel reportModel, SchoolModel schoolModel) {
+      GroupCompetencyDrillDownReportByGroupOrSchoolModel reportModel, DrilldownModel schoolModel) {
     Drilldown drilldownModel = new Drilldown();
     drilldownModel.setId(schoolModel.getId());
     drilldownModel.setName(schoolModel.getName());

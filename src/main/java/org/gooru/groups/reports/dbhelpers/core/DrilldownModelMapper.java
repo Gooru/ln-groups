@@ -9,11 +9,11 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
 /**
  * @author szgooru Created On 13-Dec-2019
  */
-public class StateModelMapper implements ResultSetMapper<StateModel> {
+public class DrilldownModelMapper implements ResultSetMapper<DrilldownModel> {
 
   @Override
-  public StateModel map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-    StateModel model = new StateModel();
+  public DrilldownModel map(int index, ResultSet r, StatementContext ctx) throws SQLException {
+    DrilldownModel model = new DrilldownModel();
     model.setId(r.getLong("id"));
     model.setName(r.getString("name"));
     model.setCode(r.getString("code"));

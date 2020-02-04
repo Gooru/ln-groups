@@ -4,18 +4,18 @@ package org.gooru.groups.reports.competency.country;
 /**
  * @author szgooru Created On 16-Dec-2019
  */
-public class GroupCompetencyStateWiseReportByCountryModel {
+public class GroupCompetencyDrilldownReportByCountryModel {
 
-  private Long stateId;
+  private Long id;
   private Long completedCompetencies;
   private Long inprogressCompetencies;
 
-  public Long getStateId() {
-    return stateId;
+  public Long getId() {
+    return id;
   }
 
-  public void setStateId(Long stateId) {
-    this.stateId = stateId;
+  public void setId(Long id) {
+    this.id = id;
   }
 
   public Long getCompletedCompetencies() {
@@ -36,7 +36,7 @@ public class GroupCompetencyStateWiseReportByCountryModel {
 
   @Override
   public String toString() {
-    return "GroupCompetencyStateWiseReportByCountryModel [stateId=" + stateId
+    return "GroupCompetencyStateWiseReportByCountryModel [id=" + id
         + ", completedCompetencies=" + completedCompetencies + ", inprogressCompetencies="
         + inprogressCompetencies + "]";
   }

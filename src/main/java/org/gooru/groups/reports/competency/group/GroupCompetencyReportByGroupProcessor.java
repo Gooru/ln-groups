@@ -10,8 +10,8 @@ import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.processors.MessageProcessor;
 import org.gooru.groups.reports.competency.dbhelpers.GroupCompetencyReportService;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
+import org.gooru.groups.reports.dbhelpers.core.DrilldownModel;
 import org.gooru.groups.reports.dbhelpers.core.GroupModel;
-import org.gooru.groups.reports.dbhelpers.core.SchoolModel;
 import org.gooru.groups.responses.MessageResponse;
 import org.gooru.groups.responses.MessageResponseFactory;
 import org.slf4j.Logger;
@@ -64,7 +64,7 @@ public class GroupCompetencyReportByGroupProcessor implements MessageProcessor {
             this.reportService.fetchGroupCompetencyReportBySDorCluster(schoolIds, bean);
         List<GroupCompetencyDrillDownReportByGroupOrSchoolModel> competencyReportBySchool =
             this.reportService.fetchGroupCompetencySchoolWiseReportBySDorCluster(schoolIds, bean);
-        Map<Long, SchoolModel> schoolModels = this.coreService.fetchSchoolDetails(schoolIds);
+        Map<Long, DrilldownModel> schoolModels = this.coreService.fetchSchoolDetails(schoolIds);
         responseModel = GroupCompentencyReportByGroupReponseModelBuilder.buildReponseForSDorCluster(
             competencyReportByWeek, competencyReportBySchool, schoolModels, averagePerformance);
       } else if (group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_DISTRICT)
