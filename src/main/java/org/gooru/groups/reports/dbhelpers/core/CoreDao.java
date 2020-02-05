@@ -56,4 +56,7 @@ public interface CoreDao {
 
   @SqlQuery("SELECT role_id FROM user_role_mapping WHERE user_id = :userId")
   List<Integer> fetchUserRoles(@Bind("userId") UUID userId);
+  
+  @SqlQuery("SELECT school_id FROM country_school_mapping WHERE country_id = :countryId::bigint")
+  Set<Long> fetchSchoolsByCountry(@Bind("countryId") Long countryId);
 }

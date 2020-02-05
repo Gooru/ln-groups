@@ -1,10 +1,8 @@
 
 package org.gooru.groups.reports.competency.state;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.processors.MessageProcessor;
@@ -60,19 +58,12 @@ public class GroupCompetencyReportByStateProcessor implements MessageProcessor {
       List<GroupCompetencyGroupWiseReportByStateModel> groupWiseReport = this.reportService
           .fetchGroupCompetencyGroupWiseReportByState(groupsByState.keySet(), bean);
 
-      // Extract the group ids and fetch the group details for which we have data
-      Set<Long> groupIds = new HashSet<>();
-      groupWiseReport.forEach(model -> {
-        groupIds.add(model.getGroupId());
-      });
-      Map<Long, GroupModel> groupsDetails = this.coreService.fetchGroupDetails(groupIds);
-
       Double averagePerformance = this.reportService.fetchAveragePerformanceByState(bean);
 
       // Prepare response models
       GroupCompetencyReportByStateResponseModel responseModel =
           GroupCompetencyReportByStateResponseModelBuilder.build(weekReport, groupWiseReport,
-              groupsDetails, averagePerformance);
+              groupsByState, averagePerformance);
 
       // Send the response
       String resultString = new ObjectMapper().writeValueAsString(responseModel);

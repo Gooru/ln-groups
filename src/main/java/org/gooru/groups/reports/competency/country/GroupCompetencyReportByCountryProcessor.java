@@ -146,12 +146,7 @@ public class GroupCompetencyReportByCountryProcessor implements MessageProcessor
         isGlobalAccess ? this.reportService.fetchGroupCompetencyStateWiseReportByCountry(bean)
             : this.reportService.fetchGroupCompetencyStateWiseReportByCountryAndTenant(bean);
 
-    Set<Long> stateIds = new HashSet<>();
-    competencyReportByState.forEach(model -> {
-      stateIds.add(model.getId());
-    });
-
-    Map<Long, DrilldownModel> states = this.coreService.fetchStateDetails(stateIds);
+    Map<Long, DrilldownModel> states = this.coreService.fetchStatesByCountry(bean.getCountryId());
     Double averagePerformance =
         isGlobalAccess ? this.reportService.fetchAveragePerformanceByCountry(bean)
             : this.reportService.fetchAveragePerformanceByCountryAndTenant(bean);
@@ -171,10 +166,7 @@ public class GroupCompetencyReportByCountryProcessor implements MessageProcessor
         isGlobalAccess ? this.reportService.fetchGroupCompetencySchoolWiseReportByCountry(bean)
             : this.reportService.fetchGroupCompetencySchoolWiseReportByCountryAndTenant(bean);
 
-    Set<Long> schoolIds = new HashSet<>();
-    competencyReportBySchool.forEach(model -> {
-      schoolIds.add(model.getId());
-    });
+    Set<Long> schoolIds = this.coreService.fetchSchoolsByCountry(bean.getCountryId());
     Map<Long, DrilldownModel> schools = this.coreService.fetchSchoolDetails(schoolIds);
     Double averagePerformance =
         isGlobalAccess ? this.reportService.fetchAveragePerformanceByCountry(bean)
