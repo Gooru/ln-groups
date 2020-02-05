@@ -179,4 +179,8 @@ public class CoreService {
   public List<Integer> fetchUserRoles(UUID userId) {
     return this.coreDao.fetchUserRoles(userId);
   }
+  
+  public Set<Long> fetchSchoolsByCountry(Long countryId) {
+    return this.coreDao.fetchSchoolsByCountry(countryId);
+  }
 }

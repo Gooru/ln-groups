@@ -3,7 +3,6 @@ package org.gooru.groups.reports.perf.dbhelpers;
 
 import java.util.List;
 import java.util.Set;
-import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryCommand;
 import org.gooru.groups.reports.perf.fetchsubject.country.FetchSubjectsForPerfReportByCountryCommand;
 import org.gooru.groups.reports.perf.group.GroupPerfReportByGroupCommand;
 import org.gooru.groups.reports.perf.school.GroupPerfReportBySchoolCommand;
@@ -68,16 +67,6 @@ public class GroupReportService {
       GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean) {
     return this.reportDao.fetchPerformanceAndTSMonthReportByState(
         CollectionUtils.toPostgresArrayLong(groupIds), bean);
-  }
-
-  public List<PerformanceAndTSReportByCountryModel> fetchPerformanceAndTSMonthReportByCountry(
-      GroupPerfReportByCountryCommand.GroupReportByCountryCommandBean bean) {
-    return this.reportDao.fetchPerformanceAndTSMonthReportByCountry(bean);
-  }
-
-  public List<PerformanceAndTSReportByCountryModel> fetchPerformanceAndTSWeekReportByCountry(
-      GroupPerfReportByCountryCommand.GroupReportByCountryCommandBean bean) {
-    return this.reportDao.fetchPerformanceAndTSWeekReportByCountry(bean);
   }
 
   public List<SubjectFrameworkModel> fetchSubjectsForPerfReportWeekByCountry(

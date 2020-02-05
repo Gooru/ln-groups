@@ -10,7 +10,6 @@ import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.processors.MessageProcessor;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.reports.dbhelpers.core.DrilldownModel;
-import org.gooru.groups.reports.perf.dbhelpers.GroupReportService;
 import org.gooru.groups.reports.perf.dbhelpers.PerformanceAndTSReportByCountryModel;
 import org.gooru.groups.responses.MessageResponse;
 import org.gooru.groups.responses.MessageResponseFactory;
@@ -32,7 +31,7 @@ public class GroupPerfReportByCountryProcessor implements MessageProcessor {
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
-  private final GroupReportService service = new GroupReportService(DBICreator.getDbiForDsdbDS());
+  private final GroupPerfReportByCountryService service = new GroupPerfReportByCountryService(DBICreator.getDbiForDsdbDS());
   private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
 
   public GroupPerfReportByCountryProcessor(Vertx vertx, Message<JsonObject> message) {

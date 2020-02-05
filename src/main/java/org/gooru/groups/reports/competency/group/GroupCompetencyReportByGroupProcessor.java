@@ -1,7 +1,6 @@
 
 package org.gooru.groups.reports.competency.group;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,11 +65,8 @@ public class GroupCompetencyReportByGroupProcessor implements MessageProcessor {
         List<GroupCompetencyDrillDownReportByGroupOrSchoolModel> competencyReportBySchool =
             this.reportService.fetchGroupCompetencySchoolWiseReportBySDorCluster(allSchoolsByGroup,
                 bean);
-        Set<Long> schoolIds = new HashSet<>();
-        competencyReportBySchool.forEach(model -> {
-          schoolIds.add(model.getId());
-        });
-        Map<Long, DrilldownModel> schoolModels = this.coreService.fetchSchoolDetails(schoolIds);
+        Map<Long, DrilldownModel> schoolModels =
+            this.coreService.fetchSchoolDetails(allSchoolsByGroup);
         responseModel = GroupCompentencyReportByGroupReponseModelBuilder.buildReponseForSDorCluster(
             competencyReportByWeek, competencyReportBySchool, schoolModels, averagePerformance);
       } else if (group.getSubType().equalsIgnoreCase(CommandAttributeConstants.GROUP_TYPE_DISTRICT)
@@ -82,15 +78,10 @@ public class GroupCompetencyReportByGroupProcessor implements MessageProcessor {
                 allGroupsByParent.keySet(), bean);
         List<GroupCompetencyReportByGroupModel> competencyReportByWeek = this.reportService
             .fetchGroupCompetencyReportByDistrictOrBlock(allGroupsByParent.keySet(), bean);
-        Set<Long> groupIds = new HashSet<>();
-        competencyReportByGroup.forEach(model -> {
-          groupIds.add(model.getId());
-        });
-        Map<Long, GroupModel> groupDetails = this.coreService.fetchGroupDetails(groupIds);
 
-        responseModel =
-            GroupCompentencyReportByGroupReponseModelBuilder.buildReponseForDistrictorBlock(
-                competencyReportByWeek, competencyReportByGroup, groupDetails, averagePerformance);
+        responseModel = GroupCompentencyReportByGroupReponseModelBuilder
+            .buildReponseForDistrictorBlock(competencyReportByWeek, competencyReportByGroup,
+                allGroupsByParent, averagePerformance);
       }
 
       String resultString = new ObjectMapper().writeValueAsString(responseModel);

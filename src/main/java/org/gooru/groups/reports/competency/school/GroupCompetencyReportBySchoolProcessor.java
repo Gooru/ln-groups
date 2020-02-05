@@ -1,10 +1,8 @@
 
 package org.gooru.groups.reports.competency.school;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.processors.MessageProcessor;
@@ -54,13 +52,8 @@ public class GroupCompetencyReportBySchoolProcessor implements MessageProcessor 
       List<GroupCompetencyClassWiseReportBySchoolModel> competencyReportByClass =
           this.reportService.fetchGroupCompetencyClassWiseReportBySchool(bean);
 
-      Set<String> classIds = new HashSet<>();
-      competencyReportByClass.forEach(model -> {
-        classIds.add(model.getClassId());
-      });
-
       // Fetch the titles of the classes from core db
-      Map<String, ClassModel> classDetails = this.coreService.fetchClassDetails(classIds);
+      Map<String, ClassModel> classDetails = this.coreService.fetchClassesBySchool(bean.getSchoolId());
       Double averagePerformance = this.reportService.fetchAveragePerformanceBySchool(bean);
 
       GroupCompetencyReportBySchoolResponseModel responseModel =
