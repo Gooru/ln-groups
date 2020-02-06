@@ -2,7 +2,6 @@
 package org.gooru.groups.reports.competency.country;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +12,6 @@ import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.processors.MessageProcessor;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryResponseModel.OverallStats;
-import org.gooru.groups.reports.competency.dbhelpers.GroupCompetencyReportService;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.reports.dbhelpers.core.DrilldownModel;
 import org.gooru.groups.reports.dbhelpers.core.hierarchy.GroupHierarchyDetailsModel;
@@ -40,8 +38,8 @@ public class GroupCompetencyReportByCountryProcessor implements MessageProcessor
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
-  private final GroupCompetencyReportService reportService =
-      new GroupCompetencyReportService(DBICreator.getDbiForDsdbDS());
+  private final GroupCompetencyReportByCountryService reportService =
+      new GroupCompetencyReportByCountryService(DBICreator.getDbiForDsdbDS());
   private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
   private final GroupHierarchyService groupHierarchyService =
       new GroupHierarchyService(DBICreator.getDbiForDefaultDS());
@@ -92,7 +90,7 @@ public class GroupCompetencyReportByCountryProcessor implements MessageProcessor
         result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
         return this.result;
       }
-      
+
       Node<GroupHierarchyDetailsModel> groupHierarchy =
           this.groupHierarchyService.fetchGroupHierarchyDetails(hierarchyId);
 
@@ -139,17 +137,19 @@ public class GroupCompetencyReportByCountryProcessor implements MessageProcessor
   private GroupCompetencyReportByCountryResponseModel fetchStateWiseReport(boolean isGlobalAccess,
       GroupCompetencyReportByCountryCommandBean bean) {
     LOGGER.debug("fetching the competency report data by week and state");
+    Set<String> tenantIds = this.coreService.fetchSubTenants(bean.getTenantId());
     List<GroupCompetencyReportByCountryModel> competencyReportByWeek =
         isGlobalAccess ? this.reportService.fetchGroupCompetencyReportByCountry(bean)
-            : this.reportService.fetchGroupCompetencyReportByCountryAndTenant(bean);
-    List<GroupCompetencyDrilldownReportByCountryModel> competencyReportByState =
-        isGlobalAccess ? this.reportService.fetchGroupCompetencyStateWiseReportByCountry(bean)
-            : this.reportService.fetchGroupCompetencyStateWiseReportByCountryAndTenant(bean);
+            : this.reportService.fetchGroupCompetencyReportByCountryAndTenant(bean, tenantIds);
+
+    List<GroupCompetencyDrilldownReportByCountryModel> competencyReportByState = isGlobalAccess
+        ? this.reportService.fetchGroupCompetencyStateWiseReportByCountry(bean)
+        : this.reportService.fetchGroupCompetencyStateWiseReportByCountryAndTenant(bean, tenantIds);
 
     Map<Long, DrilldownModel> states = this.coreService.fetchStatesByCountry(bean.getCountryId());
     Double averagePerformance =
         isGlobalAccess ? this.reportService.fetchAveragePerformanceByCountry(bean)
-            : this.reportService.fetchAveragePerformanceByCountryAndTenant(bean);
+            : this.reportService.fetchAveragePerformanceByCountryAndTenant(bean, tenantIds);
 
     LOGGER.debug("prepare the response model");
     return new GroupCompetencyReportByCountryResponseModelBuilder().build(competencyReportByWeek,
@@ -159,18 +159,21 @@ public class GroupCompetencyReportByCountryProcessor implements MessageProcessor
   private GroupCompetencyReportByCountryResponseModel fetchSchoolWiseReport(boolean isGlobalAccess,
       GroupCompetencyReportByCountryCommandBean bean) {
     LOGGER.debug("fetching the competency report data by week and school");
+    Set<String> tenantIds = this.coreService.fetchSubTenants(bean.getTenantId());
     List<GroupCompetencyReportByCountryModel> competencyReportByWeek =
         isGlobalAccess ? this.reportService.fetchGroupCompetencyReportByCountry(bean)
-            : this.reportService.fetchGroupCompetencyReportByCountryAndTenant(bean);
+            : this.reportService.fetchGroupCompetencyReportByCountryAndTenant(bean, tenantIds);
+
     List<GroupCompetencyDrilldownReportByCountryModel> competencyReportBySchool =
         isGlobalAccess ? this.reportService.fetchGroupCompetencySchoolWiseReportByCountry(bean)
-            : this.reportService.fetchGroupCompetencySchoolWiseReportByCountryAndTenant(bean);
+            : this.reportService.fetchGroupCompetencySchoolWiseReportByCountryAndTenant(bean,
+                tenantIds);
 
     Set<Long> schoolIds = this.coreService.fetchSchoolsByCountry(bean.getCountryId());
     Map<Long, DrilldownModel> schools = this.coreService.fetchSchoolDetails(schoolIds);
     Double averagePerformance =
         isGlobalAccess ? this.reportService.fetchAveragePerformanceByCountry(bean)
-            : this.reportService.fetchAveragePerformanceByCountryAndTenant(bean);
+            : this.reportService.fetchAveragePerformanceByCountryAndTenant(bean, tenantIds);
 
     LOGGER.debug("prepare the response model");
     return new GroupCompetencyReportByCountryResponseModelBuilder().build(competencyReportByWeek,

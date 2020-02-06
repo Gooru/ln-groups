@@ -47,6 +47,7 @@ public class FetchCountriesForReportProcessor implements MessageProcessor {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
       FetchCountriesForReportCommand command =
           FetchCountriesForReportCommand.build(ebMessage.getTenant(), ebMessage.getRequestBody());
+      FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean = command.asBean();
 
       UUID userId = ebMessage.getUserId().get();
       List<Integer> userRoles = CORE_SERVICE.fetchUserRoles(userId);
@@ -71,6 +72,7 @@ public class FetchCountriesForReportProcessor implements MessageProcessor {
         }
       }
 
+      LOGGER.debug("fetching competency counts for tenant {}", bean.getTenantId());
       List<FetchCountriesForReportModel> competencyCounts = null;
       if (isGlobalAccess) {
         // Fetch data for all tenants
@@ -79,20 +81,22 @@ public class FetchCountriesForReportProcessor implements MessageProcessor {
       } else {
         // Filter by tenant
         LOGGER.debug("user does not have global access, returning report for specific tenants");
-        competencyCounts = REPORT_SERVICE.fetchCompetencyCountsByTenant(command.asBean());
+        Set<String> tenantIds = this.CORE_SERVICE.fetchSubTenants(bean.getTenantId());
+        competencyCounts = REPORT_SERVICE.fetchCompetencyCountsByTenant(bean, tenantIds);
       }
-      
+
       FetchCountriesForReportResponseModel responseModel = null;
       if (competencyCounts != null && !competencyCounts.isEmpty()) {
+        LOGGER.debug("number of records returned {}", competencyCounts.size());
         Set<Long> countryIds = new HashSet<>();
         competencyCounts.forEach(model -> {
           countryIds.add(model.getCountryId());
         });
-        
-        responseModel =
-            new FetchCountriesForReportResponseModelBuilder().build(competencyCounts,
-                CORE_SERVICE.fetchCountryDetails(countryIds));
+
+        responseModel = new FetchCountriesForReportResponseModelBuilder().build(competencyCounts,
+            CORE_SERVICE.fetchCountryDetails(countryIds));
       } else {
+        LOGGER.debug("no data returned, returning empty response");
         responseModel = new FetchCountriesForReportResponseModel();
         responseModel.setCountries(new ArrayList<>());
       }

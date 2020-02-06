@@ -3,9 +3,6 @@ package org.gooru.groups.reports.competency.dbhelpers;
 
 import java.util.List;
 import java.util.Set;
-import org.gooru.groups.reports.competency.country.GroupCompetencyDrilldownReportByCountryModel;
-import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryCommand;
-import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryModel;
 import org.gooru.groups.reports.competency.group.GroupCompetencyDrillDownReportByGroupOrSchoolModel;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupCommand;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupModel;
@@ -27,46 +24,6 @@ public class GroupCompetencyReportService {
 
   public GroupCompetencyReportService(DBI dbi) {
     this.dao = dbi.onDemand(GroupCompetencyReportDao.class);
-  }
-
-  public Double fetchAveragePerformanceByCountry(
-      GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
-    return this.dao.fetchAveragePerformanceByCountry(bean);
-  }
-  
-  public Double fetchAveragePerformanceByCountryAndTenant(
-      GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
-    return this.dao.fetchAveragePerformanceByCountryAndTenant(bean);
-  }
-
-  public List<GroupCompetencyReportByCountryModel> fetchGroupCompetencyReportByCountry(
-      GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
-    return this.dao.fetchGroupCompetencyReportByCountry(bean);
-  }
-  
-  public List<GroupCompetencyReportByCountryModel> fetchGroupCompetencyReportByCountryAndTenant(
-      GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
-    return this.dao.fetchGroupCompetencyReportByCountryAndTenant(bean);
-  }
-
-  public List<GroupCompetencyDrilldownReportByCountryModel> fetchGroupCompetencyStateWiseReportByCountry(
-      GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
-    return this.dao.fetchGroupCompetencyStateWiseReportByCountry(bean);
-  }
-  
-  public List<GroupCompetencyDrilldownReportByCountryModel> fetchGroupCompetencyStateWiseReportByCountryAndTenant(
-      GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
-    return this.dao.fetchGroupCompetencyStateWiseReportByCountryAndTenant(bean);
-  }
-  
-  public List<GroupCompetencyDrilldownReportByCountryModel> fetchGroupCompetencySchoolWiseReportByCountry(
-      GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
-    return this.dao.fetchGroupCompetencySchoolWiseReportByCountry(bean);
-  }
-  
-  public List<GroupCompetencyDrilldownReportByCountryModel> fetchGroupCompetencySchoolWiseReportByCountryAndTenant(
-      GroupCompetencyReportByCountryCommand.GroupCompetencyReportByCountryCommandBean bean) {
-    return this.dao.fetchGroupCompetencySchoolWiseReportByCountryAndTenant(bean);
   }
 
   public Double fetchAveragePerformanceByState(

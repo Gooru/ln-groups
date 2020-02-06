@@ -59,4 +59,10 @@ public interface CoreDao {
   
   @SqlQuery("SELECT school_id FROM country_school_mapping WHERE country_id = :countryId::bigint")
   Set<Long> fetchSchoolsByCountry(@Bind("countryId") Long countryId);
+  
+  @SqlQuery("SELECT EXISTS (SELECT * FROM tenant WHERE id = :tenantId::uuid AND parent_tenant IS NULL)")
+  Boolean isParentTenant(@Bind("tenantId") String tenantId);
+  
+  @SqlQuery("SELECT id FROM tenant WHERE parent_tenant = :parentTenant::uuid")
+  Set<String> fetchSubTenants(@Bind("parentTenant") String parentTenant);
 }
