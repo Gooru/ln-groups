@@ -3,10 +3,12 @@ package org.gooru.groups.reports.competency.school;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import org.gooru.groups.app.components.AppConfiguration;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.processors.MessageProcessor;
-import org.gooru.groups.reports.competency.dbhelpers.GroupCompetencyReportService;
 import org.gooru.groups.reports.dbhelpers.core.ClassModel;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.responses.MessageResponse;
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -29,8 +32,8 @@ public class GroupCompetencyReportBySchoolProcessor implements MessageProcessor 
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
-  private final GroupCompetencyReportService reportService =
-      new GroupCompetencyReportService(DBICreator.getDbiForDsdbDS());
+  private final GroupCompetencyReportBySchoolService reportService =
+      new GroupCompetencyReportBySchoolService(DBICreator.getDbiForDsdbDS());
   private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
 
   public GroupCompetencyReportBySchoolProcessor(Vertx vertx, Message<JsonObject> message) {
@@ -42,19 +45,51 @@ public class GroupCompetencyReportBySchoolProcessor implements MessageProcessor 
   public Future<MessageResponse> process() {
     try {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
-      GroupCompetencyReportBySchoolCommand command =
-          GroupCompetencyReportBySchoolCommand.build(ebMessage.getRequestBody());
+      GroupCompetencyReportBySchoolCommand command = GroupCompetencyReportBySchoolCommand
+          .build(ebMessage.getRequestBody(), ebMessage.getTenant());
       GroupCompetencyReportBySchoolCommand.GroupCompetencyReportBySchoolCommandBean bean =
           command.asBean();
 
+      UUID userId = ebMessage.getUserId().get();
+      List<Integer> userRoles = coreService.fetchUserRoles(userId);
+      if (userRoles == null || userRoles.isEmpty()) {
+        LOGGER.warn("user {} does not have any role defined", userId.toString());
+        result.complete(
+            MessageResponseFactory.createForbiddenResponse("user does not have any roles defined"));
+        return this.result;
+      }
+
+      boolean isGlobalAccess = false;
+      JsonArray globalRoles = AppConfiguration.getInstance().getGlobalReportAccessRoles();
+      for (Object role : globalRoles) {
+        try {
+          Integer roleId = (Integer) role;
+          if (userRoles.contains(roleId)) {
+            isGlobalAccess = true;
+            break;
+          }
+        } catch (Exception ex) {
+          LOGGER.warn("invalid role present in the configuration");
+        }
+      }
+
+      // Fetch the sub tenants if the tenant is parent
+      Set<String> tenantIds = this.coreService.fetchSubTenants(bean.getTenantId());
+
       List<GroupCompetencyReportBySchoolModel> competencyReportByWeek =
-          this.reportService.fetchGroupCompetencyReportBySchool(bean);
+          isGlobalAccess ? this.reportService.fetchGroupCompetencyReportBySchool(bean)
+              : this.reportService.fetchGroupCompetencyReportBySchoolAndTenant(bean, tenantIds);
       List<GroupCompetencyClassWiseReportBySchoolModel> competencyReportByClass =
-          this.reportService.fetchGroupCompetencyClassWiseReportBySchool(bean);
+          isGlobalAccess ? this.reportService.fetchGroupCompetencyClassWiseReportBySchool(bean)
+              : this.reportService.fetchGroupCompetencyClassWiseReportBySchoolAndTenant(bean,
+                  tenantIds);
+      Double averagePerformance =
+          isGlobalAccess ? this.reportService.fetchAveragePerformanceBySchool(bean)
+              : this.reportService.fetchAveragePerformanceBySchoolAndTenant(bean, tenantIds);
 
       // Fetch the titles of the classes from core db
-      Map<String, ClassModel> classDetails = this.coreService.fetchClassesBySchool(bean.getSchoolId());
-      Double averagePerformance = this.reportService.fetchAveragePerformanceBySchool(bean);
+      Map<String, ClassModel> classDetails =
+          this.coreService.fetchClassesBySchool(bean.getSchoolId());
 
       GroupCompetencyReportBySchoolResponseModel responseModel =
           GroupCompetencyReportBySchoolResponseModelBuilder.build(competencyReportByWeek,
