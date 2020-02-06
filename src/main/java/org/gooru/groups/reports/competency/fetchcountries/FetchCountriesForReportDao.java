@@ -1,6 +1,8 @@
 package org.gooru.groups.reports.competency.fetchcountries;
 
 import java.util.List;
+import org.gooru.groups.app.jdbi.PGArray;
+import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.BindBean;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
@@ -23,15 +25,15 @@ public interface FetchCountriesForReportDao {
       @BindBean FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean);
 
   @Mapper(FetchCountriesForReportModelMapper.class)
-  @SqlQuery("SELECT SUM(completed_count) AS completed_competencies, country_id FROM class_competency_data_reports WHERE tenant = :tenantId"
+  @SqlQuery("SELECT SUM(completed_count) AS completed_competencies, country_id FROM class_competency_data_reports WHERE tenant = ANY(:tenantIds)"
       + " GROUP BY country_id")
   List<FetchCountriesForReportModel> fetchCompetencyCountsByTenantAllTime(
-      @BindBean FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean);
+      @BindBean FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean, @Bind("tenantIds") PGArray<String> tenantIds);
 
   @Mapper(FetchCountriesForReportModelMapper.class)
   @SqlQuery("SELECT SUM(completed_count) AS completed_competencies, country_id FROM class_competency_data_reports WHERE month = :month AND"
-      + " year = :year AND tenant = :tenantId GROUP BY country_id")
+      + " year = :year AND tenant = ANY(:tenantIds) GROUP BY country_id")
   List<FetchCountriesForReportModel> fetchCompetencyCountsByTenantMonthYear(
-      @BindBean FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean);
+      @BindBean FetchCountriesForReportCommand.FetchCountriesForReportCommandBean bean, @Bind("tenantIds") PGArray<String> tenantIds);
 
 }
