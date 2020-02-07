@@ -10,6 +10,8 @@ import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.processors.MessageProcessor;
+import org.gooru.groups.reports.auth.Authorizer;
+import org.gooru.groups.reports.auth.AuthorizerBuilder;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.reports.dbhelpers.core.SubjectModel;
 import org.gooru.groups.reports.perf.dbhelpers.GroupReportService;
@@ -34,9 +36,10 @@ public class FetchSubjectsForPerfReportByCountryProcessor implements MessageProc
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
-  private final GroupReportService service = new GroupReportService(DBICreator.getDbiForDsdbDS());
-  private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
-  
+  private final GroupReportService REPORT_SERVICE =
+      new GroupReportService(DBICreator.getDbiForDsdbDS());
+  private final CoreService CORE_SERVICE = new CoreService(DBICreator.getDbiForDefaultDS());
+
   public FetchSubjectsForPerfReportByCountryProcessor(Vertx vertx, Message<JsonObject> message) {
     this.message = message;
     this.result = Future.future();
@@ -47,15 +50,27 @@ public class FetchSubjectsForPerfReportByCountryProcessor implements MessageProc
     try {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
       FetchSubjectsForPerfReportByCountryCommand command =
-          FetchSubjectsForPerfReportByCountryCommand.build(ebMessage.getRequestBody());
+          FetchSubjectsForPerfReportByCountryCommand.build(ebMessage.getRequestBody(),
+              ebMessage.getTenant());
       FetchSubjectsForPerfReportByCountryCommand.FetchSubjectsForPerfReportByCountryCommandBean bean =
           command.asBean();
 
+      Authorizer userAuthorizer =
+          AuthorizerBuilder.buildUserRoleAuthorizer(ebMessage.getUserId().get());
+      userAuthorizer.authorize();
+
+      Set<String> tenantIds = this.CORE_SERVICE.fetchSubTenants(bean.getTenantId());
+
       List<SubjectFrameworkModel> subjects = new ArrayList<>();
       if (command.getFrequency().equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
-        subjects = this.service.fetchSubjectsForPerfReportWeekByCountry(bean);
+        subjects = userAuthorizer.isGlobalAccess()
+            ? this.REPORT_SERVICE.fetchSubjectsForPerfReportWeekByCountry(bean)
+            : this.REPORT_SERVICE.fetchSubjectsForPerfReportWeekByCountryAndTenant(bean, tenantIds);
       } else {
-        subjects = this.service.fetchSubjectsForPerfReportMonthByCountry(bean);
+        subjects = userAuthorizer.isGlobalAccess()
+            ? this.REPORT_SERVICE.fetchSubjectsForPerfReportMonthByCountry(bean)
+            : this.REPORT_SERVICE.fetchSubjectsForPerfReportMonthByCountryAndTenant(bean,
+                tenantIds);
       }
 
       Set<String> uniqueSubjects = new HashSet<>();
@@ -67,8 +82,9 @@ public class FetchSubjectsForPerfReportByCountryProcessor implements MessageProc
           uniqueSubjects.add(subjectCode);
         }
       });
-      
-      Map<String, SubjectModel> subjectModels = this.coreService.fetchSubjectDetails(uniqueSubjects);
+
+      Map<String, SubjectModel> subjectModels =
+          this.CORE_SERVICE.fetchSubjectDetails(uniqueSubjects);
 
       JsonObject response = new JsonObject();
       JsonArray subjectArray = new JsonArray();

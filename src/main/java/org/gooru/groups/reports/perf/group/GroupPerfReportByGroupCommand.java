@@ -23,9 +23,11 @@ public class GroupPerfReportByGroupCommand {
   private Integer year;
   private String subject;
   private String framework;
+  private String tenantId;
+  private String tenantRoot;
 
   public GroupPerfReportByGroupCommand(Long groupId, String frequency, Integer week, Integer month,
-      Integer year, String subject, String framework) {
+      Integer year, String subject, String framework, String tenantId, String tenantRoot) {
     this.groupId = groupId;
     this.frequency = frequency;
     this.week = week;
@@ -33,6 +35,8 @@ public class GroupPerfReportByGroupCommand {
     this.year = year;
     this.subject = subject;
     this.framework = framework;
+    this.tenantId = tenantId;
+    this.tenantRoot = tenantRoot;
   }
 
   public Long getGroupId() {
@@ -63,13 +67,24 @@ public class GroupPerfReportByGroupCommand {
     return framework;
   }
 
-  public static GroupPerfReportByGroupCommand build(JsonObject request) {
-    GroupPerfReportByGroupCommand command = buildFromJson(request);
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public String getTenantRoot() {
+    return tenantRoot;
+  }
+
+  public static GroupPerfReportByGroupCommand build(JsonObject request, JsonObject tenantJson) {
+    GroupPerfReportByGroupCommand command = buildFromJson(request, tenantJson);
     command.validate();
     return command;
   }
 
-  private static GroupPerfReportByGroupCommand buildFromJson(JsonObject request) {
+  private static GroupPerfReportByGroupCommand buildFromJson(JsonObject request,
+      JsonObject tenantJson) {
+    String tenantId = tenantJson.getString(CommandAttributeConstants.TENANT_ID);
+    String tenantRoot = tenantJson.getString(CommandAttributeConstants.TENANT_ROOT);
     Long groupId = RequestUtils.getAsLong(request, CommandAttributeConstants.GROUP_ID);
     String frequency = request.getString(CommandAttributeConstants.FREQUENCY);
     Integer week = RequestUtils.getAsInt(request, CommandAttributeConstants.WEEK);
@@ -78,7 +93,7 @@ public class GroupPerfReportByGroupCommand {
     String subject = request.getString(CommandAttributeConstants.SUBJECT);
     String framework = request.getString(CommandAttributeConstants.FRAMEWORK);
     return new GroupPerfReportByGroupCommand(groupId, frequency, week, month, year, subject,
-        framework);
+        framework, tenantId, tenantRoot);
   }
 
   private void validate() {
@@ -118,6 +133,8 @@ public class GroupPerfReportByGroupCommand {
     bean.year = year;
     bean.subject = subject;
     bean.framework = framework;
+    bean.tenantId = tenantId;
+    bean.tenantRoot = tenantRoot;
     return bean;
   }
 
@@ -129,6 +146,8 @@ public class GroupPerfReportByGroupCommand {
     private Integer year;
     private String subject;
     private String framework;
+    private String tenantId;
+    private String tenantRoot;
 
     public Long getGroupId() {
       return groupId;
@@ -184,6 +203,22 @@ public class GroupPerfReportByGroupCommand {
 
     public void setFramework(String framework) {
       this.framework = framework;
+    }
+
+    public String getTenantId() {
+      return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+      this.tenantId = tenantId;
+    }
+
+    public String getTenantRoot() {
+      return tenantRoot;
+    }
+
+    public void setTenantRoot(String tenantRoot) {
+      this.tenantRoot = tenantRoot;
     }
 
   }
