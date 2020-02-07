@@ -6,4 +6,6 @@ package org.gooru.groups.reports.auth;
  */
 public interface Authorizer {
   void authorize();
+  
+  boolean  isGlobalAccess();
 }

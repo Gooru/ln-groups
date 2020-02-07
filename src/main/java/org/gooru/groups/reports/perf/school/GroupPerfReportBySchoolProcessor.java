@@ -4,10 +4,13 @@ package org.gooru.groups.reports.perf.school;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.processors.MessageProcessor;
+import org.gooru.groups.reports.auth.Authorizer;
+import org.gooru.groups.reports.auth.AuthorizerBuilder;
 import org.gooru.groups.reports.dbhelpers.core.ClassModel;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.reports.perf.dbhelpers.GroupReportService;
@@ -32,8 +35,9 @@ public class GroupPerfReportBySchoolProcessor implements MessageProcessor {
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
-  private final GroupReportService service = new GroupReportService(DBICreator.getDbiForDsdbDS());
-  private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
+  private final GroupReportService REPORT_SERVICE =
+      new GroupReportService(DBICreator.getDbiForDsdbDS());
+  private final CoreService CORE_SERVICE = new CoreService(DBICreator.getDbiForDefaultDS());
 
   public GroupPerfReportBySchoolProcessor(Vertx vertx, Message<JsonObject> message) {
     this.message = message;
@@ -46,19 +50,30 @@ public class GroupPerfReportBySchoolProcessor implements MessageProcessor {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
 
       GroupPerfReportBySchoolCommand command =
-          GroupPerfReportBySchoolCommand.build(ebMessage.getRequestBody());
+          GroupPerfReportBySchoolCommand.build(ebMessage.getRequestBody(), ebMessage.getTenant());
       GroupPerfReportBySchoolCommand.GroupPerfReportBySchoolCommandBean bean = command.asBean();
+
+      Authorizer userAuthorizer =
+          AuthorizerBuilder.buildUserRoleAuthorizer(ebMessage.getUserId().get());
+      userAuthorizer.authorize();
+
+      Set<String> tenantIds = this.CORE_SERVICE.fetchSubTenants(bean.getTenantId());
 
       List<PerformanceAndTSReportBySchoolModel> report = new ArrayList<>();
       if (bean.getFrequency().equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
-        report = this.service.fetchPerformanceAndTSWeekReportBySchool(bean);
+        report = userAuthorizer.isGlobalAccess()
+            ? this.REPORT_SERVICE.fetchPerformanceAndTSWeekReportBySchool(bean)
+            : this.REPORT_SERVICE.fetchPerformanceAndTSWeekReportBySchoolAndTenant(bean, tenantIds);
       } else {
-        report = this.service.fetchPerformanceAndTSMonthReportBySchool(bean);
+        report = userAuthorizer.isGlobalAccess()
+            ? this.REPORT_SERVICE.fetchPerformanceAndTSMonthReportBySchool(bean)
+            : this.REPORT_SERVICE.fetchPerformanceAndTSMonthReportBySchoolAndTenant(bean,
+                tenantIds);
       }
 
       // Fetch the titles of the classes from core db
       Map<String, ClassModel> classDetails =
-          this.coreService.fetchClassesBySchool(bean.getSchoolId());
+          this.CORE_SERVICE.fetchClassesBySchool(bean.getSchoolId());
 
       // Build response
       GroupPerfReportBySchoolResponseModel responseModel =

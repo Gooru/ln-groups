@@ -22,14 +22,18 @@ public class FetchSubjectsForPerfReportByCountryCommand {
   private Integer month;
   private Integer year;
   private String frequency;
+  private String tenantId;
+  private String tenantRoot;
 
   public FetchSubjectsForPerfReportByCountryCommand(Long countryId, String frequency, Integer week,
-      Integer month, Integer year) {
+      Integer month, Integer year, String tenantId, String tenantRoot) {
     this.countryId = countryId;
     this.month = month;
     this.year = year;
     this.frequency = frequency;
     this.week = week;
+    this.tenantId = tenantId;
+    this.tenantRoot = tenantRoot;
   }
 
   public Long getCountryId() {
@@ -52,19 +56,29 @@ public class FetchSubjectsForPerfReportByCountryCommand {
     return week;
   }
 
-  public static FetchSubjectsForPerfReportByCountryCommand build(JsonObject request) {
-    FetchSubjectsForPerfReportByCountryCommand command = buildFromJson(request);
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public String getTenantRoot() {
+    return tenantRoot;
+  }
+
+  public static FetchSubjectsForPerfReportByCountryCommand build(JsonObject request, JsonObject tenantJson) {
+    FetchSubjectsForPerfReportByCountryCommand command = buildFromJson(request, tenantJson);
     command.validate();
     return command;
   }
 
-  private static FetchSubjectsForPerfReportByCountryCommand buildFromJson(JsonObject request) {
+  private static FetchSubjectsForPerfReportByCountryCommand buildFromJson(JsonObject request, JsonObject tenantJson) {
+    String tenantId = tenantJson.getString(CommandAttributeConstants.TENANT_ID);
+    String tenantRoot = tenantJson.getString(CommandAttributeConstants.TENANT_ROOT);
     Long country = RequestUtils.getAsLong(request, CommandAttributeConstants.COUNTRY_ID);
     String frequency = request.getString(CommandAttributeConstants.FREQUENCY);
     Integer week = RequestUtils.getAsInt(request, CommandAttributeConstants.WEEK);
     Integer month = RequestUtils.getAsInt(request, CommandAttributeConstants.MONTH);
     Integer year = RequestUtils.getAsInt(request, CommandAttributeConstants.YEAR);
-    return new FetchSubjectsForPerfReportByCountryCommand(country, frequency, week, month, year);
+    return new FetchSubjectsForPerfReportByCountryCommand(country, frequency, week, month, year, tenantId, tenantRoot);
   }
 
   private void validate() {
@@ -97,6 +111,8 @@ public class FetchSubjectsForPerfReportByCountryCommand {
     bean.week = week;
     bean.month = month;
     bean.year = year;
+    bean.tenantId = tenantId;
+    bean.tenantRoot = tenantRoot;
     return bean;
   }
 
@@ -106,6 +122,8 @@ public class FetchSubjectsForPerfReportByCountryCommand {
     private Integer year;
     private String frequency;
     private Integer week;
+    private String tenantId;
+    private String tenantRoot;
 
     public Long getCountryId() {
       return countryId;
@@ -146,6 +164,23 @@ public class FetchSubjectsForPerfReportByCountryCommand {
     public void setWeek(Integer week) {
       this.week = week;
     }
+
+    public String getTenantId() {
+      return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+      this.tenantId = tenantId;
+    }
+
+    public String getTenantRoot() {
+      return tenantRoot;
+    }
+
+    public void setTenantRoot(String tenantRoot) {
+      this.tenantRoot = tenantRoot;
+    }
+    
   }
 
 }
