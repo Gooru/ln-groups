@@ -12,6 +12,8 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
+import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryCommand;
+import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryBean;
 /**
  * @author renuka
  */

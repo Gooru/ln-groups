@@ -12,12 +12,16 @@ public class ClassStudentSummaryBean {
   private Date dateTill;
   private Date toDate;
   private Date fromDate;
+  private String subjectCode;
+  private Boolean skylineSummary;
 
   public ClassStudentSummaryBean(ClassStudentSummaryCommand command) {
     this.classId = command.getClassId();
     this.dateTill = command.getDateTill();
     this.fromDate = command.getFromDate();
     this.toDate = command.getToDate();
+    this.subjectCode = command.getSubjectCode();
+    this.skylineSummary = command.getSkylineSummary();
   }
 
   public String getClassId() {
@@ -52,4 +56,19 @@ public class ClassStudentSummaryBean {
     this.fromDate = fromDate;
   }
 
+  public String getTxSubjectCode() {
+    return subjectCode;
+  }
+
+  public void setTxSubjectCode(String txSubjectCode) {
+    this.subjectCode = txSubjectCode;
+  }
+
+  public Boolean getSkylineSummary() {
+    return skylineSummary;
+  }
+
+  public void setSkylineSummary(Boolean skylineSummary) {
+    this.skylineSummary = skylineSummary;
+  }
 }
