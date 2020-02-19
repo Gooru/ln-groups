@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import org.gooru.groups.constants.Constants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
-import org.gooru.groups.constants.StatusConstants;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
 import org.gooru.groups.processor.utils.ValidatorUtils;
 import org.gooru.groups.reports.dbhelpers.core.ClassMembersModel;
@@ -19,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryBean;
+import org.gooru.groups.reports.classes.student.summary.CompetencyCompletionService;
 
 /**
  * @author renuka
@@ -28,14 +29,14 @@ public class ClassStudentSummaryService {
   private static final Logger LOGGER = LoggerFactory.getLogger(ClassStudentSummaryService.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
-  private final ClassSummaryCompetencyMasteryDao classSummaryMasterydao;
   private final StudentItemInteractionDao studentInteractionDao;
   private final CoreService coreService;
+  CompetencyCompletionService competencyCompletionService;
 
   public ClassStudentSummaryService(DBI coreDbi, DBI dsDbi, DBI analyticsDbi) {
     this.coreService = new CoreService(coreDbi);
-    this.classSummaryMasterydao = dsDbi.onDemand(ClassSummaryCompetencyMasteryDao.class);
     this.studentInteractionDao = analyticsDbi.onDemand(StudentItemInteractionDao.class);
+    this.competencyCompletionService = new CompetencyCompletionService(dsDbi);
   }
 
   public JsonObject fetchClassStudentSummary(ClassStudentSummaryBean bean, String userCdnUrl) {
@@ -116,7 +117,13 @@ public class ClassStudentSummaryService {
   private JsonObject fetchAllTimeData(ClassStudentSummaryBean bean, String userId) {
     JsonObject allTimeData = new JsonObject();
     Date currentDate = Calendar.getInstance().getTime();
-    generateAllTimeCompetencyStats(bean, userId, allTimeData, currentDate);
+    if (!bean.getSkylineSummary()) {
+      competencyCompletionService.generateAllTimeCompetencyStatsInClass(bean, userId, allTimeData,
+          currentDate);
+    } else {
+      competencyCompletionService.generateAllTimeCompetencyStatsInSkyline(bean, userId, allTimeData,
+          currentDate);
+    }
 
     allTimeData.put(Constants.Response.AS_ON, Constants.Params.DATE_FORMAT.format(currentDate));
     return allTimeData;
@@ -124,7 +131,12 @@ public class ClassStudentSummaryService {
 
   private JsonObject fetchWeekData(ClassStudentSummaryBean bean, String userId) {
     JsonObject weekData = new JsonObject();
-    generateWeeklyCompetencyStats(bean, userId, weekData);
+
+    if (!bean.getSkylineSummary()) {
+      competencyCompletionService.generateWeeklyCompetencyStatsInClass(bean, userId, weekData);
+    } else {
+      competencyCompletionService.generateWeeklyCompetencyStatsInSkyline(bean, userId, weekData);
+    }
 
     JsonObject suggestions = new JsonObject();
     JsonObject interactions = new JsonObject();
@@ -177,71 +189,6 @@ public class ClassStudentSummaryService {
       }
     }
     return interactions;
-  }
-
-  private void generateWeeklyCompetencyStats(ClassStudentSummaryBean bean, String userId,
-      JsonObject weekData) {
-    List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesInWeek(bean.getClassId(), userId, bean.getFromDate(), bean.getToDate());
-    JsonArray masteredCompetencyList = new JsonArray();
-    JsonArray completedCompetencyList = new JsonArray();
-    JsonArray inferredCompetencyList = new JsonArray();
-    JsonArray inprogressCompetencyList = new JsonArray();
-    aggregateCompetencyPerfPerStatus(studentCompetencyStudyStatus, masteredCompetencyList,
-        completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
-    weekData.put(Constants.Response.MASTERED, masteredCompetencyList)
-        .put(Constants.Response.COMPLETED, completedCompetencyList)
-        .put(Constants.Response.INFERRED, inferredCompetencyList)
-        .put(Constants.Response.IN_PROGRESS, inprogressCompetencyList);
-
-  }
-
-  private void generateAllTimeCompetencyStats(ClassStudentSummaryBean bean, String userId,
-      JsonObject allTimeData, Date currentDate) {
-    List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesTillNow(bean.getClassId(), userId, currentDate);
-    JsonArray masteredCompetencyList = new JsonArray();
-    JsonArray completedCompetencyList = new JsonArray();
-    JsonArray inferredCompetencyList = new JsonArray();
-    JsonArray inprogressCompetencyList = new JsonArray();
-    aggregateCompetencyPerfPerStatus(studentCompetencyStudyStatus, masteredCompetencyList,
-        completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
-    allTimeData.put(Constants.Response.MASTERED, masteredCompetencyList.size())
-        .put(Constants.Response.COMPLETED, completedCompetencyList.size())
-        .put(Constants.Response.INFERRED, inferredCompetencyList.size())
-        .put(Constants.Response.IN_PROGRESS, inprogressCompetencyList.size());
-  }
-
-  private void aggregateCompetencyPerfPerStatus(
-      List<CompetencyStatusModel> studentCompetencyStudyStatus, JsonArray masteredCompetencyList,
-      JsonArray completedCompetencyList, JsonArray inferredCompetencyList,
-      JsonArray inprogressCompetencyList) {
-    for (CompetencyStatusModel competencyStudyStatus : studentCompetencyStudyStatus) {
-      switch (competencyStudyStatus.getStatus()) {
-        case StatusConstants.MASTERED:
-          addToRespectiveArray(competencyStudyStatus, masteredCompetencyList);
-          break;
-        case StatusConstants.COMPLETED:
-          addToRespectiveArray(competencyStudyStatus, completedCompetencyList);
-          break;
-        case StatusConstants.INFERRED:
-          addToRespectiveArray(competencyStudyStatus, inferredCompetencyList);
-          break;
-        case StatusConstants.IN_PROGRESS:
-          addToRespectiveArray(competencyStudyStatus, inprogressCompetencyList);
-          break;
-        default:
-          // Do Nothing
-      }
-    }
-  }
-
-  private void addToRespectiveArray(CompetencyStatusModel competencyStudyStatus,
-      JsonArray competencyList) {
-    JsonObject competencies = new JsonObject();
-    competencies.put(Constants.Response.ID, competencyStudyStatus.getCompetencyCode());
-    competencies.put(Constants.Response.CODE, competencyStudyStatus.getCompetencyDisplayCode());
-    competencyList.add(competencies);
   }
 
 }

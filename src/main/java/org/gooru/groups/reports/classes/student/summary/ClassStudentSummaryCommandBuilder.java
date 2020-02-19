@@ -45,13 +45,19 @@ public final class ClassStudentSummaryCommandBuilder {
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
           RESOURCE_BUNDLE.getString("invalid.classid.format"));
     }
-        
+
     if (command.getFromDate() != null && command.getToDate() != null) {
       if (!isValidFromAndToDate(command.getFromDate(), command.getToDate())) {
         LOGGER.warn("Invalid date range requested");
         throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
             RESOURCE_BUNDLE.getString("invalid.date.range"));
       }
+    }
+
+    if (command.getSubjectCode() == null || command.getSubjectCode().isEmpty()) {
+      LOGGER.warn("Subject code not provided in request");
+      throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+          RESOURCE_BUNDLE.getString("missing.subjectcode"));
     }
   }
 
@@ -60,6 +66,8 @@ public final class ClassStudentSummaryCommandBuilder {
     String dateTill = request.getString("dateTill");
     String fromDate = request.getString("fromDate");
     String toDate = request.getString("toDate");
+    String subjectCode = request.getString("subjectCode");
+    Boolean skylineSummary = Boolean.valueOf(request.getString("skylineSummary", "false"));
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     Date fDate = null;
@@ -74,7 +82,7 @@ public final class ClassStudentSummaryCommandBuilder {
         throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
             RESOURCE_BUNDLE.getString("invalid.date.format"));
       }
-    } else if (dateTill != null){
+    } else if (dateTill != null) {
       try {
         tillDate = simpleDateFormat.parse(dateTill);
       } catch (Exception e) {
@@ -84,12 +92,13 @@ public final class ClassStudentSummaryCommandBuilder {
       }
     } else {
       tillDate = Calendar.getInstance().getTime();
-    } 
+    }
 
     if (tillDate != null && !isValidDate(tillDate)) {
       tillDate = Calendar.getInstance().getTime();
     }
-    return new ClassStudentSummaryCommand(classId, fDate, tDate, tillDate);
+    return new ClassStudentSummaryCommand(classId, fDate, tDate, tillDate, subjectCode,
+        skylineSummary);
   }
 
   private static Boolean isValidDate(Date requestedDate) {
@@ -104,17 +113,17 @@ public final class ClassStudentSummaryCommandBuilder {
     }
     return isValidDate;
   }
-  
+
   private static Boolean isValidFromAndToDate(Date fromDate, Date toDate) {
     Boolean isValidDate = true;
     Calendar fromCalendar = Calendar.getInstance();
     fromCalendar.setTime(fromDate);
-    LocalDate reqFromDate = LocalDate.of(fromCalendar.get(Calendar.YEAR), fromCalendar.get(Calendar.MONTH) + 1,
-        fromCalendar.get(Calendar.DAY_OF_MONTH));
+    LocalDate reqFromDate = LocalDate.of(fromCalendar.get(Calendar.YEAR),
+        fromCalendar.get(Calendar.MONTH) + 1, fromCalendar.get(Calendar.DAY_OF_MONTH));
     Calendar toCalendar = Calendar.getInstance();
     toCalendar.setTime(toDate);
-    LocalDate reqToDate = LocalDate.of(toCalendar.get(Calendar.YEAR), toCalendar.get(Calendar.MONTH) + 1,
-        toCalendar.get(Calendar.DAY_OF_MONTH));
+    LocalDate reqToDate = LocalDate.of(toCalendar.get(Calendar.YEAR),
+        toCalendar.get(Calendar.MONTH) + 1, toCalendar.get(Calendar.DAY_OF_MONTH));
     LocalDate now = LocalDate.now();
     if (reqFromDate.isAfter(now) || reqToDate.isBefore(reqFromDate)) {
       isValidDate = false;

@@ -14,6 +14,8 @@ import org.gooru.groups.processor.utils.ValidatorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.vertx.core.json.JsonObject;
+import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryBean;
+import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryCommand;
 
 /**
  * @author renuka
@@ -46,6 +48,12 @@ public final class ClassStudentSummaryCommandBuilder {
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
           RESOURCE_BUNDLE.getString("invalid.classid.format"));
     }
+    
+    if (command.getSubjectCode() == null || command.getSubjectCode().isEmpty()) {
+      LOGGER.warn("Subject code not provided in request");
+      throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+          RESOURCE_BUNDLE.getString("missing.subjectcode"));
+    }
 
     // It's decided not to fall back on the current week if the input is invalid or not
     // present.
@@ -69,6 +77,8 @@ public final class ClassStudentSummaryCommandBuilder {
     String classId = request.getString("classId");
     String fromDate = request.getString("fromDate");
     String toDate = request.getString("toDate");
+    String subjectCode = request.getString("subjectCode");
+    Boolean skylineSummary = Boolean.valueOf(request.getString("skylineSummary", "false"));
 
     if (fromDate == null || toDate == null) {
       LOGGER.warn("Missing Date");
@@ -87,7 +97,8 @@ public final class ClassStudentSummaryCommandBuilder {
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
           RESOURCE_BUNDLE.getString("invalid.date.format"));
     }
-    return new ClassStudentSummaryCommand(classId, fDate, tDate);
+    return new ClassStudentSummaryCommand(classId, fDate, tDate, null, subjectCode,
+        skylineSummary);
   }
 
   private static Boolean isFirstDayOfWeek(Date requestedDate) {

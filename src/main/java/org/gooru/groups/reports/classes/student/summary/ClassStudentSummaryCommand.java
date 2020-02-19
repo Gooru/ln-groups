@@ -12,13 +12,17 @@ public class ClassStudentSummaryCommand {
   private Date fromDate;
   private Date toDate;
   private Date dateTill;
+  private String subjectCode;
+  private Boolean skylineSummary;
 
-  public ClassStudentSummaryCommand(String classId, Date fromDate, Date toDate, Date dateTill) {
+  public ClassStudentSummaryCommand(String classId, Date fromDate, Date toDate, Date dateTill, String subjectCode, Boolean skylineSummary) {
     super();
     this.classId = classId;
     this.dateTill = dateTill;
     this.fromDate = fromDate;
     this.toDate = toDate;
+    this.subjectCode = subjectCode;
+    this.skylineSummary = skylineSummary;
   }
 
   public String getClassId() {
@@ -35,5 +39,14 @@ public class ClassStudentSummaryCommand {
   
   public Date getToDate() {
     return toDate;
+  }
+  
+
+  public Boolean getSkylineSummary() {
+    return skylineSummary;
+  }
+
+  public String getSubjectCode() {
+    return subjectCode;
   }
 }

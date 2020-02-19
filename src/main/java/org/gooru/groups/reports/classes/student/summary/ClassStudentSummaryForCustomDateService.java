@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import org.gooru.groups.constants.Constants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
-import org.gooru.groups.constants.StatusConstants;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
 import org.gooru.groups.processor.utils.ValidatorUtils;
 import org.gooru.groups.reports.dbhelpers.core.ClassMembersModel;
@@ -26,13 +25,13 @@ public class ClassStudentSummaryForCustomDateService {
   private static final Logger LOGGER = LoggerFactory.getLogger(ClassStudentSummaryForCustomDateService.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
-  private final ClassSummaryCompetencyMasteryDao classSummaryMasterydao;
   private final StudentItemInteractionDao studentInteractionDao;
   private final CoreService coreService;
+  CompetencyCompletionService competencyCompletionService;
 
   public ClassStudentSummaryForCustomDateService(DBI coreDbi, DBI dsDbi, DBI analyticsDbi) {
     this.coreService = new CoreService(coreDbi);
-    this.classSummaryMasterydao = dsDbi.onDemand(ClassSummaryCompetencyMasteryDao.class);
+    this.competencyCompletionService = new CompetencyCompletionService(dsDbi);
     this.studentInteractionDao = analyticsDbi.onDemand(StudentItemInteractionDao.class);
   }
 
@@ -108,7 +107,11 @@ public class ClassStudentSummaryForCustomDateService {
 
   private JsonObject fetchUsageSummary(ClassStudentSummaryBean bean, String userId) {
     JsonObject usageSummaryData = new JsonObject();
-    generateCompetencyStats(bean, userId, usageSummaryData);
+    if (!bean.getSkylineSummary()) {
+      competencyCompletionService.generateWeeklyCompetencyStatsInClass(bean, userId, usageSummaryData);
+    } else {
+      competencyCompletionService.generateWeeklyCompetencyStatsInSkyline(bean, userId, usageSummaryData);
+    }
 
     JsonObject suggestions = new JsonObject();
     JsonObject interactions = new JsonObject();
@@ -161,54 +164,6 @@ public class ClassStudentSummaryForCustomDateService {
       }
     }
     return interactions;
-  }
-
-  private void generateCompetencyStats(ClassStudentSummaryBean bean, String userId,
-      JsonObject usageSummaryData) {
-    List<CompetencyStatusModel> studentCompetencyStudyStatus = this.classSummaryMasterydao
-        .fetchCompetenciesInAPeriod(bean.getClassId(), userId, bean.getFromDate(), bean.getToDate());
-    JsonArray masteredCompetencyList = new JsonArray();
-    JsonArray completedCompetencyList = new JsonArray();
-    JsonArray inferredCompetencyList = new JsonArray();
-    JsonArray inprogressCompetencyList = new JsonArray();
-    aggregateCompetencyPerfPerStatus(studentCompetencyStudyStatus, masteredCompetencyList,
-        completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
-    usageSummaryData.put(Constants.Response.MASTERED, masteredCompetencyList)
-        .put(Constants.Response.COMPLETED, completedCompetencyList)
-        .put(Constants.Response.INFERRED, inferredCompetencyList)
-        .put(Constants.Response.IN_PROGRESS, inprogressCompetencyList);
-  }
-
-  private void aggregateCompetencyPerfPerStatus(
-      List<CompetencyStatusModel> studentCompetencyStudyStatus, JsonArray masteredCompetencyList,
-      JsonArray completedCompetencyList, JsonArray inferredCompetencyList,
-      JsonArray inprogressCompetencyList) {
-    for (CompetencyStatusModel competencyStudyStatus : studentCompetencyStudyStatus) {
-      switch (competencyStudyStatus.getStatus()) {
-        case StatusConstants.MASTERED:
-          addToRespectiveArray(competencyStudyStatus, masteredCompetencyList);
-          break;
-        case StatusConstants.COMPLETED:
-          addToRespectiveArray(competencyStudyStatus, completedCompetencyList);
-          break;
-        case StatusConstants.INFERRED:
-          addToRespectiveArray(competencyStudyStatus, inferredCompetencyList);
-          break;
-        case StatusConstants.IN_PROGRESS:
-          addToRespectiveArray(competencyStudyStatus, inprogressCompetencyList);
-          break;
-        default:
-          // Do Nothing
-      }
-    }
-  }
-
-  private void addToRespectiveArray(CompetencyStatusModel competencyStudyStatus,
-      JsonArray competencyList) {
-    JsonObject competencies = new JsonObject();
-    competencies.put(Constants.Response.ID, competencyStudyStatus.getCompetencyCode());
-    competencies.put(Constants.Response.CODE, competencyStudyStatus.getCompetencyDisplayCode());
-    competencyList.add(competencies);
   }
 
 }
