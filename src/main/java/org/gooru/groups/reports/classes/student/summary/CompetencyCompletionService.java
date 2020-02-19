@@ -66,7 +66,7 @@ public class CompetencyCompletionService {
       // excluding
       // inprogress competencies which are already completed.
       inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
-          completedCompetencyList, inprogressCompetencyList);
+          completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
     }
 
     weekData.put(Constants.Response.MASTERED, masteredCompetencyList)
@@ -109,7 +109,7 @@ public class CompetencyCompletionService {
       // since we are taking in class competency completion from evidence table, here we are
       // excluding inprogress competencies which are already completed.
       inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
-          completedCompetencyList, inprogressCompetencyList);
+          completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
     }
 
     allTimeData.put(Constants.Response.MASTERED, masteredCompetencyList)
@@ -138,6 +138,8 @@ public class CompetencyCompletionService {
           segregateCompetencyCompletionStatus(masteredCompetencyList, inprogressCompetencyList,
               completedCompetencyList, userCompetencyCompletionModels);
       computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered);
+      inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
+          completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
     }
 
     weekData.put(Constants.Response.MASTERED, masteredCompetencyList)
@@ -162,6 +164,8 @@ public class CompetencyCompletionService {
           segregateCompetencyCompletionStatus(masteredCompetencyList, inprogressCompetencyList,
               completedCompetencyList, userSkylineModels);
       computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered);
+      inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
+          completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
     }
 
     allTimeData.put(Constants.Response.MASTERED, masteredCompetencyList)
@@ -199,7 +203,6 @@ public class CompetencyCompletionService {
     completedModels.forEach(model -> {
       String domain = model.getDomainCode();
       String compCode = model.getCompetencyCode();
-      LOGGER.debug("Completed/Mastered Competencies Code" + compCode);
 
       if (completedCompMap.containsKey(domain)) {
         Map<String, CompetencyStatusModel> competencies = completedCompMap.get(domain);
@@ -238,10 +241,12 @@ public class CompetencyCompletionService {
   }
 
   private JsonArray removeCompletedFromInprogressList(JsonArray masteredCompetencyList,
-      JsonArray completedCompetencyList, JsonArray inprogressCompetencyList) {
+      JsonArray completedCompetencyList, JsonArray inferredCompetencyList,
+      JsonArray inprogressCompetencyList) {
     JsonArray masteredOrCompletedList = new JsonArray();
     masteredOrCompletedList.addAll(masteredCompetencyList);
     masteredOrCompletedList.addAll(completedCompetencyList);
+    masteredOrCompletedList.addAll(inferredCompetencyList);
 
     Set<String> completedOrMasteredCompetencySet = new HashSet<>();
     masteredOrCompletedList.forEach(completedCompetencyObj -> {

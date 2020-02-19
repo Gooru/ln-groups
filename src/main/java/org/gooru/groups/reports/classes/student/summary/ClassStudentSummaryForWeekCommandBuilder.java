@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.classes.student.summary.weekly;
+package org.gooru.groups.reports.classes.student.summary;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -11,22 +11,21 @@ import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
 import org.gooru.groups.processor.utils.ValidatorUtils;
+import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.vertx.core.json.JsonObject;
-import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryBean;
-import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryCommand;
 
 /**
  * @author renuka
  */
-public final class ClassStudentSummaryCommandBuilder {
+public final class ClassStudentSummaryForWeekCommandBuilder {
 
   private static final Logger LOGGER =
-      LoggerFactory.getLogger(ClassStudentSummaryCommandBuilder.class);
+      LoggerFactory.getLogger(ClassStudentSummaryForWeekCommandBuilder.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
-  private ClassStudentSummaryCommandBuilder() {
+  private ClassStudentSummaryForWeekCommandBuilder() {
     throw new AssertionError();
   }
 

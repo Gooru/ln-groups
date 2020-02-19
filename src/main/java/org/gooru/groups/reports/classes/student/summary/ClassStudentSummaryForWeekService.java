@@ -1,5 +1,5 @@
 
-package org.gooru.groups.reports.classes.student.summary.weekly;
+package org.gooru.groups.reports.classes.student.summary;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -9,6 +9,10 @@ import org.gooru.groups.constants.Constants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
 import org.gooru.groups.processor.utils.ValidatorUtils;
+import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryBean;
+import org.gooru.groups.reports.classes.student.summary.CompetencyCompletionService;
+import org.gooru.groups.reports.classes.student.summary.StudentItemInteraction;
+import org.gooru.groups.reports.classes.student.summary.StudentItemInteractionDao;
 import org.gooru.groups.reports.dbhelpers.core.ClassMembersModel;
 import org.gooru.groups.reports.dbhelpers.core.ClassModel;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
@@ -18,22 +22,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryBean;
-import org.gooru.groups.reports.classes.student.summary.CompetencyCompletionService;
 
 /**
  * @author renuka
  */
-public class ClassStudentSummaryService {
+public class ClassStudentSummaryForWeekService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ClassStudentSummaryService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClassStudentSummaryForWeekService.class);
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
 
   private final StudentItemInteractionDao studentInteractionDao;
   private final CoreService coreService;
   CompetencyCompletionService competencyCompletionService;
 
-  public ClassStudentSummaryService(DBI coreDbi, DBI dsDbi, DBI analyticsDbi) {
+  public ClassStudentSummaryForWeekService(DBI coreDbi, DBI dsDbi, DBI analyticsDbi) {
     this.coreService = new CoreService(coreDbi);
     this.studentInteractionDao = analyticsDbi.onDemand(StudentItemInteractionDao.class);
     this.competencyCompletionService = new CompetencyCompletionService(dsDbi);
