@@ -23,6 +23,7 @@ public final class EventBusMessage {
   private final String userCdnUrl;
   private JsonObject readOnlySession;
   private JsonObject readOnlyRequestBody;
+  private JsonObject tenant;
 
   public String getSessionToken() {
     return this.sessionToken;
@@ -46,6 +47,10 @@ public final class EventBusMessage {
   public String getUserCdnUrl() {
     return this.userCdnUrl;
   }
+  
+  public JsonObject getTenant() {
+    return this.tenant;
+  }
 
   private EventBusMessage(String sessionToken, JsonObject requestBody, UUID userId,
       JsonObject session, String userCdnUrl) {
@@ -53,6 +58,7 @@ public final class EventBusMessage {
     this.requestBody = requestBody;
     this.userId = userId;
     this.session = session;
+    this.tenant = session.getJsonObject(Constants.Message.MSG_SESSION_TENANT);
     this.readOnlyRequestBody = new JsonObject(Collections.unmodifiableMap(requestBody.getMap()));
     this.readOnlySession = new JsonObject(Collections.unmodifiableMap(session.getMap()));
     this.userCdnUrl= userCdnUrl;
