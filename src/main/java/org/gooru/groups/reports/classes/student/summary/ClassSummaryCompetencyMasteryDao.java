@@ -17,7 +17,7 @@ public interface ClassSummaryCompetencyMasteryDao {
   @SqlQuery("select cm.tx_domain_code, cm.tx_comp_code, cm.tx_comp_seq, ucm.status, cm.tx_comp_name, cm.tx_comp_desc, cm.tx_comp_student_desc, cm.tx_comp_display_code from domain_competency_matrix cm "
       + "left join learner_profile_competency_evidence_ts ucm on  "
       + "cm.tx_comp_code = ucm.gut_code and ucm.user_id = :userId where "
-      + "and cast(ucm.created_at as date) BETWEEN :fromDate AND :toDate and ucm.class_id =:classId and ucm.status IN (1,2,4,5) order by cm.tx_domain_code, cm.tx_comp_seq asc")
+      + "cast(ucm.created_at as date) BETWEEN :fromDate AND :toDate and ucm.class_id =:classId and ucm.status IN (1,2,4,5) order by cm.tx_domain_code, cm.tx_comp_seq asc")
   List<CompetencyStatusModel> fetchCompetencyCompletionInClassInWeek(@Bind("classId") String classId,
       @Bind("userId") String userId, @Bind("fromDate") Date fromDate, @Bind("toDate") Date toDate);
   
