@@ -48,6 +48,10 @@ public class CompetencyCompletionService {
       for (CompetencyStatusModel completedCompetencyCode : userCompetencyCompletionModels) {
         String[] s = completedCompetencyCode.getCompetencyCode().split("-");
         if (!bean.getTxSubjectCode().equalsIgnoreCase(s[0])) {
+          // Here, ideally we should be returning 500 with respective message as DB data is
+          // different from requested subject and developer has to investigate why. but since FE
+          // currently uses only the status code to display appropriate message, we are choosing
+          // 409 http status to return, as subject code has conflict
           LOGGER.warn(
               "Either requested subject is not matching with data or multiple subject codes are inferred in this class");
           throw new HttpResponseWrapperException(HttpStatus.CONFLICT,
@@ -92,6 +96,10 @@ public class CompetencyCompletionService {
       for (CompetencyStatusModel completedCompetencyCode : userCompetencyCompletionModels) {
         String[] s = completedCompetencyCode.getCompetencyCode().split("-");
         if (!bean.getTxSubjectCode().equalsIgnoreCase(s[0])) {
+          // Here, ideally we should be returning 500 with respective message as DB data is
+          // different from requested subject and developer has to investigate why. but since FE
+          // currently uses only the status code to display appropriate message, we are choosing
+          // 409 http status to return, as subject code has conflict
           LOGGER.warn(
               "Either requested subject is not matching or multiple subject codes are inferred in this class");
           throw new HttpResponseWrapperException(HttpStatus.CONFLICT,
