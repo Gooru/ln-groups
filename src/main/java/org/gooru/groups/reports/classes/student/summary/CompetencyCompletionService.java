@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import org.gooru.groups.constants.Constants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
@@ -24,6 +25,7 @@ import io.vertx.core.json.JsonObject;
 public class CompetencyCompletionService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CompetencyCompletionService.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private final ClassSummaryCompetencyMasteryDao classSummaryMasterydao;
 
   public CompetencyCompletionService(DBI dbi) {
@@ -48,8 +50,8 @@ public class CompetencyCompletionService {
         if (!bean.getTxSubjectCode().equalsIgnoreCase(s[0])) {
           LOGGER.warn(
               "Either requested subject is not matching with data or multiple subject codes are inferred in this class");
-          throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-              "multiple subjects inferred");
+          throw new HttpResponseWrapperException(HttpStatus.CONFLICT,
+              RESOURCE_BUNDLE.getString("mismatching.subjectcode"));
         }
       }
       userSkylineModels = classSummaryMasterydao.fetchUserSkyline(userId, bean.getTxSubjectCode());
@@ -92,8 +94,8 @@ public class CompetencyCompletionService {
         if (!bean.getTxSubjectCode().equalsIgnoreCase(s[0])) {
           LOGGER.warn(
               "Either requested subject is not matching or multiple subject codes are inferred in this class");
-          throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-              "multiple subjects inferred");
+          throw new HttpResponseWrapperException(HttpStatus.CONFLICT,
+              RESOURCE_BUNDLE.getString("mismatching.subjectcode"));
         }
       }
       userSkylineModels = classSummaryMasterydao.fetchUserSkyline(userId, bean.getTxSubjectCode());
