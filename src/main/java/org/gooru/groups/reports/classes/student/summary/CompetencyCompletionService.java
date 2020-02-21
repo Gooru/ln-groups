@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import org.gooru.groups.constants.Constants;
 import org.gooru.groups.constants.HttpConstants.HttpStatus;
@@ -24,6 +25,7 @@ import io.vertx.core.json.JsonObject;
 public class CompetencyCompletionService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CompetencyCompletionService.class);
+  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("messages");
   private final ClassSummaryCompetencyMasteryDao classSummaryMasterydao;
 
   public CompetencyCompletionService(DBI dbi) {
@@ -46,10 +48,14 @@ public class CompetencyCompletionService {
       for (CompetencyStatusModel completedCompetencyCode : userCompetencyCompletionModels) {
         String[] s = completedCompetencyCode.getCompetencyCode().split("-");
         if (!bean.getTxSubjectCode().equalsIgnoreCase(s[0])) {
+          // Here, ideally we should be returning 500 with respective message as DB data is
+          // different from requested subject and developer has to investigate why. but since FE
+          // currently uses only the status code to display appropriate message, we are choosing
+          // 409 http status to return, as subject code has conflict
           LOGGER.warn(
               "Either requested subject is not matching with data or multiple subject codes are inferred in this class");
-          throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-              "multiple subjects inferred");
+          throw new HttpResponseWrapperException(HttpStatus.CONFLICT,
+              RESOURCE_BUNDLE.getString("mismatching.subjectcode"));
         }
       }
       userSkylineModels = classSummaryMasterydao.fetchUserSkyline(userId, bean.getTxSubjectCode());
@@ -90,10 +96,14 @@ public class CompetencyCompletionService {
       for (CompetencyStatusModel completedCompetencyCode : userCompetencyCompletionModels) {
         String[] s = completedCompetencyCode.getCompetencyCode().split("-");
         if (!bean.getTxSubjectCode().equalsIgnoreCase(s[0])) {
+          // Here, ideally we should be returning 500 with respective message as DB data is
+          // different from requested subject and developer has to investigate why. but since FE
+          // currently uses only the status code to display appropriate message, we are choosing
+          // 409 http status to return, as subject code has conflict
           LOGGER.warn(
               "Either requested subject is not matching or multiple subject codes are inferred in this class");
-          throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
-              "multiple subjects inferred");
+          throw new HttpResponseWrapperException(HttpStatus.CONFLICT,
+              RESOURCE_BUNDLE.getString("mismatching.subjectcode"));
         }
       }
       userSkylineModels = classSummaryMasterydao.fetchUserSkyline(userId, bean.getTxSubjectCode());
