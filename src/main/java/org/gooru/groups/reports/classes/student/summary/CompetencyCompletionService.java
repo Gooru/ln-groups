@@ -58,7 +58,8 @@ public class CompetencyCompletionService {
               RESOURCE_BUNDLE.getString("mismatching.subjectcode"));
         }
       }
-      userSkylineModels = classSummaryMasterydao.fetchUserSkyline(userId, bean.getTxSubjectCode());
+      userSkylineModels = classSummaryMasterydao.fetchUserSkylineTillToDate(userId,
+          bean.getTxSubjectCode(), bean.getToDate());
     }
 
     if (!userCompetencyCompletionModels.isEmpty()) {
@@ -67,7 +68,7 @@ public class CompetencyCompletionService {
           segregateCompetencyCompletionStatus(masteredCompetencyList, inprogressCompetencyList,
               completedCompetencyList, userCompetencyCompletionModels);
       // compute inferred competencies
-      computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered);
+      computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered, true);
       // since we are taking in class competency completion from evidence table, here we are
       // excluding
       // inprogress competencies which are already completed.
@@ -115,7 +116,7 @@ public class CompetencyCompletionService {
           segregateCompetencyCompletionStatus(masteredCompetencyList, inprogressCompetencyList,
               completedCompetencyList, userCompetencyCompletionModels);
       // compute inferred competencies
-      computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered);
+      computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered, false);
       // since we are taking in class competency completion from evidence table, here we are
       // excluding inprogress competencies which are already completed.
       inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
@@ -138,8 +139,8 @@ public class CompetencyCompletionService {
 
     // Get completed competencies(with seq) of skyline in given period and using all the
     // competencies seq in user skyline compute inferred.
-    List<CompetencyStatusModel> userSkylineModels =
-        classSummaryMasterydao.fetchUserSkyline(userId, bean.getTxSubjectCode());
+    List<CompetencyStatusModel> userSkylineModels = classSummaryMasterydao
+        .fetchUserSkylineTillToDate(userId, bean.getTxSubjectCode(), bean.getToDate());
     List<CompetencyStatusModel> userCompetencyCompletionModels =
         classSummaryMasterydao.fetchUserSkylineInWeek(userId, bean.getTxSubjectCode(),
             bean.getFromDate(), bean.getToDate());
@@ -147,7 +148,7 @@ public class CompetencyCompletionService {
       List<CompetencyStatusModel> completedOrMastered =
           segregateCompetencyCompletionStatus(masteredCompetencyList, inprogressCompetencyList,
               completedCompetencyList, userCompetencyCompletionModels);
-      computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered);
+      computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered, true);
       inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
           completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
     }
@@ -173,7 +174,7 @@ public class CompetencyCompletionService {
       List<CompetencyStatusModel> completedOrMastered =
           segregateCompetencyCompletionStatus(masteredCompetencyList, inprogressCompetencyList,
               completedCompetencyList, userSkylineModels);
-      computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered);
+      computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered, false);
       inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
           completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
     }
@@ -208,11 +209,14 @@ public class CompetencyCompletionService {
   }
 
   private void computeInferred(JsonArray inferredCompetencyList,
-      List<CompetencyStatusModel> userSkylineModels, List<CompetencyStatusModel> completedModels) {
+      List<CompetencyStatusModel> userSkylineModels, List<CompetencyStatusModel> completedModels,
+      boolean fetchForCustomDate) {
     Map<String, Map<String, CompetencyStatusModel>> completedCompMap = new HashMap<>();
+    Set<String> completedCompetencySet = new HashSet<>();
     completedModels.forEach(model -> {
       String domain = model.getDomainCode();
       String compCode = model.getCompetencyCode();
+      completedCompetencySet.add(compCode);
 
       if (completedCompMap.containsKey(domain)) {
         Map<String, CompetencyStatusModel> competencies = completedCompMap.get(domain);
@@ -236,9 +240,11 @@ public class CompetencyCompletionService {
           CompetencyStatusModel compModel = entry.getValue();
           int completedCompSeq = compModel.getCompetencySeq();
 
-          if (compSequence < completedCompSeq && status < StatusConstants.ASSERTED
-              && status != StatusConstants.INFERRED
-              && !inferredCompetencySet.contains(model.getCompetencyCode())) {
+          if (compSequence < completedCompSeq && status != StatusConstants.INFERRED
+              && !inferredCompetencySet.contains(model.getCompetencyCode())
+              && !completedCompetencySet.contains(model.getCompetencyCode())
+              && ((!fetchForCustomDate && status < StatusConstants.ASSERTED)
+                  || (fetchForCustomDate && status != StatusConstants.ASSERTED))) {
             JsonObject inferredCompetency = new JsonObject();
             inferredCompetency.put(Constants.Response.ID, model.getCompetencyCode());
             inferredCompetency.put(Constants.Response.CODE, model.getCompetencyDisplayCode());

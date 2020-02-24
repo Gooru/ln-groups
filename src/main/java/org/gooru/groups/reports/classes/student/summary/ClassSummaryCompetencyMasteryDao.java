@@ -51,4 +51,16 @@ public interface ClassSummaryCompetencyMasteryDao {
   List<CompetencyStatusModel> fetchUserSkylineInWeek(@Bind("userId") String user,
       @Bind("subjectCode") String subjectCode, @Bind("fromDate") Date fromDate, @Bind("toDate") Date toDate);
 
+  @Mapper(CompetencyStatusModelMapper.class)
+  @SqlQuery("select distinct(cm.tx_comp_code), cm.tx_domain_code, cm.tx_comp_code, cm.tx_comp_name, cm.tx_comp_desc, cm.tx_comp_student_desc, cm.tx_comp_seq, cm.tx_comp_display_code, "
+      + " (SELECT DISTINCT ON (lpcs.gut_code) FIRST_VALUE(lpcs.status) OVER (PARTITION BY lpcs.gut_code ORDER BY lpcs.updated_at desc) "
+      + " FROM learner_profile_competency_status_ts lpcs where lpcs.user_id = :userId and lpcs.gut_code = ucm.gut_code and cast(lpcs.updated_at as date) < :toDate)"
+      + " as status from domain_competency_matrix cm left join learner_profile_competency_status_ts"
+      + " ucm on cm.tx_subject_code = ucm.tx_subject_code and cm.tx_comp_code = ucm.gut_code and ucm.user_id = :userId and "
+      + " cast(ucm.updated_at as date) < :toDate where cm.tx_subject_code = :subjectCode order by cm.tx_domain_code,"
+      + " cm.tx_comp_seq asc")
+  List<CompetencyStatusModel> fetchUserSkylineTillToDate(
+      @Bind("userId") String userId, @Bind("subjectCode") String subjectCode,
+      @Bind("toDate") Date now);
+
 }
