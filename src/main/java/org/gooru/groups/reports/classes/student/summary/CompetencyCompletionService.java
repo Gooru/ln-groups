@@ -22,7 +22,7 @@ import io.vertx.core.json.JsonObject;
 public class CompetencyCompletionService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CompetencyCompletionService.class);
-  public static final String COMPLETED_INFERRED = "completedInferred";
+  private static final String COMPLETED_INFERRED = "completedInferred";
   private final ClassSummaryCompetencyMasteryDao classSummaryMasterydao;
 
   public CompetencyCompletionService(DBI dbi) {
