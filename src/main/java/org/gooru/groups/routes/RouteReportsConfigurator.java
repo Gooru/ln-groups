@@ -50,7 +50,33 @@ public class RouteReportsConfigurator implements RouteConfigurator {
     
     router.get(Constants.Route.API_REPORTS_CLASS_STUDENT_SUMMARY_GET)
     .handler(this::getClassStudentSummary);
+    
+    router.get(Constants.Route.API_FETCH_GROUP_REPORT).handler(this::fetchGroupReports);
+    router.get(Constants.Route.API_FETCH_COMPETENCY_GROUP_REPORT)
+        .handler(this::fetchCompetencyGroupReports);
+    router.get(Constants.Route.API_FETCH_PERFORMANCE_GROUP_REPORT)
+        .handler(this::fetchPerformanceGroupReports);
+    
   }
+  
+  private void fetchGroupReports(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_REPORTS_GROUPS,
+        Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
+  }
+  
+  private void fetchCompetencyGroupReports(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_REPORTS_GROUPS_COMPETENCY,
+        Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
+  }
+  
+  private void fetchPerformanceGroupReports(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_REPORTS_GROUPS_PERFORMANCE,
+        Constants.EventBus.MBEP_DISPATCHER, this.mbusTimeout, LOGGER);
+  }
+  
 
   private void getClassActivitiesCount(RoutingContext routingContext) {
     RouteHandlerUtils.baseHandler(this.eb, routingContext,

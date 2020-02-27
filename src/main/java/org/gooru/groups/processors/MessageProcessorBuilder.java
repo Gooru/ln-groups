@@ -7,6 +7,7 @@ import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryRepor
 import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryForWeekReportProcessor;
 import org.gooru.groups.reports.classes.summary.ClassSummaryReportProcessor;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryProcessor;
+import org.gooru.groups.reports.competency.drilldown.GroupReportProcessor;
 import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportProcessor;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupProcessor;
 import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolProcessor;
@@ -75,6 +76,9 @@ public final class MessageProcessorBuilder {
 
       case Constants.Message.MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_SCHOOL:
         return new GroupCompetencyReportBySchoolProcessor(vertx, message);
+
+      case Constants.Message.MSG_OP_REPORTS_GROUPS:
+        return new GroupReportProcessor(vertx, message);
 
       default:
         return null;
