@@ -64,11 +64,11 @@ class RouteTokenVerificationConfigurator implements RouteConfigurator {
         JsonObject session = responseHolder.getSession();
         VerificationCompletionHelper.setupUserContextInRoutingContext(routingContext, session,
             responseHolder.getUser());
-        if (UserPermissionAuthorizerUtil.authorize(routingContext, session)) {
+        //if (UserPermissionAuthorizerUtil.authorize(routingContext, session)) {
           routingContext.next();  
-        } else {
-          this.sendForbiddenResponse(routingContext);
-        }
+        //} else {
+        //  this.sendForbiddenResponse(routingContext);
+        //}
       } else {
         this.logUnAuthorized(responseHolder);
         this.sendUnAuthorizedResponse(routingContext);
