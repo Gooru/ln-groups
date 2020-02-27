@@ -61,7 +61,6 @@ public class TokenVerificationVerticle extends AbstractVerticle {
         if (redisResult != null) {
           try {
             JsonObject jsonResult = new JsonObject(redisResult);
-            LOGGER.debug("session received from redis:{}", jsonResult);
             future.complete(jsonResult);
           } catch (DecodeException de) {
             LOGGER.error("exception while decoding json for token '{}'", sessionToken, de);
