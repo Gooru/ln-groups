@@ -76,16 +76,17 @@ public class GroupReportProcessor implements MessageProcessor {
           this.GROUP_HIERARCHY_SERVICE.fetchGroupHierarchyDetails(hierarchyId);
 
       // Fetch users group ACL. If there is no ACL found then return 403
-      Map<String, JsonArray> userGroupACLMap =
-          this.GROUP_ACL_SERVICE.fetchUserGroupACL(ebMessage.getUserId().toString());
+      String userId = ebMessage.getUserId().get().toString();
+      Map<String, JsonArray> userGroupACLMap = this.GROUP_ACL_SERVICE.fetchUserGroupACL(userId);
+
       if (userGroupACLMap == null || userGroupACLMap.isEmpty()) {
-        LOGGER.debug("user '{}' does not have any group ACL defined",
-            ebMessage.getUserId().toString());
+        LOGGER.debug("user '{}' does not have any group ACL defined", userId);
         result.complete(
             MessageResponseFactory.createForbiddenResponse("no group acl defined for user"));
         return result;
       }
 
+      LOGGER.debug("group acl types found :{}", userGroupACLMap.size());
       List<GroupReportByCountryModel> report = new ArrayList<GroupReportByCountryModel>();
 
       // Fetch the groups accessible to the user based on the group hierarchy and user ACL
@@ -97,29 +98,34 @@ public class GroupReportProcessor implements MessageProcessor {
         return result;
       }
 
-      if (groups.size() == 1 && groups.getString(0).equalsIgnoreCase("*")) {
-        report = REPORT_SERVICE.fetchCompetencyCounts(bean);
-      } else {
-        Set<Long> groupIds = new HashSet<>();
-        groups.forEach(group -> {
-          String value = (String) group;
-          try {
-            groupIds.add(Long.valueOf(value));
-          } catch (NumberFormatException e) {
-            LOGGER.warn("group '{}' in the acl is not valid id", value);
-          }
-        });
+      LOGGER.debug("user have access to '{}' groups at country level", groups.size());
 
+      Set<Long> groupIds = new HashSet<>();
+      if (groups.size() == 1) {
+        String value = String.valueOf(groups.getValue(0));
+        if (value.equalsIgnoreCase("*")) {
+          report = this.REPORT_SERVICE.fetchCompetencyCounts(bean);
+        } else {
+          groupIds.add(Long.valueOf(value));
+          report = this.REPORT_SERVICE.fetchCompetencyCountsByCountry(bean, groupIds);
+        }
+      } else {
+        groups.forEach(group -> {
+          groupIds.add(Long.valueOf(String.valueOf(group)));
+        });
         report = this.REPORT_SERVICE.fetchCompetencyCountsByCountry(bean, groupIds);
       }
+      
+      LOGGER.debug("number of report records returned '{}'", report.size());
 
       Set<Long> countryIds = new HashSet<>();
       report.forEach(model -> {
+        LOGGER.debug("countryID: {}", model.getCountryId());
         countryIds.add(model.getCountryId());
       });
 
-      CompetencyReportResponseModel response = new GroupReportResponseModelBuilder().build(bean, report,
-          CORE_SERVICE.fetchCountryDetails(countryIds));
+      CompetencyReportResponseModel response = new GroupReportResponseModelBuilder().build(bean,
+          report, CORE_SERVICE.fetchCountryDetails(countryIds));
       String resultString = new ObjectMapper().writeValueAsString(response);
       result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
     } catch (Throwable t) {
@@ -137,13 +143,9 @@ public class GroupReportProcessor implements MessageProcessor {
   private JsonArray fetchUserAccessibleGroups(Map<String, JsonArray> userGroupACLMap,
       Node<GroupHierarchyDetailsModel> groupHierarchy) {
     // check if user has access to root level group
-    JsonArray groups = userGroupACLMap.get(groupHierarchy.getData().getType());
-    while (groups != null && !groups.isEmpty()) {
-      Node<GroupHierarchyDetailsModel> hierarchy = groupHierarchy.getChild();
-      groups = userGroupACLMap.get(hierarchy.getData().getType());
-      groupHierarchy = hierarchy;
-    }
-    return groups;
+    String groupType = groupHierarchy.getData().getType();
+    LOGGER.debug("group type for which finding the ACLs '{}'", groupType);
+   return userGroupACLMap.get(groupType);
   }
 
 }
