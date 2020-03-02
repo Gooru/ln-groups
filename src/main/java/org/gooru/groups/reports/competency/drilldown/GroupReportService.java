@@ -31,10 +31,10 @@ public class GroupReportService {
       Set<Long> countryIds) {
     if (bean.getMonth() == null && bean.getYear() == null) {
       return this.dao.fetchCompetencyCountsByCountryAllTime(bean,
-          CollectionUtils.convertToSqlArrayOfLong(countryIds));
+          CollectionUtils.toPostgresArrayLong(countryIds));
     } else {
       return this.dao.fetchCompetencyCountsByMonthYearAndCountry(bean,
-          CollectionUtils.convertToSqlArrayOfLong(countryIds));
+          CollectionUtils.toPostgresArrayLong(countryIds));
     }
   }
 }

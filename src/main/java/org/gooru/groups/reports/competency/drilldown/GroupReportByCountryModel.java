@@ -7,6 +7,7 @@ package org.gooru.groups.reports.competency.drilldown;
 public class GroupReportByCountryModel {
   
   private Long completedCompetencies;
+  private Long inprogressCompetencies;
   private Long countryId;
 
   public Long getCompletedCompetencies() {
@@ -15,6 +16,14 @@ public class GroupReportByCountryModel {
 
   public void setCompletedCompetencies(Long completedCompetencies) {
     this.completedCompetencies = completedCompetencies;
+  }
+  
+  public Long getInprogressCompetencies() {
+    return inprogressCompetencies;
+  }
+
+  public void setInprogressCompetencies(Long inprogressCompetencies) {
+    this.inprogressCompetencies = inprogressCompetencies;
   }
 
   public Long getCountryId() {

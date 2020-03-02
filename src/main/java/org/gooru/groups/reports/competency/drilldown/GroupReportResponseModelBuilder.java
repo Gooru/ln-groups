@@ -5,12 +5,16 @@ import java.util.List;
 import java.util.Map;
 import org.gooru.groups.reports.competency.response.CompetencyReportResponseModel;
 import org.gooru.groups.reports.dbhelpers.core.CountryModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author szgooru on 18-Feb-2020
  *
  */
 public class GroupReportResponseModelBuilder {
+  
+  private final static Logger LOGGER = LoggerFactory.getLogger(GroupReportResponseModelBuilder.class);
 
   public CompetencyReportResponseModel build(GroupReportCommand.GroupReportCommandBean bean,
       List<GroupReportByCountryModel> reportModels, Map<Long, CountryModel> countryModels) {
@@ -19,7 +23,11 @@ public class GroupReportResponseModelBuilder {
 
     List<CompetencyReportResponseModel.Drilldown> drilldowns = new ArrayList<>();
     reportModels.forEach(reportModel -> {
-      drilldowns.add(populateDrilldown(reportModel, countryModels.get(reportModel.getCountryId())));
+      LOGGER.debug("populating drilldown for country :{}", reportModel.getCountryId());
+      CountryModel countryModel = countryModels.get(reportModel.getCountryId());
+      if (countryModel != null) {
+        drilldowns.add(populateDrilldown(reportModel, countryModel));
+      }
     });
     responseModel.setDrilldown(drilldowns);
     return responseModel;
@@ -43,7 +51,18 @@ public class GroupReportResponseModelBuilder {
     drilldown.setId(countryModel.getId());
     drilldown.setCode(countryModel.getCode());
     drilldown.setName(countryModel.getName());
-    drilldown.setCompletedCompetencies(reportModel.getCompletedCompetencies());
+    drilldown.setType("country");
+    if (reportModel != null) {
+      drilldown.setCompletedCompetencies(
+          reportModel.getCompletedCompetencies() != null ? reportModel.getCompletedCompetencies()
+              : 0l);
+      drilldown.setInprogressCompetencies(
+          reportModel.getInprogressCompetencies() != null ? reportModel.getInprogressCompetencies()
+              : 0l);
+    } else {
+      drilldown.setCompletedCompetencies(0l);
+      drilldown.setInprogressCompetencies(0l);
+    }
     return drilldown;
   }
 }
