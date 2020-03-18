@@ -88,21 +88,38 @@ public final class Constants {
         "mb.op.reports.class.student.summary.weekly";
     public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_DETAILED_SUMMARY_WEEKLY =
         "mb.op.reports.class.student.detailed.summary.weekly";
-    
-    public static final String MSG_OP_REPORTS_GROUPS_COUNTRIES = "mb.op.reports.groups.contries.get";
-    public static final String MSG_OP_PERF_REPORTS_SUBJECTS_BY_COUNTRY = "mb.op.perf.reports.country.subjects.get";
-    public static final String MSG_OP_PERF_REPORTS_GROUPS_BY_COUNTRY = "mb.op.perf.reports.groups.country.get";
-    public static final String MSG_OP_PERF_REPORTS_GROUPS_BY_STATE = "mb.op.perf.reports.groups.state.get";
-    public static final String MSG_OP_PERF_REPORTS_GROUPS_BY_GROUP = "mb.op.perf.reports.groups.group.get";
-    public static final String MSG_OP_PERF_REPORTS_GROUPS_BY_SCHOOL = "mb.op.perf.reports.groups.school.get";
-    
-    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_COUNTRY = "mb.op.competency.reports.groups.country.get";
-    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_STATE = "mb.op.competency.reports.groups.state.get";
-    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_GROUP = "mb.op.competency.reports.groups.group.get";
-    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_SCHOOL = "mb.op.competency.reports.groups.school.get";
-    
+
+    public static final String MSG_OP_REPORTS_GROUPS_COUNTRIES =
+        "mb.op.reports.groups.contries.get";
+    public static final String MSG_OP_PERF_REPORTS_SUBJECTS_BY_COUNTRY =
+        "mb.op.perf.reports.country.subjects.get";
+    public static final String MSG_OP_PERF_REPORTS_GROUPS_BY_COUNTRY =
+        "mb.op.perf.reports.groups.country.get";
+    public static final String MSG_OP_PERF_REPORTS_GROUPS_BY_STATE =
+        "mb.op.perf.reports.groups.state.get";
+    public static final String MSG_OP_PERF_REPORTS_GROUPS_BY_GROUP =
+        "mb.op.perf.reports.groups.group.get";
+    public static final String MSG_OP_PERF_REPORTS_GROUPS_BY_SCHOOL =
+        "mb.op.perf.reports.groups.school.get";
+
+    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_COUNTRY =
+        "mb.op.competency.reports.groups.country.get";
+    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_STATE =
+        "mb.op.competency.reports.groups.state.get";
+    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_GROUP =
+        "mb.op.competency.reports.groups.group.get";
+    public static final String MSG_OP_COMPETENCY_REPORTS_GROUPS_BY_SCHOOL =
+        "mb.op.competency.reports.groups.school.get";
+
     public static final String MSG_OP_REPORTS_GET_CLASS_STUDENT_SUMMARY =
         "mb.op.reports.class.student.summary";
+
+    // New APIs for flexible group hierarchy
+    public static final String MSG_OP_REPORTS_GROUPS = "mb.op.reports.groups.get";
+    public static final String MSG_OP_REPORTS_GROUPS_COMPETENCY =
+        "mb.op.competency.reports.groups.get";
+    public static final String MSG_OP_REPORTS_GROUPS_PERFORMANCE =
+        "mb.op.performance.reports.groups.get";
 
     private Message() {
       throw new AssertionError();
@@ -200,10 +217,11 @@ public final class Constants {
 
     public static final String API_GROUP_TOKEN_VERIFICATION = API_GROUPS_BASE_ROUTE + SEP + "*";
 
-    public static final String API_GROUP_UPDATE_DELETE = API_GROUPS_BASE_ROUTE + SEP + COLON + ID_GROUP;
+    public static final String API_GROUP_UPDATE_DELETE =
+        API_GROUPS_BASE_ROUTE + SEP + COLON + ID_GROUP;
 
-    public static final String API_GROUP_ASSOCIATE =
-        API_GROUPS_BASE_ROUTE + SEP + COLON + ID_GROUP + SEP + "associate" + SEP + ":associateGroupId";
+    public static final String API_GROUP_ASSOCIATE = API_GROUPS_BASE_ROUTE + SEP + COLON + ID_GROUP
+        + SEP + "associate" + SEP + ":associateGroupId";
     public static final String API_GROUP_REMOVE =
         API_GROUPS_BASE_ROUTE + SEP + COLON + ID_GROUP + SEP + "remove" + SEP + ":removeGroupId";
 
@@ -216,8 +234,8 @@ public final class Constants {
         API_REPORTS_BASE_ROUTE + "ca/classes/" + COLON + ID_CLASS + SEP + ACTIVITIES;
     public static final String API_REPORTS_CLASS_SUMMARY_GET =
         API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + SUMMARY;
-    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_WEEKLY_GET =
-        API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY + SEP + WEEKLY;
+    public static final String API_REPORTS_CLASS_STUDENT_SUMMARY_WEEKLY_GET = API_REPORTS_BASE_ROUTE
+        + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + SUMMARY + SEP + WEEKLY;
     public static final String API_REPORTS_CLASS_STUDENT_DETAILED_SUMMARY_GET =
         API_REPORTS_BASE_ROUTE + CLASS + SEP + COLON + ID_CLASS + SEP + STUDENT + SEP + DETAILED
             + SEP + SUMMARY;
@@ -226,22 +244,22 @@ public final class Constants {
 
     // Performance Reports
     public static final String API_FETCH_COUNTRIES = API_REPORTS_BASE_ROUTE + COUNTRIES;
-    
+
     public static final String API_FETCH_PERF_SUBJECTS_BY_COUNTRY = API_REPORTS_BASE_ROUTE
         + PERFORMANCE + SEP + COUNTRIES + SEP + COLON + ID_COUNTRY + SEP + SUBJECTS;
-        
+
     public static final String API_FETCH_PERF_REPORT_BY_COUNTRY =
         API_REPORTS_BASE_ROUTE + PERFORMANCE + SEP + COUNTRIES + SEP + COLON + ID_COUNTRY;
-    
-    public static final String API_FETCH_PERF_REPORT_BY_STATE = API_REPORTS_BASE_ROUTE + PERFORMANCE + SEP + COUNTRIES
-        + SEP + COLON + ID_COUNTRY + SEP + STATES + SEP + COLON + ID_STATE;
-    
+
+    public static final String API_FETCH_PERF_REPORT_BY_STATE = API_REPORTS_BASE_ROUTE + PERFORMANCE
+        + SEP + COUNTRIES + SEP + COLON + ID_COUNTRY + SEP + STATES + SEP + COLON + ID_STATE;
+
     public static final String API_FETCH_PERF_REPORT_BY_GROUP =
         API_REPORTS_BASE_ROUTE + PERFORMANCE + SEP + GROUPS + SEP + COLON + ID_GROUP;
-    
+
     public static final String API_FETCH_PERF_REPORT_BY_SCHOOL =
         API_REPORTS_BASE_ROUTE + PERFORMANCE + SEP + SCHOOLS + SEP + COLON + ID_SCHOOL;
-    
+
     // Competency Count Reports
     public static final String API_FETCH_COMPETENCY_REPORT_BY_COUNTRY =
         API_REPORTS_BASE_ROUTE + COMPETENCY + SEP + COUNTRIES + SEP + COLON + ID_COUNTRY;
@@ -255,7 +273,14 @@ public final class Constants {
 
     public static final String API_FETCH_COMPETENCY_REPORT_BY_SCHOOL =
         API_REPORTS_BASE_ROUTE + COMPETENCY + SEP + SCHOOLS + SEP + COLON + ID_SCHOOL;
-    
+
+    // New APIs for flexible group hierarchy
+    public static final String API_FETCH_GROUP_REPORT = API_REPORTS_BASE_ROUTE + GROUPS;
+    public static final String API_FETCH_COMPETENCY_GROUP_REPORT =
+        API_REPORTS_BASE_ROUTE + GROUPS + SEP + COMPETENCY;
+    public static final String API_FETCH_PERFORMANCE_GROUP_REPORT =
+        API_REPORTS_BASE_ROUTE + GROUPS + SEP + PERFORMANCE;
+
     private Route() {
       throw new AssertionError();
     }
@@ -266,7 +291,7 @@ public final class Constants {
   public static final String HTTP = "http";
   public static final String COLON = ":";
   public static final String PRODUCT_DOMAIN = "product.domain";
-  
+
   private Constants() {
     throw new AssertionError();
   }

@@ -14,8 +14,9 @@ import io.vertx.core.json.JsonObject;
  */
 public class GroupPerfReportByCountryCommand {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(GroupPerfReportByCountryCommand.class);
-  
+  private final static Logger LOGGER =
+      LoggerFactory.getLogger(GroupPerfReportByCountryCommand.class);
+
   private Long countryId;
   private Integer month;
   private Integer year;
@@ -23,9 +24,12 @@ public class GroupPerfReportByCountryCommand {
   private Integer week;
   private String subject;
   private String framework;
+  private String tenantId;
+  private String tenantRoot;
 
   public GroupPerfReportByCountryCommand(Long countryId, String frequency, Integer week,
-      Integer month, Integer year, String subject, String framework) {
+      Integer month, Integer year, String subject, String framework, String tenantId,
+      String tenantRoot) {
     this.countryId = countryId;
     this.month = month;
     this.year = year;
@@ -33,6 +37,8 @@ public class GroupPerfReportByCountryCommand {
     this.week = week;
     this.subject = subject;
     this.framework = framework;
+    this.tenantId = tenantId;
+    this.tenantRoot = tenantRoot;
   }
 
   public Long getCountryId() {
@@ -63,13 +69,24 @@ public class GroupPerfReportByCountryCommand {
     return framework;
   }
 
-  public static GroupPerfReportByCountryCommand build(JsonObject request) {
-    GroupPerfReportByCountryCommand command = buildFromJson(request);
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public String getTenantRoot() {
+    return tenantRoot;
+  }
+
+  public static GroupPerfReportByCountryCommand build(JsonObject request, JsonObject tenantJson) {
+    GroupPerfReportByCountryCommand command = buildFromJson(request, tenantJson);
     command.validate();
     return command;
   }
 
-  private static GroupPerfReportByCountryCommand buildFromJson(JsonObject request) {
+  private static GroupPerfReportByCountryCommand buildFromJson(JsonObject request,
+      JsonObject tenantJson) {
+    String tenantId = tenantJson.getString(CommandAttributeConstants.TENANT_ID);
+    String tenantRoot = tenantJson.getString(CommandAttributeConstants.TENANT_ROOT);
     Long country = RequestUtils.getAsLong(request, CommandAttributeConstants.COUNTRY_ID);
     String frequency = request.getString(CommandAttributeConstants.FREQUENCY);
     Integer week = RequestUtils.getAsInt(request, CommandAttributeConstants.WEEK);
@@ -77,7 +94,8 @@ public class GroupPerfReportByCountryCommand {
     Integer year = RequestUtils.getAsInt(request, CommandAttributeConstants.YEAR);
     String subject = request.getString(CommandAttributeConstants.SUBJECT);
     String framework = request.getString(CommandAttributeConstants.FRAMEWORK);
-    return new GroupPerfReportByCountryCommand(country, frequency, week, month, year, subject, framework);
+    return new GroupPerfReportByCountryCommand(country, frequency, week, month, year, subject,
+        framework, tenantId, tenantRoot);
   }
 
   private void validate() {
@@ -86,7 +104,7 @@ public class GroupPerfReportByCountryCommand {
       throw new HttpResponseWrapperException(HttpConstants.HttpStatus.BAD_REQUEST,
           "Invalid value of frequency provided");
     }
-    
+
     if (frequency.equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
       if (week == null) {
         LOGGER.warn("invalid value of week provided");
@@ -94,13 +112,13 @@ public class GroupPerfReportByCountryCommand {
             "Invalid value of week provided");
       }
     }
-    
+
     if (month == null || year == null) {
       LOGGER.warn("invalid month or year provided");
       throw new HttpResponseWrapperException(HttpConstants.HttpStatus.BAD_REQUEST,
           "Invalid month or year provided");
     }
-    
+
     if (subject == null || framework == null) {
       LOGGER.warn("invalid value of subject or framework provided");
       throw new HttpResponseWrapperException(HttpConstants.HttpStatus.BAD_REQUEST,
@@ -117,6 +135,8 @@ public class GroupPerfReportByCountryCommand {
     bean.year = year;
     bean.subject = subject;
     bean.framework = framework;
+    bean.tenantId = tenantId;
+    bean.tennatRoot = tenantRoot;
     return bean;
   }
 
@@ -128,6 +148,8 @@ public class GroupPerfReportByCountryCommand {
     private Integer week;
     private String subject;
     private String framework;
+    private String tenantId;
+    private String tennatRoot;
 
     public Long getCountryId() {
       return countryId;
@@ -184,5 +206,22 @@ public class GroupPerfReportByCountryCommand {
     public void setFramework(String framework) {
       this.framework = framework;
     }
+
+    public String getTenantId() {
+      return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+      this.tenantId = tenantId;
+    }
+
+    public String getTennatRoot() {
+      return tennatRoot;
+    }
+
+    public void setTennatRoot(String tennatRoot) {
+      this.tennatRoot = tennatRoot;
+    }
+    
   }
 }

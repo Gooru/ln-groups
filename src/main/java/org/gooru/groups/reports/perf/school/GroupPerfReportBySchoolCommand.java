@@ -24,9 +24,12 @@ public class GroupPerfReportBySchoolCommand {
   private Integer year;
   private String subject;
   private String framework;
+  private String tenantId;
+  private String tenantRoot;
 
   public GroupPerfReportBySchoolCommand(Long schoolId, String frequency, Integer week,
-      Integer month, Integer year, String subject, String framework) {
+      Integer month, Integer year, String subject, String framework, String tenantId,
+      String tenantRoot) {
     this.schoolId = schoolId;
     this.frequency = frequency;
     this.week = week;
@@ -34,6 +37,8 @@ public class GroupPerfReportBySchoolCommand {
     this.year = year;
     this.subject = subject;
     this.framework = framework;
+    this.tenantId = tenantId;
+    this.tenantRoot = tenantRoot;
   }
 
   public Long getSchoolId() {
@@ -64,13 +69,24 @@ public class GroupPerfReportBySchoolCommand {
     return framework;
   }
 
-  public static GroupPerfReportBySchoolCommand build(JsonObject request) {
-    GroupPerfReportBySchoolCommand command = buildFromJson(request);
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public String getTenantRoot() {
+    return tenantRoot;
+  }
+
+  public static GroupPerfReportBySchoolCommand build(JsonObject request, JsonObject tenantJson) {
+    GroupPerfReportBySchoolCommand command = buildFromJson(request, tenantJson);
     command.validate();
     return command;
   }
 
-  private static GroupPerfReportBySchoolCommand buildFromJson(JsonObject request) {
+  private static GroupPerfReportBySchoolCommand buildFromJson(JsonObject request,
+      JsonObject tenantJson) {
+    String tenantId = tenantJson.getString(CommandAttributeConstants.TENANT_ID);
+    String tenantRoot = tenantJson.getString(CommandAttributeConstants.TENANT_ROOT);
     Long school = RequestUtils.getAsLong(request, CommandAttributeConstants.SCHOOL_ID);
     String frequency = request.getString(CommandAttributeConstants.FREQUENCY);
     Integer week = RequestUtils.getAsInt(request, CommandAttributeConstants.WEEK);
@@ -79,7 +95,7 @@ public class GroupPerfReportBySchoolCommand {
     String subject = request.getString(CommandAttributeConstants.SUBJECT);
     String framework = request.getString(CommandAttributeConstants.FRAMEWORK);
     return new GroupPerfReportBySchoolCommand(school, frequency, week, month, year, subject,
-        framework);
+        framework, tenantId, tenantRoot);
   }
 
   private void validate() {
@@ -119,6 +135,8 @@ public class GroupPerfReportBySchoolCommand {
     bean.year = year;
     bean.subject = subject;
     bean.framework = framework;
+    bean.tenantId = tenantId;
+    bean.tenantRoot = tenantRoot;
     return bean;
   }
 
@@ -130,6 +148,8 @@ public class GroupPerfReportBySchoolCommand {
     private Integer year;
     private String subject;
     private String framework;
+    private String tenantId;
+    private String tenantRoot;
 
     public Long getSchoolId() {
       return schoolId;
@@ -185,6 +205,22 @@ public class GroupPerfReportBySchoolCommand {
 
     public void setFramework(String framework) {
       this.framework = framework;
+    }
+
+    public String getTenantId() {
+      return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+      this.tenantId = tenantId;
+    }
+
+    public String getTenantRoot() {
+      return tenantRoot;
+    }
+
+    public void setTenantRoot(String tenantRoot) {
+      this.tenantRoot = tenantRoot;
     }
 
   }

@@ -61,10 +61,10 @@
 	},
 	"app.configuration": {
 		"gobal.report.access.roles": [
-			"super-admin"
+			1
 		],
 		"report.access.roles": [
-			"tenant-admin"
+			2
 		]
 	},
 	"vertxOptions": {

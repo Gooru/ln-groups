@@ -1,16 +1,22 @@
 package org.gooru.groups.reports.dbhelpers.core;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.gooru.groups.reports.utils.CollectionUtils;
 import org.skife.jdbi.v2.DBI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author renuka
  */
 public class CoreService {
+
+  private final static Logger LOGGER = LoggerFactory.getLogger(CoreService.class);
 
   private final CoreClassDao classDao;
   private final CoreClassMemberDao classMembersDao;
@@ -89,19 +95,29 @@ public class CoreService {
     return this.collectionDao.findCompetenciesForCollection(collectionId);
   }
 
-  public Map<Long, StateModel> fetchStateDetails(Set<Long> stateIds) {
-    Map<Long, StateModel> stateModelMap = new HashMap<>();
-    List<StateModel> stateModels =
+  public Map<Long, CountryModel> fetchCountryDetails(Set<Long> countryIds) {
+    Map<Long, CountryModel> countryModelMap = new HashMap<>();
+    List<CountryModel> counrtyModels =
+        this.coreDao.fetchCountryDetails(CollectionUtils.toPostgresArrayLong(countryIds));
+    counrtyModels.forEach(state -> {
+      countryModelMap.put(state.getId(), state);
+    });
+    return countryModelMap;
+  }
+
+  public Map<Long, DrilldownModel> fetchStateDetails(Set<Long> stateIds) {
+    Map<Long, DrilldownModel> stateModelMap = new HashMap<>();
+    List<DrilldownModel> stateModels =
         this.coreDao.fetchStateDetails(CollectionUtils.toPostgresArrayLong(stateIds));
     stateModels.forEach(state -> {
       stateModelMap.put(state.getId(), state);
     });
     return stateModelMap;
   }
-  
-  public Map<Long, StateModel> fetchStatesByCountry(Long countryId) {
-    Map<Long, StateModel> stateModelMap = new HashMap<>();
-    List<StateModel> stateModels = this.coreDao.fetchStatesByCountry(countryId);
+
+  public Map<Long, DrilldownModel> fetchStatesByCountry(Long countryId) {
+    Map<Long, DrilldownModel> stateModelMap = new HashMap<>();
+    List<DrilldownModel> stateModels = this.coreDao.fetchStatesByCountry(countryId);
     stateModels.forEach(state -> {
       stateModelMap.put(state.getId(), state);
     });
@@ -128,9 +144,9 @@ public class CoreService {
     return groupModelMap;
   }
 
-  public Map<Long, SchoolModel> fetchSchoolDetails(Set<Long> schoolIds) {
-    Map<Long, SchoolModel> schoolModelMap = new HashMap<>();
-    List<SchoolModel> schoolModels =
+  public Map<Long, DrilldownModel> fetchSchoolDetails(Set<Long> schoolIds) {
+    Map<Long, DrilldownModel> schoolModelMap = new HashMap<>();
+    List<DrilldownModel> schoolModels =
         this.coreDao.fetchSchoolDetails(CollectionUtils.toPostgresArrayLong(schoolIds));
     schoolModels.forEach(school -> {
       schoolModelMap.put(school.getId(), school);
@@ -163,5 +179,34 @@ public class CoreService {
       groupModelMap.put(group.getId(), group);
     });
     return groupModelMap;
+  }
+
+  public List<Integer> fetchUserRoles(UUID userId) {
+    return this.coreDao.fetchUserRoles(userId);
+  }
+
+  public Set<Long> fetchSchoolsByCountry(Long countryId) {
+    return this.coreDao.fetchSchoolsByCountry(countryId);
+  }
+
+  private Boolean isParentTenant(String tenantId) {
+    return this.coreDao.isParentTenant(tenantId);
+  }
+
+  public Set<String> fetchSubTenants(String tenantId) {
+    Set<String> tenants = null;
+    if (isParentTenant(tenantId)) {
+      LOGGER.debug("tenant '{}' is parent, fetching sub tenants", tenantId);
+      tenants = this.coreDao.fetchSubTenants(tenantId);
+      if (tenants != null && !tenants.isEmpty()) {
+        return tenants;
+      }
+    }
+
+    LOGGER.debug("looks like tenant '{}' is not parent or don't have any sub tenant, returning it",
+        tenantId);
+    tenants = new HashSet<>();
+    tenants.add(tenantId);
+    return tenants;
   }
 }

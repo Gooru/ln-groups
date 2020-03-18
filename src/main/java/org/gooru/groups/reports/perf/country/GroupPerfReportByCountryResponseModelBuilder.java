@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.gooru.groups.reports.dbhelpers.core.StateModel;
+import org.gooru.groups.reports.dbhelpers.core.DrilldownModel;
 import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryResponseModel.OverallStats;
 import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryResponseModel.StateLevelPerf;
 import org.gooru.groups.reports.perf.dbhelpers.PerformanceAndTSReportByCountryModel;
@@ -17,7 +17,7 @@ import org.gooru.groups.reports.perf.dbhelpers.PerformanceAndTSReportByCountryMo
 public class GroupPerfReportByCountryResponseModelBuilder {
 
   public static GroupPerfReportByCountryResponseModel build(
-      List<PerformanceAndTSReportByCountryModel> report, Map<Long, StateModel> states) {
+      List<PerformanceAndTSReportByCountryModel> report, Map<Long, DrilldownModel> states) {
     GroupPerfReportByCountryResponseModel responseModel =
         new GroupPerfReportByCountryResponseModel();
 
@@ -27,7 +27,7 @@ public class GroupPerfReportByCountryResponseModelBuilder {
     });
 
     List<StateLevelPerf> stateLevelPerfs = new ArrayList<>();
-    for (Map.Entry<Long, StateModel> entry : states.entrySet()) {
+    for (Map.Entry<Long, DrilldownModel> entry : states.entrySet()) {
       stateLevelPerfs
           .add(buildStateLevelPerfObject(perfReportMap.get(entry.getKey()), entry.getValue()));
     }
@@ -47,7 +47,7 @@ public class GroupPerfReportByCountryResponseModelBuilder {
   }
 
   private static StateLevelPerf buildStateLevelPerfObject(PerformanceAndTSReportByCountryModel perf,
-      StateModel state) {
+      DrilldownModel state) {
     StateLevelPerf stateLevelPerf = new StateLevelPerf();
     stateLevelPerf.setId(state.getId());
     stateLevelPerf.setName(state.getName());

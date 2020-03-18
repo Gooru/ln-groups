@@ -16,7 +16,7 @@ public class SubjectFrameworkModelMapper implements ResultSetMapper<SubjectFrame
       throws SQLException {
     SubjectFrameworkModel model = new SubjectFrameworkModel();
     String subject = r.getString("subject");
-    if (subject != null && !subject.isEmpty()) {
+    if (subject != null && !subject.isEmpty() && subject.length() > 0) {
       model.setSubject(subject);
       model.setFramework(r.getString("framework"));
     }

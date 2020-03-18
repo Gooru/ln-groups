@@ -13,7 +13,7 @@ import io.vertx.core.json.JsonObject;
  * @author szgooru Created On 19-Mar-2019
  */
 public class GroupPerfReportByStateCommand {
-  
+
   private final static Logger LOGGER = LoggerFactory.getLogger(GroupPerfReportByStateCommand.class);
 
   private Long stateId;
@@ -23,9 +23,11 @@ public class GroupPerfReportByStateCommand {
   private Integer year;
   private String subject;
   private String framework;
+  private String tenantId;
+  private String tenantRoot;
 
   public GroupPerfReportByStateCommand(Long stateId, String frequency, Integer week, Integer month,
-      Integer year, String subject, String framework) {
+      Integer year, String subject, String framework, String tenantId, String tenantRoot) {
     this.stateId = stateId;
     this.frequency = frequency;
     this.week = week;
@@ -33,6 +35,8 @@ public class GroupPerfReportByStateCommand {
     this.year = year;
     this.subject = subject;
     this.framework = framework;
+    this.tenantId = tenantId;
+    this.tenantRoot = tenantRoot;
   }
 
   public Long getStateId() {
@@ -63,13 +67,24 @@ public class GroupPerfReportByStateCommand {
     return framework;
   }
 
-  public static GroupPerfReportByStateCommand build(JsonObject request) {
-    GroupPerfReportByStateCommand command = buildFromJson(request);
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public String getTenantRoot() {
+    return tenantRoot;
+  }
+
+  public static GroupPerfReportByStateCommand build(JsonObject request, JsonObject tenantJson) {
+    GroupPerfReportByStateCommand command = buildFromJson(request, tenantJson);
     command.validate();
     return command;
   }
 
-  private static GroupPerfReportByStateCommand buildFromJson(JsonObject request) {
+  private static GroupPerfReportByStateCommand buildFromJson(JsonObject request,
+      JsonObject tenantJson) {
+    String tenantId = tenantJson.getString(CommandAttributeConstants.TENANT_ID);
+    String tenantRoot = tenantJson.getString(CommandAttributeConstants.TENANT_ROOT);
     Long state = RequestUtils.getAsLong(request, CommandAttributeConstants.STATE_ID);
     String frequency = request.getString(CommandAttributeConstants.FREQUENCY);
     Integer week = RequestUtils.getAsInt(request, CommandAttributeConstants.WEEK);
@@ -77,7 +92,8 @@ public class GroupPerfReportByStateCommand {
     Integer year = RequestUtils.getAsInt(request, CommandAttributeConstants.YEAR);
     String subject = request.getString(CommandAttributeConstants.SUBJECT);
     String framework = request.getString(CommandAttributeConstants.FRAMEWORK);
-    return new GroupPerfReportByStateCommand(state, frequency, week, month, year, subject, framework);
+    return new GroupPerfReportByStateCommand(state, frequency, week, month, year, subject,
+        framework, tenantId, tenantRoot);
   }
 
   private void validate() {
@@ -86,7 +102,7 @@ public class GroupPerfReportByStateCommand {
       throw new HttpResponseWrapperException(HttpConstants.HttpStatus.BAD_REQUEST,
           "Invalid value of frequency provided");
     }
-    
+
     if (frequency.equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
       if (week == null) {
         LOGGER.warn("invalid value of week provided");
@@ -94,13 +110,13 @@ public class GroupPerfReportByStateCommand {
             "Invalid value of week provided");
       }
     }
-    
+
     if (month == null || year == null) {
       LOGGER.warn("invalid month or year provided");
       throw new HttpResponseWrapperException(HttpConstants.HttpStatus.BAD_REQUEST,
           "Invalid month or year provided");
     }
-    
+
     if (subject == null || framework == null) {
       LOGGER.warn("invalid value of subject or framework provided");
       throw new HttpResponseWrapperException(HttpConstants.HttpStatus.BAD_REQUEST,
@@ -117,6 +133,8 @@ public class GroupPerfReportByStateCommand {
     bean.year = year;
     bean.subject = subject;
     bean.framework = framework;
+    bean.tenantId = tenantId;
+    bean.tenantRoot = tenantRoot;
     return bean;
   }
 
@@ -128,6 +146,8 @@ public class GroupPerfReportByStateCommand {
     private Integer year;
     private String subject;
     private String framework;
+    private String tenantId;
+    private String tenantRoot;
 
     public Long getStateId() {
       return stateId;
@@ -136,7 +156,7 @@ public class GroupPerfReportByStateCommand {
     public void setStateId(Long stateId) {
       this.stateId = stateId;
     }
-    
+
     public String getFrequency() {
       return frequency;
     }
@@ -184,5 +204,22 @@ public class GroupPerfReportByStateCommand {
     public void setFramework(String framework) {
       this.framework = framework;
     }
+
+    public String getTenantId() {
+      return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+      this.tenantId = tenantId;
+    }
+
+    public String getTenantRoot() {
+      return tenantRoot;
+    }
+
+    public void setTenantRoot(String tenantRoot) {
+      this.tenantRoot = tenantRoot;
+    }
+
   }
 }

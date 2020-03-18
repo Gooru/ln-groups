@@ -3,7 +3,6 @@ package org.gooru.groups.reports.perf.dbhelpers;
 
 import java.util.List;
 import java.util.Set;
-import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryCommand;
 import org.gooru.groups.reports.perf.fetchsubject.country.FetchSubjectsForPerfReportByCountryCommand;
 import org.gooru.groups.reports.perf.group.GroupPerfReportByGroupCommand;
 import org.gooru.groups.reports.perf.school.GroupPerfReportBySchoolCommand;
@@ -32,6 +31,20 @@ public class GroupReportService {
     return this.reportDao.fetchPerformanceAndTSMonthReportBySchool(bean);
   }
 
+  public List<PerformanceAndTSReportBySchoolModel> fetchPerformanceAndTSWeekReportBySchoolAndTenant(
+      GroupPerfReportBySchoolCommand.GroupPerfReportBySchoolCommandBean bean,
+      Set<String> tenantIds) {
+    return this.reportDao.fetchPerformanceAndTSWeekReportBySchoolAndTenant(bean,
+        CollectionUtils.convertToSqlArrayOfString(tenantIds));
+  }
+
+  public List<PerformanceAndTSReportBySchoolModel> fetchPerformanceAndTSMonthReportBySchoolAndTenant(
+      GroupPerfReportBySchoolCommand.GroupPerfReportBySchoolCommandBean bean,
+      Set<String> tenantIds) {
+    return this.reportDao.fetchPerformanceAndTSMonthReportBySchoolAndTenant(bean,
+        CollectionUtils.convertToSqlArrayOfString(tenantIds));
+  }
+
   public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByDistrictOrBlock(
       Set<Long> groupIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
     return this.reportDao.fetchPerformanceAndTSWeekReportByDistrictOrBlock(
@@ -44,6 +57,22 @@ public class GroupReportService {
         CollectionUtils.toPostgresArrayLong(groupIds), bean);
   }
 
+  public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByDistrictOrBlockAndTenant(
+      Set<Long> groupIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean,
+      Set<String> tenantIds) {
+    return this.reportDao.fetchPerformanceAndTSWeekReportByDistrictOrBlockAndTenant(
+        CollectionUtils.toPostgresArrayLong(groupIds), bean,
+        CollectionUtils.convertToSqlArrayOfString(tenantIds));
+  }
+
+  public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByDistrictOrBlockAndTenant(
+      Set<Long> groupIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean,
+      Set<String> tenantIds) {
+    return this.reportDao.fetchPerformanceAndTSMonthReportByDistrictOrBlockAndTenant(
+        CollectionUtils.toPostgresArrayLong(groupIds), bean,
+        CollectionUtils.convertToSqlArrayOfString(tenantIds));
+  }
+
   public List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSWeekReportBySDorCluster(
       Set<Long> schoolIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
     return this.reportDao.fetchPerformanceAndTSWeekReportBySDorCluster(
@@ -54,6 +83,22 @@ public class GroupReportService {
       Set<Long> schoolIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean) {
     return this.reportDao.fetchPerformanceAndTSMonthReportBySDorCluster(
         CollectionUtils.toPostgresArrayLong(schoolIds), bean);
+  }
+
+  public List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSWeekReportBySDorClusterAndTenant(
+      Set<Long> schoolIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean,
+      Set<String> tenantIds) {
+    return this.reportDao.fetchPerformanceAndTSWeekReportBySDorClusterAndTenant(
+        CollectionUtils.toPostgresArrayLong(schoolIds), bean,
+        CollectionUtils.convertToSqlArrayOfString(tenantIds));
+  }
+
+  public List<PerformanceAndTSReportByClusterModel> fetchPerformanceAndTSMonthReportBySDorClusterAndTenant(
+      Set<Long> schoolIds, GroupPerfReportByGroupCommand.GroupPerfReportByGroupCommandBean bean,
+      Set<String> tenantIds) {
+    return this.reportDao.fetchPerformanceAndTSMonthReportBySDorClusterAndTenant(
+        CollectionUtils.toPostgresArrayLong(schoolIds), bean,
+        CollectionUtils.convertToSqlArrayOfString(tenantIds));
   }
 
   public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByState(
@@ -70,14 +115,22 @@ public class GroupReportService {
         CollectionUtils.toPostgresArrayLong(groupIds), bean);
   }
 
-  public List<PerformanceAndTSReportByCountryModel> fetchPerformanceAndTSMonthReportByCountry(
-      GroupPerfReportByCountryCommand.GroupReportByCountryCommandBean bean) {
-    return this.reportDao.fetchPerformanceAndTSMonthReportByCountry(bean);
+  public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSWeekReportByStateAndTenant(
+      Set<Long> groupIds,
+      GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean,
+      Set<String> tenantIds) {
+    return this.reportDao.fetchPerformanceAndTSWeekReportByStateAndTenant(
+        CollectionUtils.toPostgresArrayLong(groupIds), bean,
+        CollectionUtils.convertToSqlArrayOfString(tenantIds));
   }
 
-  public List<PerformanceAndTSReportByCountryModel> fetchPerformanceAndTSWeekReportByCountry(
-      GroupPerfReportByCountryCommand.GroupReportByCountryCommandBean bean) {
-    return this.reportDao.fetchPerformanceAndTSWeekReportByCountry(bean);
+  public List<PerformanceAndTSReportByGroupModel> fetchPerformanceAndTSMonthReportByStateAndTenant(
+      Set<Long> groupIds,
+      GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean,
+      Set<String> tenantIds) {
+    return this.reportDao.fetchPerformanceAndTSMonthReportByStateAndTenant(
+        CollectionUtils.toPostgresArrayLong(groupIds), bean,
+        CollectionUtils.convertToSqlArrayOfString(tenantIds));
   }
 
   public List<SubjectFrameworkModel> fetchSubjectsForPerfReportWeekByCountry(
@@ -88,5 +141,19 @@ public class GroupReportService {
   public List<SubjectFrameworkModel> fetchSubjectsForPerfReportMonthByCountry(
       FetchSubjectsForPerfReportByCountryCommand.FetchSubjectsForPerfReportByCountryCommandBean bean) {
     return this.reportDao.fetchSubectsForPerformanceReportMonthByCountry(bean);
+  }
+
+  public List<SubjectFrameworkModel> fetchSubjectsForPerfReportWeekByCountryAndTenant(
+      FetchSubjectsForPerfReportByCountryCommand.FetchSubjectsForPerfReportByCountryCommandBean bean,
+      Set<String> tenantIds) {
+    return this.reportDao.fetchSubectsForPerformanceReportWeekByCountryAndTenant(bean,
+        CollectionUtils.convertToSqlArrayOfString(tenantIds));
+  }
+
+  public List<SubjectFrameworkModel> fetchSubjectsForPerfReportMonthByCountryAndTenant(
+      FetchSubjectsForPerfReportByCountryCommand.FetchSubjectsForPerfReportByCountryCommandBean bean,
+      Set<String> tenantIds) {
+    return this.reportDao.fetchSubectsForPerformanceReportMonthByCountryAndTenant(bean,
+        CollectionUtils.convertToSqlArrayOfString(tenantIds));
   }
 }

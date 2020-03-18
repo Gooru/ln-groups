@@ -4,13 +4,15 @@ package org.gooru.groups.reports.perf.country;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.processors.MessageProcessor;
+import org.gooru.groups.reports.auth.Authorizer;
+import org.gooru.groups.reports.auth.AuthorizerBuilder;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
-import org.gooru.groups.reports.dbhelpers.core.StateModel;
-import org.gooru.groups.reports.perf.dbhelpers.GroupReportService;
+import org.gooru.groups.reports.dbhelpers.core.DrilldownModel;
 import org.gooru.groups.reports.perf.dbhelpers.PerformanceAndTSReportByCountryModel;
 import org.gooru.groups.responses.MessageResponse;
 import org.gooru.groups.responses.MessageResponseFactory;
@@ -32,8 +34,9 @@ public class GroupPerfReportByCountryProcessor implements MessageProcessor {
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
-  private final GroupReportService service = new GroupReportService(DBICreator.getDbiForDsdbDS());
-  private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
+  private final GroupPerfReportByCountryService REPORT_SERVICE =
+      new GroupPerfReportByCountryService(DBICreator.getDbiForDsdbDS());
+  private final CoreService CORE_SERVICE = new CoreService(DBICreator.getDbiForDefaultDS());
 
   public GroupPerfReportByCountryProcessor(Vertx vertx, Message<JsonObject> message) {
     this.message = message;
@@ -47,18 +50,31 @@ public class GroupPerfReportByCountryProcessor implements MessageProcessor {
 
       // Build command object and validate input data
       GroupPerfReportByCountryCommand command =
-          GroupPerfReportByCountryCommand.build(ebMessage.getRequestBody());
+          GroupPerfReportByCountryCommand.build(ebMessage.getRequestBody(), ebMessage.getTenant());
       GroupPerfReportByCountryCommand.GroupReportByCountryCommandBean bean = command.asBean();
+
+      Authorizer userAuthorizer =
+          AuthorizerBuilder.buildUserRoleAuthorizer(ebMessage.getUserId().get());
+      userAuthorizer.authorize();
+
+      Set<String> tenantIds = this.CORE_SERVICE.fetchSubTenants(bean.getTenantId());
 
       // Fetch performance and timespent report by country
       List<PerformanceAndTSReportByCountryModel> report = new ArrayList<>();
       if (command.getFrequency().equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
-        report = this.service.fetchPerformanceAndTSWeekReportByCountry(bean);
+        report = userAuthorizer.isGlobalAccess()
+            ? this.REPORT_SERVICE.fetchPerformanceAndTSWeekReportByCountry(bean)
+            : this.REPORT_SERVICE.fetchPerformanceAndTSWeekReportByCountryAndTenant(bean,
+                tenantIds);
       } else {
-        report = this.service.fetchPerformanceAndTSMonthReportByCountry(bean);
+        report = userAuthorizer.isGlobalAccess()
+            ? this.REPORT_SERVICE.fetchPerformanceAndTSMonthReportByCountry(bean)
+            : this.REPORT_SERVICE.fetchPerformanceAndTSMonthReportByCountryAndTenant(bean,
+                tenantIds);
       }
 
-      Map<Long, StateModel> states = this.coreService.fetchStatesByCountry(bean.getCountryId());
+      Map<Long, DrilldownModel> states =
+          this.CORE_SERVICE.fetchStatesByCountry(bean.getCountryId());
 
       // Build the response models and complete result
       GroupPerfReportByCountryResponseModel responseModel =

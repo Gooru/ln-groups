@@ -4,10 +4,13 @@ package org.gooru.groups.reports.perf.state;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.gooru.groups.app.data.EventBusMessage;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.processors.MessageProcessor;
+import org.gooru.groups.reports.auth.Authorizer;
+import org.gooru.groups.reports.auth.AuthorizerBuilder;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.reports.dbhelpers.core.GroupModel;
 import org.gooru.groups.reports.perf.dbhelpers.GroupReportService;
@@ -32,8 +35,9 @@ public class GroupPerfReportByStateProcessor implements MessageProcessor {
   private final Message<JsonObject> message;
   private final Future<MessageResponse> result;
 
-  private final GroupReportService service = new GroupReportService(DBICreator.getDbiForDsdbDS());
-  private final CoreService coreService = new CoreService(DBICreator.getDbiForDefaultDS());
+  private final GroupReportService REPORT_SERVICE =
+      new GroupReportService(DBICreator.getDbiForDsdbDS());
+  private final CoreService CORE_SERVICE = new CoreService(DBICreator.getDbiForDefaultDS());
 
   public GroupPerfReportByStateProcessor(Vertx vertx, Message<JsonObject> message) {
     this.message = message;
@@ -46,18 +50,32 @@ public class GroupPerfReportByStateProcessor implements MessageProcessor {
       EventBusMessage ebMessage = EventBusMessage.eventBusMessageBuilder(this.message);
 
       GroupPerfReportByStateCommand command =
-          GroupPerfReportByStateCommand.build(ebMessage.getRequestBody());
+          GroupPerfReportByStateCommand.build(ebMessage.getRequestBody(), ebMessage.getTenant());
       GroupPerfReportByStateCommand.GroupPerformanceReportByStateCommandBean bean =
           command.asBean();
 
+      Authorizer userAuthorizer =
+          AuthorizerBuilder.buildUserRoleAuthorizer(ebMessage.getUserId().get());
+      userAuthorizer.authorize();
+
+      Set<String> tenantIds = this.CORE_SERVICE.fetchSubTenants(bean.getTenantId());
+
       // Fetch all the groups falls below the state
-      Map<Long, GroupModel> groupsByState = this.coreService.fetchGroupsByState(bean.getStateId());
+      Map<Long, GroupModel> groupsByState = this.CORE_SERVICE.fetchGroupsByState(bean.getStateId());
 
       List<PerformanceAndTSReportByGroupModel> report = new ArrayList<>();
       if (command.getFrequency().equalsIgnoreCase(CommandAttributeConstants.FREQUENCY_WEEKLY)) {
-        report = this.service.fetchPerformanceAndTSWeekReportByState(groupsByState.keySet(), bean);
+        report = userAuthorizer.isGlobalAccess()
+            ? this.REPORT_SERVICE.fetchPerformanceAndTSWeekReportByState(groupsByState.keySet(),
+                bean)
+            : this.REPORT_SERVICE.fetchPerformanceAndTSWeekReportByStateAndTenant(
+                groupsByState.keySet(), bean, tenantIds);
       } else {
-        report = this.service.fetchPerformanceAndTSMonthReportByState(groupsByState.keySet(), bean);
+        report = userAuthorizer.isGlobalAccess()
+            ? this.REPORT_SERVICE.fetchPerformanceAndTSMonthReportByState(groupsByState.keySet(),
+                bean)
+            : this.REPORT_SERVICE.fetchPerformanceAndTSMonthReportByStateAndTenant(
+                groupsByState.keySet(), bean, tenantIds);
       }
 
       GroupPerfReportByStateResponseModel responseModel =

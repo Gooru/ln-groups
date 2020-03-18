@@ -8,6 +8,7 @@ import org.gooru.groups.responses.auth.AuthSessionResponseHolder;
 import org.gooru.groups.responses.auth.AuthSessionResponseHolderBuilder;
 import org.gooru.groups.routes.utils.DeliveryOptionsBuilder;
 import org.gooru.groups.routes.utils.TokenValidationUtils;
+import org.gooru.groups.routes.utils.UserPermissionAuthorizerUtil;
 import org.gooru.groups.routes.utils.VerificationCompletionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,11 @@ class RouteTokenVerificationConfigurator implements RouteConfigurator {
         JsonObject session = responseHolder.getSession();
         VerificationCompletionHelper.setupUserContextInRoutingContext(routingContext, session,
             responseHolder.getUser());
-        routingContext.next();
+        //if (UserPermissionAuthorizerUtil.authorize(routingContext, session)) {
+          routingContext.next();  
+        //} else {
+        //  this.sendForbiddenResponse(routingContext);
+        //}
       } else {
         this.logUnAuthorized(responseHolder);
         this.sendUnAuthorizedResponse(routingContext);
@@ -93,6 +98,11 @@ class RouteTokenVerificationConfigurator implements RouteConfigurator {
   private void sendUnAuthorizedResponse(RoutingContext routingContext) {
     routingContext.response().setStatusCode(HttpStatus.UNAUTHORIZED.getCode())
         .setStatusMessage(HttpStatus.UNAUTHORIZED.getMessage()).end();
+  }
+  
+  private void sendForbiddenResponse(RoutingContext routingContext) {
+    routingContext.response().setStatusCode(HttpStatus.FORBIDDEN.getCode())
+    .setStatusMessage(HttpStatus.FORBIDDEN.getMessage()).end();
   }
 
 }

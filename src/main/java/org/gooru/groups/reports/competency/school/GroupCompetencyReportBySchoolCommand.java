@@ -20,13 +20,17 @@ public class GroupCompetencyReportBySchoolCommand {
   private Integer month;
   private Integer year;
   private String frequency;
+  private String tenantId;
+  private String tenantRoot;
 
   public GroupCompetencyReportBySchoolCommand(Long schoolId, Integer month, Integer year,
-      String frequency) {
+      String frequency, String tenantId, String tenantRoot) {
     this.schoolId = schoolId;
     this.month = month;
     this.year = year;
     this.frequency = frequency;
+    this.tenantId = tenantId;
+    this.tenantRoot = tenantRoot;
   }
 
   public Long getSchoolId() {
@@ -45,18 +49,31 @@ public class GroupCompetencyReportBySchoolCommand {
     return frequency;
   }
 
-  public static GroupCompetencyReportBySchoolCommand build(JsonObject request) {
-    GroupCompetencyReportBySchoolCommand command = buildFromJson(request);
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public String getTenantRoot() {
+    return tenantRoot;
+  }
+
+  public static GroupCompetencyReportBySchoolCommand build(JsonObject request,
+      JsonObject tenantJson) {
+    GroupCompetencyReportBySchoolCommand command = buildFromJson(request, tenantJson);
     command.validate();
     return command;
   }
 
-  private static GroupCompetencyReportBySchoolCommand buildFromJson(JsonObject request) {
+  private static GroupCompetencyReportBySchoolCommand buildFromJson(JsonObject request,
+      JsonObject tenantJson) {
+    String tenantId = tenantJson.getString(CommandAttributeConstants.TENANT_ID);
+    String tenantRoot = tenantJson.getString(CommandAttributeConstants.TENANT_ROOT);
     Long school = RequestUtils.getAsLong(request, CommandAttributeConstants.SCHOOL_ID);
     String frequency = request.getString(CommandAttributeConstants.FREQUENCY);
     Integer month = RequestUtils.getAsInt(request, CommandAttributeConstants.MONTH);
     Integer year = RequestUtils.getAsInt(request, CommandAttributeConstants.YEAR);
-    return new GroupCompetencyReportBySchoolCommand(school, month, year, frequency);
+    return new GroupCompetencyReportBySchoolCommand(school, month, year, frequency, tenantId,
+        tenantRoot);
   }
 
   private void validate() {
@@ -80,6 +97,8 @@ public class GroupCompetencyReportBySchoolCommand {
     bean.frequency = frequency;
     bean.month = month;
     bean.year = year;
+    bean.tenantId = tenantId;
+    bean.tenantRoot = tenantRoot;
     return bean;
   }
 
@@ -88,6 +107,8 @@ public class GroupCompetencyReportBySchoolCommand {
     private Integer month;
     private Integer year;
     private String frequency;
+    private String tenantId;
+    private String tenantRoot;
 
     public Long getSchoolId() {
       return schoolId;
@@ -119,6 +140,22 @@ public class GroupCompetencyReportBySchoolCommand {
 
     public void setFrequency(String frequency) {
       this.frequency = frequency;
+    }
+
+    public String getTenantId() {
+      return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+      this.tenantId = tenantId;
+    }
+
+    public String getTenantRoot() {
+      return tenantRoot;
+    }
+
+    public void setTenantRoot(String tenantRoot) {
+      this.tenantRoot = tenantRoot;
     }
 
   }
