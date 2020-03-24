@@ -121,6 +121,9 @@ public final class Constants {
     public static final String MSG_OP_REPORTS_GROUPS_PERFORMANCE =
         "mb.op.performance.reports.groups.get";
 
+    // Group Hierarchies API
+    public static final String MSG_OP_HIERARCHIES_GROUP_ALL = "mb.op.group.hierarchies.all.fetch";
+    
     private Message() {
       throw new AssertionError();
     }
@@ -281,6 +284,10 @@ public final class Constants {
     public static final String API_FETCH_PERFORMANCE_GROUP_REPORT =
         API_REPORTS_BASE_ROUTE + GROUPS + SEP + PERFORMANCE;
 
+    // Group Hierarchy
+    public static final String API_FETCH_GROUP_HIERARCHIES_ALL =
+        API_REPORTS_BASE_ROUTE + GROUPS + SEP + "hierarchies/all";
+    
     private Route() {
       throw new AssertionError();
     }
