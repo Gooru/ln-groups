@@ -123,6 +123,7 @@ public final class Constants {
 
     // Group Hierarchies API
     public static final String MSG_OP_HIERARCHIES_GROUP_ALL = "mb.op.group.hierarchies.all.fetch";
+    public static final String MSG_OP_HIERARCHIES_GROUP_TENANT_ASSIGN = "mb.op.group.hierarchies.tenant.assign";
     
     private Message() {
       throw new AssertionError();
@@ -217,6 +218,8 @@ public final class Constants {
     public static final String ID_COUNTRY = "countryId";
     public static final String ID_STATE = "stateId";
     public static final String ID_SCHOOL = "schoolId";
+    public static final String ID_HIERARCHY = "hierarchyId";
+    public static final String ID_TENANT = "tenantId";
 
     public static final String API_GROUP_TOKEN_VERIFICATION = API_GROUPS_BASE_ROUTE + SEP + "*";
 
@@ -287,6 +290,9 @@ public final class Constants {
     // Group Hierarchy
     public static final String API_FETCH_GROUP_HIERARCHIES_ALL =
         API_REPORTS_BASE_ROUTE + GROUPS + SEP + "hierarchies/all";
+    public static final String API_ASSIGN_GROUP_HIERARCHIES = API_REPORTS_BASE_ROUTE + GROUPS + SEP
+        + "hierarchies" + SEP + COLON + ID_HIERARCHY + SEP + "tenant" + SEP + COLON + ID_TENANT;
+  
     
     private Route() {
       throw new AssertionError();
