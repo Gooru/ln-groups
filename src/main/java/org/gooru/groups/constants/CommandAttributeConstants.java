@@ -23,6 +23,8 @@ public class CommandAttributeConstants {
   public static final String YEAR = "year";
   public static final String SUBJECT = "subject";
   public static final String FRAMEWORK = "framework";
+  public static final String HIERARCHY_ID = "hierarchyId";
+  public static final String TENANT_ID_FROM_URL = "tenantId";
   
   public final static String FREQUENCY_WEEKLY = "weekly";
   public final static String FREQUENCY_MONTHLY = "monthly";
@@ -33,6 +35,7 @@ public class CommandAttributeConstants {
   public final static String GROUP_TYPE_BLOCK = "block";
   public final static String GROUP_TYPE_CLUSTER = "cluster";
   
+  // Used to read tenant details from session
   public final static String TENANT_ID = "tenant_id";
   public final static String TENANT_ROOT = "tenant_root";
 

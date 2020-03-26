@@ -1,6 +1,7 @@
 package org.gooru.groups.processors;
 
 import org.gooru.groups.constants.Constants;
+import org.gooru.groups.hierarchies.assign.AssignHierarchyProcessor;
 import org.gooru.groups.hierarchies.fetch.FetchGroupHierarchiesAllProcessor;
 import org.gooru.groups.reports.ca.ClassActivitiesCountProcessor;
 import org.gooru.groups.reports.classes.student.detailed.summary.ClassStudentDetailedSummaryProcessor;
@@ -84,6 +85,9 @@ public final class MessageProcessorBuilder {
       case Constants.Message.MSG_OP_HIERARCHIES_GROUP_ALL:
         return new FetchGroupHierarchiesAllProcessor(vertx, message);
 
+      case Constants.Message.MSG_OP_HIERARCHIES_GROUP_TENANT_ASSIGN:
+        return new AssignHierarchyProcessor(vertx, message);
+            
       default:
         return null;
     }
