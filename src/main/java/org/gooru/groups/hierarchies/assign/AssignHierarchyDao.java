@@ -21,4 +21,7 @@ public interface AssignHierarchyDao {
       + " DO UPDATE SET value = :hierarchyId")
   void insertOrupdateTenantHierarchy(
       @BindBean AssignHierarchyCommand.AssignHierarchyCommandBean bean);
+  
+  @SqlQuery("SELECT count(*) FROM tenant WHERE parent_tenant = :tenant::uuid")
+  Integer fetchSubtenantCount(@Bind("tenant") String tenant);
 }

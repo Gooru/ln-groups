@@ -44,18 +44,29 @@ public class AssignHierarchyProcessor implements MessageProcessor {
 
       // Verify that the given hierarchy present in database
       if (!ASSIGN_SERVICE.isHierarchyExists(bean.getHierarchyId())) {
-        LOGGER.warn("hierarchy '' not present in data store", bean.getHierarchyId());
+        LOGGER.warn("hierarchy '{}' not present in data store", bean.getHierarchyId());
         result.complete(MessageResponseFactory.createNotFoundResponse("hierarchy not found"));
         return this.result;
       }
 
       // Verify that the given tenant is present in database
       if (!ASSIGN_SERVICE.isTenantExists(bean.getTenant())) {
-        LOGGER.warn("tenant '' not present in data store", bean.getTenant());
+        LOGGER.warn("tenant '{}' not present in data store", bean.getTenant());
         result.complete(MessageResponseFactory.createNotFoundResponse("tenant not found"));
         return this.result;
       }
-      
+
+      // Fetch number of sub tenants of the tenant. If there are sub tenants present, we can not
+      // assign the hierarchy to parent tenant.
+      Integer count = ASSIGN_SERVICE.fetchSubtenantCount(bean.getTenant());
+      if (count != null && count > 0) {
+        LOGGER.warn("tenant '{}' has '{}' subtenants, hence we can't set hierarchy",
+            bean.getTenant(), count);
+        result.complete(MessageResponseFactory
+            .createInvalidRequestResponse("hierarchy can not be assigned to parent tenant"));
+        return result;
+      }
+
       // persist the hierarchy against the tenant
       ASSIGN_SERVICE.insertOrupdateTenantHierarchy(bean);
 
