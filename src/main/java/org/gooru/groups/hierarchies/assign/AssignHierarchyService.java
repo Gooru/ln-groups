@@ -21,6 +21,10 @@ public class AssignHierarchyService {
   public Boolean isTenantExists(String tenant) {
     return this.dao.isTenantExists(tenant);
   }
+  
+  public Integer fetchSubtenantCount(String tenant) {
+    return this.dao.fetchSubtenantCount(tenant);
+  }
 
   public void insertOrupdateTenantHierarchy(
       AssignHierarchyCommand.AssignHierarchyCommandBean bean) {
