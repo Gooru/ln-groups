@@ -36,7 +36,9 @@ public class CommandAttributeConstants {
   public final static String GROUP_TYPE_CLUSTER = "cluster";
   
   // Used to read tenant details from session
+  public final static String USER_ID = "user_id";
   public final static String TENANT_ID = "tenant_id";
   public final static String TENANT_ROOT = "tenant_root";
+  public final static String USER_ANONYMOUS = "anonymous";
 
 }

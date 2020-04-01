@@ -28,6 +28,8 @@ public class RouteGroupHierarchyConfigurator implements RouteConfigurator {
 
     router.get(Constants.Route.API_FETCH_GROUP_HIERARCHIES_ALL)
         .handler(this::fetchAllGroupHierarhies);
+    router.get(Constants.Route.API_FETCH_GROUP_HIERARCHIES_USER)
+        .handler(this::fetchUserGroupHierarchies);
 
     router.put(Constants.Route.API_ASSIGN_GROUP_HIERARCHIES).handler(this::assignGroupHierarchy);
   }
@@ -35,6 +37,12 @@ public class RouteGroupHierarchyConfigurator implements RouteConfigurator {
   private void fetchAllGroupHierarhies(RoutingContext routingContext) {
     RouteHandlerUtils.baseHandler(this.eb, routingContext,
         Constants.Message.MSG_OP_HIERARCHIES_GROUP_ALL, Constants.EventBus.MBEP_DISPATCHER,
+        this.mbusTimeout, LOGGER);
+  }
+
+  private void fetchUserGroupHierarchies(RoutingContext routingContext) {
+    RouteHandlerUtils.baseHandler(this.eb, routingContext,
+        Constants.Message.MSG_OP_HIERARCHIES_GROUP_USER, Constants.EventBus.MBEP_DISPATCHER,
         this.mbusTimeout, LOGGER);
   }
 
