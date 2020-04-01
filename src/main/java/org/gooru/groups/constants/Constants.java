@@ -123,6 +123,7 @@ public final class Constants {
 
     // Group Hierarchies API
     public static final String MSG_OP_HIERARCHIES_GROUP_ALL = "mb.op.group.hierarchies.all.fetch";
+    public static final String MSG_OP_HIERARCHIES_GROUP_USER = "mb.op.group.hierarchies.user.fetch";
     public static final String MSG_OP_HIERARCHIES_GROUP_TENANT_ASSIGN = "mb.op.group.hierarchies.tenant.assign";
     
     private Message() {
@@ -290,6 +291,8 @@ public final class Constants {
     // Group Hierarchy
     public static final String API_FETCH_GROUP_HIERARCHIES_ALL =
         API_REPORTS_BASE_ROUTE + GROUPS + SEP + "hierarchies/all";
+    public static final String API_FETCH_GROUP_HIERARCHIES_USER =
+        API_REPORTS_BASE_ROUTE + GROUPS + SEP + "hierarchies/user";
     public static final String API_ASSIGN_GROUP_HIERARCHIES = API_REPORTS_BASE_ROUTE + GROUPS + SEP
         + "hierarchies" + SEP + COLON + ID_HIERARCHY + SEP + "tenant" + SEP + COLON + ID_TENANT;
   
