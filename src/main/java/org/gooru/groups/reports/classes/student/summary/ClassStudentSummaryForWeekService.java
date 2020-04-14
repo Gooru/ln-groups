@@ -51,7 +51,13 @@ public class ClassStudentSummaryForWeekService {
           RESOURCE_BUNDLE.getString("class.unavailable"));
     }
 
-    List<ClassMembersModel> classMembers = this.coreService.fetchClassMembers(bean.getClassId());
+    List<ClassMembersModel> classMembers = null;
+    if (bean.getUserId() != null) {
+      classMembers =
+          this.coreService.fetchClassMembersByMemberId(bean.getClassId(), bean.getUserId());
+    } else {
+      classMembers = this.coreService.fetchClassMembers(bean.getClassId());
+    }
     int memberCount = (classMembers != null && !classMembers.isEmpty()) ? classMembers.size() : 0;
     JsonObject classObject = fetchClassDetails(bean.getClassId(), classData, memberCount);
     responseObject.put(Constants.Response.CLASS, classObject);

@@ -46,6 +46,12 @@ public final class ClassStudentDetailedSummaryCommandBuilder {
           RESOURCE_BUNDLE.getString("invalid.classid.format"));
     }
 
+    if (command.getUserId() != null && !ValidatorUtils.isValidUUID(command.getUserId())) {
+      LOGGER.warn("invalid format of the user id");
+      throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+          RESOURCE_BUNDLE.getString("invalid.userid.format"));
+    }
+    
     if (command.getFromDate() != null && command.getToDate() != null) {
       if (!isValidFromAndToDate(command.getFromDate(), command.getToDate())) {
         LOGGER.warn("Invalid date range requested");
@@ -57,6 +63,7 @@ public final class ClassStudentDetailedSummaryCommandBuilder {
 
   private static ClassStudentDetailedSummaryCommand buildFromJson(JsonObject request) {
     String classId = request.getString("classId");
+    String userId = request.getString("userId");
     String fromDate = request.getString("fromDate");
     String toDate = request.getString("toDate");
 
@@ -77,7 +84,7 @@ public final class ClassStudentDetailedSummaryCommandBuilder {
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
           RESOURCE_BUNDLE.getString("invalid.date.format"));
     }
-    return new ClassStudentDetailedSummaryCommand(classId, fDate, tDate);
+    return new ClassStudentDetailedSummaryCommand(classId, userId, fDate, tDate);
   }
 
   private static Boolean isValidFromAndToDate(Date fromDate, Date toDate) {

@@ -45,6 +45,12 @@ public final class ClassStudentSummaryCommandBuilder {
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
           RESOURCE_BUNDLE.getString("invalid.classid.format"));
     }
+    
+    if (command.getUserId() != null && !ValidatorUtils.isValidUUID(command.getUserId())) {
+      LOGGER.warn("invalid format of the user id");
+      throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+          RESOURCE_BUNDLE.getString("invalid.userid.format"));
+    }
 
     if (command.getFromDate() != null && command.getToDate() != null) {
       if (!isValidFromAndToDate(command.getFromDate(), command.getToDate())) {
@@ -63,6 +69,7 @@ public final class ClassStudentSummaryCommandBuilder {
 
   private static ClassStudentSummaryCommand buildFromJson(JsonObject request) {
     String classId = request.getString("classId");
+    String userId = request.getString("userId");
     String dateTill = request.getString("dateTill");
     String fromDate = request.getString("fromDate");
     String toDate = request.getString("toDate");
@@ -97,7 +104,7 @@ public final class ClassStudentSummaryCommandBuilder {
     if (tillDate != null && !isValidDate(tillDate)) {
       tillDate = Calendar.getInstance().getTime();
     }
-    return new ClassStudentSummaryCommand(classId, fDate, tDate, tillDate, subjectCode,
+    return new ClassStudentSummaryCommand(classId, userId, fDate, tDate, tillDate, subjectCode,
         skylineSummary);
   }
 

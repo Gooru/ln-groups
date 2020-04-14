@@ -9,12 +9,14 @@ import java.util.Date;
 public class ClassStudentDetailedSummaryCommand {
 
   private String classId;
+  private String userId;
   private Date fromDate;
   private Date toDate;
 
-  public ClassStudentDetailedSummaryCommand(String classId, Date fromDate, Date toDate) {
+  public ClassStudentDetailedSummaryCommand(String classId, String userId, Date fromDate, Date toDate) {
     super();
     this.classId = classId;
+    this.userId = userId;
     this.fromDate = fromDate;
     this.toDate = toDate;
   }
@@ -29,5 +31,9 @@ public class ClassStudentDetailedSummaryCommand {
 
   public Date getToDate() {
     return toDate;
+  }
+  
+  public String getUserId() {
+    return userId;
   }
 }
