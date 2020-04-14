@@ -86,6 +86,10 @@ public class CoreService {
   public List<ClassMembersModel> fetchClassMembers(String classId) {
     return this.classMembersDao.fetchClassMembers(classId);
   }
+  
+  public List<ClassMembersModel> fetchClassMembersByMemberId(String classId, String userId) {
+    return this.classMembersDao.fetchClassMembersByMemberId(classId, userId);
+  }
 
   public UserModel fetchUser(String userId) {
     return this.userDao.fetchUser(userId);
