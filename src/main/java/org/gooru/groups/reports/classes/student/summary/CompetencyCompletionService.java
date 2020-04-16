@@ -1,6 +1,7 @@
 package org.gooru.groups.reports.classes.student.summary;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,8 +63,20 @@ public class CompetencyCompletionService {
 
       // since we are taking in class competency completion from evidence table, here we are
       // excluding inprogress competencies which are already completed.
-      inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
+      inprogressCompetencyList = removeUnwantedSetFromInputCompList(masteredCompetencyList,
           completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
+      
+      // here we are excluding inferred competencies which are already inferred in another period.
+      Date tillDate = getPreviousDateOfGivenDate(bean.getFromDate());
+      JsonObject skylineDataTillFromDate = new JsonObject();
+      generateAllTimeCompetencyStatsInClass(bean, userId, skylineDataTillFromDate, tillDate);
+      JsonArray inferredCompetencyListOfSkylineTillFromDate = new JsonArray();
+      inferredCompetencyListOfSkylineTillFromDate = skylineDataTillFromDate.getJsonArray(Constants.Response.INFERRED);
+      inferredCompetencyList = removeUnwantedSetFromInputCompList(inferredCompetencyListOfSkylineTillFromDate,
+          null, null, inferredCompetencyList);
+      // here we are excluding completed competencies which are already mastered.
+      completedCompetencyList = removeUnwantedSetFromInputCompList(masteredCompetencyList,
+          null, null, completedCompetencyList);
     }
 
     weekData.put(Constants.Response.MASTERED, masteredCompetencyList)
@@ -96,8 +109,11 @@ public class CompetencyCompletionService {
       computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered, false);
       // since we are taking in class competency completion from evidence table, here we are
       // excluding inprogress competencies which are already completed.
-      inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
+      inprogressCompetencyList = removeUnwantedSetFromInputCompList(masteredCompetencyList,
           completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
+      // here we are excluding completed competencies which are already mastered.
+      completedCompetencyList = removeUnwantedSetFromInputCompList(masteredCompetencyList,
+          null, null, completedCompetencyList);
     }
 
     allTimeData.put(Constants.Response.MASTERED, masteredCompetencyList)
@@ -122,12 +138,29 @@ public class CompetencyCompletionService {
         classSummaryMasterydao.fetchUserSkylineInWeek(userId, bean.getTxSubjectCode(),
             bean.getFromDate(), bean.getToDate());
     if (!userCompetencyCompletionModels.isEmpty() && !userSkylineModels.isEmpty()) {
+      // generate unique competencies of completed, mastered and inprogress status.
       List<CompetencyStatusModel> completedOrMastered =
           segregateCompetencyCompletionStatus(masteredCompetencyList, inprogressCompetencyList,
               completedCompetencyList, userCompetencyCompletionModels);
+      // compute inferred competencies
       computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered, true);
-      inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
+      
+      // here we are excluding inprogress competencies which are already completed.
+      inprogressCompetencyList = removeUnwantedSetFromInputCompList(masteredCompetencyList,
           completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
+      
+      // here we are excluding inferred competencies which are already inferred in another period.
+      Date tillDate = getPreviousDateOfGivenDate(bean.getFromDate());
+      JsonObject skylineDataTillFromDate = new JsonObject();
+      generateAllTimeCompetencyStatsInSkyline(bean, userId, skylineDataTillFromDate, tillDate);
+      JsonArray inferredCompetencyListOfSkylineTillFromDate = new JsonArray();
+      inferredCompetencyListOfSkylineTillFromDate = skylineDataTillFromDate.getJsonArray(Constants.Response.INFERRED);
+      inferredCompetencyList = removeUnwantedSetFromInputCompList(inferredCompetencyListOfSkylineTillFromDate,
+          null, null, inferredCompetencyList);
+      
+      // here we are excluding completed competencies which are already mastered.
+      completedCompetencyList = removeUnwantedSetFromInputCompList(masteredCompetencyList,
+          null, null, completedCompetencyList);
     }
 
     weekData.put(Constants.Response.MASTERED, masteredCompetencyList)
@@ -148,12 +181,20 @@ public class CompetencyCompletionService {
     List<CompetencyStatusModel> userSkylineModels =
         classSummaryMasterydao.fetchUserSkyline(userId, bean.getTxSubjectCode());
     if (!userSkylineModels.isEmpty() && !userSkylineModels.isEmpty()) {
+      // generate unique competencies of completed, mastered and inprogress status.
       List<CompetencyStatusModel> completedOrMastered =
           segregateCompetencyCompletionStatus(masteredCompetencyList, inprogressCompetencyList,
               completedCompetencyList, userSkylineModels);
+      // compute inferred competencies
       computeInferred(inferredCompetencyList, userSkylineModels, completedOrMastered, false);
-      inprogressCompetencyList = removeCompletedFromInprogressList(masteredCompetencyList,
+      
+      // here we are excluding inprogress competencies which are already mastered.
+      inprogressCompetencyList = removeUnwantedSetFromInputCompList(masteredCompetencyList,
           completedCompetencyList, inferredCompetencyList, inprogressCompetencyList);
+      
+      // here we are excluding completed competencies which are already mastered.
+      completedCompetencyList = removeUnwantedSetFromInputCompList(masteredCompetencyList,
+          null, null, completedCompetencyList);
     }
 
     allTimeData.put(Constants.Response.MASTERED, masteredCompetencyList)
@@ -241,13 +282,16 @@ public class CompetencyCompletionService {
     return completedCompetencyMap;
   }
 
-  private JsonArray removeCompletedFromInprogressList(JsonArray masteredCompetencyList,
+  private JsonArray removeUnwantedSetFromInputCompList(JsonArray masteredCompetencyList,
       JsonArray completedCompetencyList, JsonArray inferredCompetencyList,
-      JsonArray inprogressCompetencyList) {
+      JsonArray inputCompetencyList) {
     JsonArray masteredOrCompletedList = new JsonArray();
-    masteredOrCompletedList.addAll(masteredCompetencyList);
-    masteredOrCompletedList.addAll(completedCompetencyList);
-    masteredOrCompletedList.addAll(inferredCompetencyList);
+    if (masteredCompetencyList != null && !masteredCompetencyList.isEmpty())
+      masteredOrCompletedList.addAll(masteredCompetencyList);
+    if (completedCompetencyList != null && !completedCompetencyList.isEmpty())
+      masteredOrCompletedList.addAll(completedCompetencyList);
+    if (inferredCompetencyList != null && !inferredCompetencyList.isEmpty())
+      masteredOrCompletedList.addAll(inferredCompetencyList);
 
     Set<String> completedOrMasteredCompetencySet = new HashSet<>();
     masteredOrCompletedList.forEach(completedCompetencyObj -> {
@@ -255,20 +299,20 @@ public class CompetencyCompletionService {
       completedOrMasteredCompetencySet.add(completedCompetency.getString(Constants.Response.ID));
     });
 
-    Set<String> inprogressCompetencySet = new HashSet<>();
-    JsonArray inprogressCompetencyOpList = new JsonArray();
-    inprogressCompetencyList.forEach(inprogressCompetencyObj -> {
-      JsonObject inprogressCompetency = (JsonObject) inprogressCompetencyObj;
+    Set<String> finalCompetencySet = new HashSet<>();
+    JsonArray finalCompetencyOpList = new JsonArray();
+    inputCompetencyList.forEach(inputCompetencyObj -> {
+      JsonObject inputCompetency = (JsonObject) inputCompetencyObj;
       if (!completedOrMasteredCompetencySet
-          .contains(inprogressCompetency.getString(Constants.Response.ID))
-          && !inprogressCompetencySet
-              .contains(inprogressCompetency.getString(Constants.Response.ID))) {
-        inprogressCompetencyOpList.add(inprogressCompetency);
-        inprogressCompetencySet.add(inprogressCompetency.getString(Constants.Response.ID));
+          .contains(inputCompetency.getString(Constants.Response.ID))
+          && !finalCompetencySet
+              .contains(inputCompetency.getString(Constants.Response.ID))) {
+        finalCompetencyOpList.add(inputCompetency);
+        finalCompetencySet.add(inputCompetency.getString(Constants.Response.ID));
       }
     });
-    inprogressCompetencyList = inprogressCompetencyOpList;
-    return inprogressCompetencyList;
+    inputCompetencyList = finalCompetencyOpList;
+    return inputCompetencyList;
   }
 
   private JsonArray removeInferredCompetenciesCompletedInAnotherPeriod(
@@ -317,6 +361,13 @@ public class CompetencyCompletionService {
       competencyListToAdd.add(competencies);
     }
   }
-
+  
+  private Date getPreviousDateOfGivenDate(Date date) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(date);
+    calendar.add(Calendar.DATE,-1);
+    Date fromDate = new Date(calendar.getTimeInMillis());
+    return fromDate;
+  }
 
 }
