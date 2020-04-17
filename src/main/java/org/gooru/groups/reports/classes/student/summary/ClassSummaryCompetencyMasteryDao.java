@@ -46,7 +46,7 @@ public interface ClassSummaryCompetencyMasteryDao {
       @Bind("toDate") Date toDate);
 
   @Mapper(CompetencyStatusModelMapper.class)
-  @SqlQuery("select distinct(cm.tx_comp_code), cm.tx_domain_code, cm.tx_comp_code, cm.tx_comp_name, cm.tx_comp_desc, cm.tx_comp_student_desc, cm.tx_comp_seq, cm.tx_comp_display_code, "
+  @SqlQuery("select distinct(cm.tx_comp_code) as tx_comp_code, cm.tx_domain_code, cm.tx_comp_name, cm.tx_comp_desc, cm.tx_comp_student_desc, cm.tx_comp_seq, cm.tx_comp_display_code, "
       + " (SELECT DISTINCT ON (lpcs.gut_code) FIRST_VALUE(lpcs.status) OVER (PARTITION BY lpcs.gut_code ORDER BY lpcs.updated_at desc) "
       + " FROM learner_profile_competency_status_ts lpcs where lpcs.user_id = :userId and lpcs.gut_code = ucm.gut_code and cast(lpcs.updated_at as date) <= :toDate)"
       + " as status from domain_competency_matrix cm left join learner_profile_competency_status_ts"
