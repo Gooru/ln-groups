@@ -9,15 +9,17 @@ import java.util.Date;
 public class ClassStudentSummaryCommand {
 
   private String classId;
+  private String userId;
   private Date fromDate;
   private Date toDate;
   private Date dateTill;
   private String subjectCode;
   private Boolean skylineSummary;
 
-  public ClassStudentSummaryCommand(String classId, Date fromDate, Date toDate, Date dateTill, String subjectCode, Boolean skylineSummary) {
+  public ClassStudentSummaryCommand(String classId, String userId, Date fromDate, Date toDate, Date dateTill, String subjectCode, Boolean skylineSummary) {
     super();
     this.classId = classId;
+    this.userId = userId;
     this.dateTill = dateTill;
     this.fromDate = fromDate;
     this.toDate = toDate;
@@ -41,12 +43,15 @@ public class ClassStudentSummaryCommand {
     return toDate;
   }
   
-
   public Boolean getSkylineSummary() {
     return skylineSummary;
   }
 
   public String getSubjectCode() {
     return subjectCode;
+  }
+
+  public String getUserId() {
+    return userId;
   }
 }

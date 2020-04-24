@@ -48,6 +48,12 @@ public final class ClassStudentSummaryForWeekCommandBuilder {
           RESOURCE_BUNDLE.getString("invalid.classid.format"));
     }
     
+    if (command.getUserId() != null && !ValidatorUtils.isValidUUID(command.getUserId())) {
+      LOGGER.warn("invalid format of the user id");
+      throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
+          RESOURCE_BUNDLE.getString("invalid.userid.format"));
+    }
+    
     if (command.getSubjectCode() == null || command.getSubjectCode().isEmpty()) {
       LOGGER.warn("Subject code not provided in request");
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
@@ -74,6 +80,7 @@ public final class ClassStudentSummaryForWeekCommandBuilder {
 
   private static ClassStudentSummaryCommand buildFromJson(JsonObject request) {
     String classId = request.getString("classId");
+    String userId = request.getString("userId");
     String fromDate = request.getString("fromDate");
     String toDate = request.getString("toDate");
     String subjectCode = request.getString("subjectCode");
@@ -96,7 +103,7 @@ public final class ClassStudentSummaryForWeekCommandBuilder {
       throw new HttpResponseWrapperException(HttpStatus.BAD_REQUEST,
           RESOURCE_BUNDLE.getString("invalid.date.format"));
     }
-    return new ClassStudentSummaryCommand(classId, fDate, tDate, null, subjectCode,
+    return new ClassStudentSummaryCommand(classId, userId, fDate, tDate, null, subjectCode,
         skylineSummary);
   }
 

@@ -9,11 +9,13 @@ import java.util.Date;
 public class ClassStudentDetailedSummaryBean {
 
   private String classId;
+  private String userId;
   private Date fromDate;
   private Date toDate;
 
   public ClassStudentDetailedSummaryBean(ClassStudentDetailedSummaryCommand command) {
     this.classId = command.getClassId();
+    this.userId = command.getUserId();
     this.fromDate = command.getFromDate();
     this.toDate = command.getToDate();
   }
@@ -42,4 +44,11 @@ public class ClassStudentDetailedSummaryBean {
     this.toDate = toDate;
   }
 
+  public String getUserId() {
+    return userId;
+  }
+
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
 }
