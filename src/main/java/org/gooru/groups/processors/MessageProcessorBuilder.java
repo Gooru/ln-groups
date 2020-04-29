@@ -10,9 +10,10 @@ import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryRepor
 import org.gooru.groups.reports.classes.student.summary.ClassStudentSummaryForWeekReportProcessor;
 import org.gooru.groups.reports.classes.summary.ClassSummaryReportProcessor;
 import org.gooru.groups.reports.competency.country.GroupCompetencyReportByCountryProcessor;
-import org.gooru.groups.reports.competency.drilldown.GroupReportProcessor;
+import org.gooru.groups.reports.competency.drilldownreport.GroupCompetencyDrilldownReportProcessor;
 import org.gooru.groups.reports.competency.fetchcountries.FetchCountriesForReportProcessor;
 import org.gooru.groups.reports.competency.group.GroupCompetencyReportByGroupProcessor;
+import org.gooru.groups.reports.competency.initialreport.GroupCompetencyInitialReportProcessor;
 import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolProcessor;
 import org.gooru.groups.reports.competency.state.GroupCompetencyReportByStateProcessor;
 import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryProcessor;
@@ -81,7 +82,10 @@ public final class MessageProcessorBuilder {
         return new GroupCompetencyReportBySchoolProcessor(vertx, message);
 
       case Constants.Message.MSG_OP_REPORTS_GROUPS:
-        return new GroupReportProcessor(vertx, message);
+        return new GroupCompetencyInitialReportProcessor(vertx, message);
+        
+      case Constants.Message.MSG_OP_REPORTS_GROUPS_COMPETENCY:
+        return new GroupCompetencyDrilldownReportProcessor(vertx, message);
         
       case Constants.Message.MSG_OP_HIERARCHIES_GROUP_ALL:
         return new FetchGroupHierarchiesAllProcessor(vertx, message);

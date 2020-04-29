@@ -3,6 +3,7 @@ package org.gooru.groups.reports.dbhelpers.core;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.postgresql.util.PSQLException;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
@@ -18,7 +19,13 @@ public class GroupModelMapper implements ResultSetMapper<GroupModel> {
     model.setName(r.getString("name"));
     model.setCode(r.getString("code"));
     model.setType(r.getString("type"));
-    model.setSubType(r.getString("sub_type"));
+    try {
+      String subType = r.getString("sub_type");
+      model.setSubType((subType != null && !subType.isEmpty()) ? subType : null);
+    } catch (PSQLException pse) {
+      // We do not need to do anything here because the query may not always have the sub type
+      // column
+    }
     return model;
   }
 

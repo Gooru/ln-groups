@@ -51,4 +51,10 @@ public class GroupModel {
     this.subType = subType;
   }
 
+  @Override
+  public String toString() {
+    return "GroupModel [id=" + id + ", name=" + name + ", code=" + code + ", type=" + type
+        + ", subType=" + subType + "]";
+  }
+
 }

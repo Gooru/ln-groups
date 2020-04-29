@@ -14,7 +14,7 @@
 			"username": "dsuser",
 			"password": "dspass",
 			"autoCommit": false,
-			"jdbcUrl": "jdbc:postgresql://localhost:5433/dsdb",
+			"jdbcUrl": "jdbc:postgresql://localhost:5432/dsdb",
 			"maximumPoolSize": 5
 		},
 		"analyticsDataSource": {

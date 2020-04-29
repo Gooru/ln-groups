@@ -55,5 +55,10 @@ public class GroupHierarchyDetailsModel {
     this.sequence = sequence;
   }
 
+  @Override
+  public String toString() {
+    return "GroupHierarchyDetailsModel [id=" + id + ", name=" + name + ", type=" + type
+        + ", hierarchyId=" + hierarchyId + ", sequence=" + sequence + "]";
+  }
 
 }

@@ -65,4 +65,9 @@ public interface CoreDao {
   
   @SqlQuery("SELECT id FROM tenant WHERE parent_tenant = :parentTenant::uuid")
   Set<String> fetchSubTenants(@Bind("parentTenant") String parentTenant);
+  
+  // Flexible Groups Queries
+  @Mapper(GroupModelMapper.class)
+  @SqlQuery("SELECT id, name, code, type FROM flexible_groups WHERE id = ANY(:groupIds::bigint[])")
+  List<GroupModel> fetchFlexibleGroupDetails(@Bind("groupIds") String groupIds);
 }

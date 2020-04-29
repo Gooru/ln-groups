@@ -16,8 +16,10 @@ public class GroupACLModelMapper implements ResultSetMapper<GroupACLModel> {
   @Override
   public GroupACLModel map(int index, ResultSet r, StatementContext ctx) throws SQLException {
     GroupACLModel model = new GroupACLModel();
+    model.setId(r.getLong("id"));
     model.setType(r.getString("type"));
-
+    model.setParentRefId(r.getLong("parent_reference_id"));
+    
     String groupsStr = r.getString("groups");
     if (groupsStr != null && !groupsStr.isEmpty()) {
       try {
