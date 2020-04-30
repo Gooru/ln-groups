@@ -66,7 +66,7 @@ public class GroupCompetencyDrilldownReportProcessor implements MessageProcessor
       // If there is no ACL found then return 403.
       String userId = ebMessage.getUserId().get().toString();
 
-      GroupACLResolver aclResolver = new GroupACLResolver(userId, bean.getHierarchyId());
+      GroupACLResolver aclResolver = new GroupACLResolver(userId, bean.getHierarchyId(), bean.getTenants());
       aclResolver.initUsersAllGroupACLs();
       aclResolver.verifyIfGroupIsAccessible(bean.getGroupId(), bean.getGroupType());
 

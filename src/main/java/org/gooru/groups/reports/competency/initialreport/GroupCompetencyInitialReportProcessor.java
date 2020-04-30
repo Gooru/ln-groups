@@ -65,15 +65,12 @@ public class GroupCompetencyInitialReportProcessor implements MessageProcessor {
       Node<GroupHierarchyDetailsModel> groupHierarchy =
           this.GROUP_HIERARCHY_SERVICE.fetchGroupHierarchyDetails(command.getHierarchyId());
 
-      // TODO: IF the user has only one node access in the ACL, then skip those nodes and report the
-      // data only for the level for which user has multiple nodes access.
-
       // Fetch all group ACL of the user as the purpose if this API is to return the first level in
       // the hierarchy for which user has access to. It may not be root always. User's access may
       // start at any level in the group hierarchy.
       // If there is no ACL found then return 403.
       String userId = ebMessage.getUserId().get().toString();
-      GroupACLResolver aclResolver = new GroupACLResolver(userId, bean.getHierarchyId());
+      GroupACLResolver aclResolver = new GroupACLResolver(userId, bean.getHierarchyId(), bean.getTenants());
       aclResolver.initFiltereGroupACLs();
       
       // This is the root level based on the user group ACL for which we need to report the data.
