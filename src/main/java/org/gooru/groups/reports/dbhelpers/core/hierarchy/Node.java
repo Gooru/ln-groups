@@ -48,6 +48,9 @@ public class Node<T> {
     return parent.getRoot();
    }
   
+  public boolean isRoot() {
+    return (parent == null) ? true : false;
+  }
   
   public Node<T> getLeaf() {
     Node<T> child = this.getChild();
@@ -56,5 +59,9 @@ public class Node<T> {
     } 
     
     return child.getLeaf();
+  }
+  
+  public boolean isLeaf() {
+    return (child == null) ? true : false;
   }
 }

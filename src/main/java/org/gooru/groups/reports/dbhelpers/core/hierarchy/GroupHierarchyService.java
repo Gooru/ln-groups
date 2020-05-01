@@ -2,6 +2,8 @@ package org.gooru.groups.reports.dbhelpers.core.hierarchy;
 
 import java.util.List;
 import org.skife.jdbi.v2.DBI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author szgooru
@@ -9,19 +11,12 @@ import org.skife.jdbi.v2.DBI;
  */
 public class GroupHierarchyService {
   
+  private final static Logger LOGGER = LoggerFactory.getLogger(GroupHierarchyService.class);
+  
   private final GroupHierarchyDao dao;
 
   public GroupHierarchyService(DBI dbi) {
     this.dao = dbi.onDemand(GroupHierarchyDao.class);
-  }
-
-  public Long fetchGroupHierarchyByTenant(String tenant) {
-    String strGroupHierarchyId = this.dao.fetchHierarchyByTenant(tenant);
-    try {
-      return Long.parseLong(strGroupHierarchyId);
-    } catch (NumberFormatException nfe) {
-      return null;
-    }
   }
   
   @SuppressWarnings({"unchecked", "rawtypes"})
@@ -30,6 +25,7 @@ public class GroupHierarchyService {
     Node<GroupHierarchyDetailsModel> parent = null;
     Node<GroupHierarchyDetailsModel> prevNode = null;
     for (GroupHierarchyDetailsModel level : groupHierarchy) {
+      LOGGER.debug("{}", level.toString());
       if (parent == null) {
         parent = new Node(level);
         prevNode = parent;

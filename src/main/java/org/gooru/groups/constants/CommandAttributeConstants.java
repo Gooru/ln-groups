@@ -14,6 +14,7 @@ public class CommandAttributeConstants {
   }
 
   public static final String GROUP_ID = "groupId";
+  public static final String GROUP_TYPE = "groupType";
   public static final String STATE_ID = "stateId";
   public static final String COUNTRY_ID = "countryId";
   public static final String SCHOOL_ID = "schoolId";
@@ -24,6 +25,7 @@ public class CommandAttributeConstants {
   public static final String SUBJECT = "subject";
   public static final String FRAMEWORK = "framework";
   public static final String HIERARCHY_ID = "hierarchyId";
+  public static final String TENANTS = "tenants";
   public static final String TENANT_ID_FROM_URL = "tenantId";
   
   public final static String FREQUENCY_WEEKLY = "weekly";

@@ -213,4 +213,15 @@ public class CoreService {
     tenants.add(tenantId);
     return tenants;
   }
+  
+  public Map<Long, GroupModel> fetchFlexibleGroupDetails(Set<Long> groupIds) {
+    Map<Long, GroupModel> groupModelMap = new HashMap<>();
+    List<GroupModel> groupModels =
+        this.coreDao.fetchFlexibleGroupDetails(CollectionUtils.toPostgresArrayLong(groupIds));
+    groupModels.forEach(group -> {
+      groupModelMap.put(group.getId(), group);
+    });
+
+    return groupModelMap;
+  }
 }
