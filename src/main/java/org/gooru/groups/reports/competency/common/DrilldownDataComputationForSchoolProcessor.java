@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import org.gooru.groups.app.jdbi.DBICreator;
 import org.gooru.groups.app.jdbi.PGArray;
+import org.gooru.groups.reports.dbhelpers.core.ClassModel;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.reports.dbhelpers.core.GroupModel;
 import org.gooru.groups.reports.dbhelpers.core.groupacl.GroupACLResolver;
@@ -20,34 +21,23 @@ import org.slf4j.LoggerFactory;
  * @author szgooru on 29-Apr-2020
  *
  */
-public class DrilldownDataComputationProcessor {
+public class DrilldownDataComputationForSchoolProcessor {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(DrilldownDataComputationProcessor.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(DrilldownDataComputationForSchoolProcessor.class);
   
   private final GroupReportService REPORT_SERVICE =
       new GroupReportService(DBICreator.getDbiForDsdbDS());
 
   private final CoreService CORE_SERVICE = new CoreService(DBICreator.getDbiForDefaultDS());
 
-  public DataModel processDrilldownComputation(
-      Long groupId, String groupType, Integer month, Integer year, PGArray<String> tenants,
+  public DataModelForClass processDrilldownComputationForClasses(Long groupId, String groupType, Integer month, Integer year, PGArray<String> tenants,
       GroupACLResolver aclResolver, Node<GroupHierarchyDetailsModel> groupHierarchy) {
-    
-    Set<Long> childNodes = aclResolver.getChildNodes(groupId);
-    LOGGER.debug("{} child nodes for the group {}", childNodes.size(), groupId);
     
     // Fetch the group details from the actual group definition table
     Set<Long> groupIds = new HashSet<>();
-    groupIds.addAll(childNodes);
     groupIds.add(groupId);
     Map<Long, GroupModel> groupModels = this.CORE_SERVICE.fetchFlexibleGroupDetails(groupIds);
     
-    if (childNodes == null || childNodes.isEmpty()) {
-      LOGGER.debug("seems that user for group {} of type {} does not have any child",
-          groupId, groupType);
-      return prepareEmptyDataModel(groupModels.get(groupId));
-    }
-
     // classesByGroups
     Map<Long, Set<String>> classesByGroups = aclResolver.getClassesByGroupACL(groupHierarchy);
 
@@ -57,53 +47,47 @@ public class DrilldownDataComputationProcessor {
           groupId, groupType);
       return prepareEmptyDataModel(groupModels.get(groupId));
     }
-
+    
+    Map<String, ClassModel> classModels = this.CORE_SERVICE.fetchClassesByGroup(groupId);
+    
     // Fetch the competency report for all the classes we resolved above using the user acl. This
     // will return the data for all the classes without grouping them by the specific parent in
     // which the classes fall under.
     Map<String, List<GroupReportModel>> classReport =
         this.REPORT_SERVICE.fetchCompetencyReportByMonthYear(classes, tenants, month, year);
-
+    
     Map<Integer, WeekDataModel> weeklyDataModels = prepareWeeeklyDataReport(classReport);
 
-    Map<Long, AggregatedDataGroupReportModel> drilldownDataModels = new HashMap<>();
-    for (Long childId : childNodes) {
+    Map<String, AggregatedDataGroupReportForClassModel> drilldownDataModels = new HashMap<>();
+    for (String classId : classes) {
       Long completedCompetencies = 0l;
       Long inferredCompetencies = 0l;
       Long inprogressCompetencies = 0l;
       Long notstartedCompetencies = 0l;
-      LOGGER.debug("aggregating data for node {}", childId);
-      Set<String> groupClasses = classesByGroups.get(childId);
-      if (groupClasses != null && !groupClasses.isEmpty()) {
-        for (String id : groupClasses) {
-          List<GroupReportModel> classModels = classReport.get(id);
-          if (classModels != null) {
-            for (GroupReportModel classModel : classModels) {
-              completedCompetencies = completedCompetencies + classModel.getCompletedCompetencies();
-              inferredCompetencies = inferredCompetencies + classModel.getInferredCompetencies();
-              inprogressCompetencies =
-                  inprogressCompetencies + classModel.getInprogressCompetencies();
-              notstartedCompetencies =
-                  notstartedCompetencies + classModel.getNotstartedCompetencies();
-            } 
-          } else {
-            LOGGER.debug("No data present for the class '{}'", id);
-          }
-        }
+      
+      List<GroupReportModel> classDataModels = classReport.get(classId);
+
+      for (GroupReportModel classDataModel : classDataModels) {
+        completedCompetencies = completedCompetencies + classDataModel.getCompletedCompetencies();
+        inferredCompetencies = inferredCompetencies + classDataModel.getInferredCompetencies();
+        inprogressCompetencies =
+            inprogressCompetencies + classDataModel.getInprogressCompetencies();
+        notstartedCompetencies =
+            notstartedCompetencies + classDataModel.getNotstartedCompetencies();
       }
 
-      GroupModel groupModel = groupModels.get(childId);
+      ClassModel classModel = classModels.get(classId);
 
-      drilldownDataModels.put(childId,
-          prepareAggregatedDataReportModel(groupModel, completedCompetencies, inferredCompetencies,
+      drilldownDataModels.put(classId,
+          prepareAggregatedDataReportModelForClass(classModel, completedCompetencies, inferredCompetencies,
               inprogressCompetencies, notstartedCompetencies));
     }
 
-    return prepareDataModel(groupId, weeklyDataModels, drilldownDataModels, groupModels);
+    return prepareDataModel(groupId, weeklyDataModels, drilldownDataModels, groupModels.get(groupId));
   }
   
   private static OverallStatsModel prepareOverallStatsModel(
-      Map<Long, AggregatedDataGroupReportModel> drilldownDataModels) {
+      Map<String, AggregatedDataGroupReportForClassModel> drilldownDataModels) {
 
     if (drilldownDataModels == null || drilldownDataModels.isEmpty()) {
       return new OverallStatsModel();
@@ -115,8 +99,8 @@ public class DrilldownDataComputationProcessor {
     Long totalInprogressCompetencies = 0l;
     Long totalNotstartedCompetencies = 0l;
 
-    for (Long id : drilldownDataModels.keySet()) {
-      AggregatedDataGroupReportModel aggregatedDataModel = drilldownDataModels.get(id);
+    for (String id : drilldownDataModels.keySet()) {
+      AggregatedDataGroupReportForClassModel aggregatedDataModel = drilldownDataModels.get(id);
       totalCompletedCompetencies =
           totalCompletedCompetencies + aggregatedDataModel.getCompletedCompetencies();
       totalInferredCompetencies =
@@ -171,11 +155,10 @@ public class DrilldownDataComputationProcessor {
     return weeklyDataModels;
   }
   
-  private DataModel prepareDataModel(Long groupId, Map<Integer, WeekDataModel> weeklyDataModels,
-      Map<Long, AggregatedDataGroupReportModel> drilldownDataModels,
-      Map<Long, GroupModel> groupModels) {
-    DataModel dataModel = new DataModel();
-    GroupModel groupModel = groupModels.get(groupId);
+  private DataModelForClass prepareDataModel(Long groupId, Map<Integer, WeekDataModel> weeklyDataModels,
+      Map<String, AggregatedDataGroupReportForClassModel> drilldownDataModels,
+      GroupModel groupModel) {
+    DataModelForClass dataModel = new DataModelForClass();
     if (groupModel != null) {
       dataModel.setId(groupId);
       dataModel.setCode(groupModel.getCode());
@@ -185,33 +168,33 @@ public class DrilldownDataComputationProcessor {
     dataModel.setOverallStats(prepareOverallStatsModel(drilldownDataModels));
     dataModel.setCoordinates(new ArrayList<WeekDataModel>(weeklyDataModels.values()));
     dataModel
-        .setDrilldown(new ArrayList<AggregatedDataGroupReportModel>(drilldownDataModels.values()));
+        .setDrilldown(new ArrayList<AggregatedDataGroupReportForClassModel>(drilldownDataModels.values()));
     return dataModel;
   }
   
-  private AggregatedDataGroupReportModel prepareAggregatedDataReportModel(GroupModel groupModel,
+  private AggregatedDataGroupReportForClassModel prepareAggregatedDataReportModelForClass(ClassModel classModel,
       Long completedCompetencies, Long inferredCompetencies, Long inprogressCompetencies,
       Long notstartedCompetencies) {
-    AggregatedDataGroupReportModel dataModel = new AggregatedDataGroupReportModel();
-    dataModel.setGroupId(groupModel.getId());
-    dataModel.setName(groupModel.getName());
-    dataModel.setCode(groupModel.getCode());
-    dataModel.setType(groupModel.getType());
+    AggregatedDataGroupReportForClassModel dataModel = new AggregatedDataGroupReportForClassModel();
+    dataModel.setGroupId(classModel.getId());
+    dataModel.setName(classModel.getTitle());
+    dataModel.setCode(classModel.getCode());
+    dataModel.setType("class");
     dataModel.setCompletedCompetencies(completedCompetencies);
     dataModel.setInferredCompetencies(inferredCompetencies);
     dataModel.setInprogressCompetencies(inprogressCompetencies);
     dataModel.setNotstartedCompetencies(notstartedCompetencies);
     return dataModel;
   }
-  
-  private DataModel prepareEmptyDataModel(GroupModel groupModel) {
-    DataModel dataModel = new DataModel();
+
+  private DataModelForClass prepareEmptyDataModel(GroupModel groupModel) {
+    DataModelForClass dataModel = new DataModelForClass();
     dataModel.setId(groupModel.getId());
     dataModel.setCode(groupModel.getCode());
     dataModel.setName(groupModel.getName());
     dataModel.setType(groupModel.getType());
     dataModel.setCoordinates(new ArrayList<WeekDataModel>());
-    dataModel.setDrilldown(new ArrayList<AggregatedDataGroupReportModel>());
+    dataModel.setDrilldown(new ArrayList<AggregatedDataGroupReportForClassModel>());
     return dataModel;
   }
 }

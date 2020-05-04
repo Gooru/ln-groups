@@ -1,14 +1,13 @@
 CREATE TABLE group_user_acl (
 	id bigserial PRIMARY KEY,
 	user_id text NOT NULL,
-	type varchar(128) NOT NULL CHECK (type::varchar = ANY(ARRAY['school_district'::varchar, 'district'::varchar, 'block'::varchar, 'cluster'::varchar, 'school'::varchar, 'country'::varchar, 'state'::varchar])),
+	type varchar(128) NOT NULL CHECK (type::varchar = ANY(ARRAY['school_district'::varchar, 'district'::varchar, 'block'::varchar, 'cluster'::varchar, 'school'::varchar, 'country'::varchar, 'state'::varchar, 'class'::varchar])),
 	groups jsonb,
 	parent_reference_id bigint,
 	tenant text NOT NULL,
 	tenant_root text,
 	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-	UNIQUE (user_id, type)
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')
 );
 
 CREATE TABLE tenant_user_acl (
@@ -33,8 +32,45 @@ CREATE TABLE flexible_groups (
 	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')
 );
 
-INSERT INTO flexible_groups (name, code, type, parent_id, reference_id) SELECT name, code, 'country', null, null  FROM country_ds;
-INSERT INTO flexible_groups (name, code, type, parent_id, reference_id) SELECT name, code, 'state', country_id, null FROM state_ds;
+alter table group_hierarchy_details drop constraint group_hierarchy_details_type_check, add constraint group_hierarchy_details_type_check CHECK (type::character varying::text = ANY (ARRAY['school_district'::character varying, 'district'::character varying, 'block'::character varying, 'cluster'::character varying, 'school'::character varying, 'country'::character varying, 'state'::character varying, 'class'::character varying]::text[]));
+
+
+CREATE TABLE group_hierarchy_mapping (
+	group_id bigint NOT NULL REFERENCES flexible_groups(id),
+	hierarchy_id bigint NOT NULL REFERENCES group_hierarchy(id),
+	type varchar(128) NOT NULL CHECK (type::varchar = ANY(ARRAY['school_district'::varchar, 'district'::varchar, 'block'::varchar, 'cluster'::varchar, 'school'::varchar, 'country'::varchar, 'state'::varchar])),
+	parent_id bigint,
+	tenant text NOT NULL,
+	tenant_root text,
+	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	UNIQUE (group_id, hierarchy_id, type, tenant)
+);
+
+CREATE TABLE class_competency_base_reports_weekly (
+	id bigserial PRIMARY KEY,
+	class_id text NOT NULL,
+	completed_competencies bigint,
+	inferred_competencies bigint,
+	inprogress_competencies bigint,
+	notstarted_competencies bigint,
+	week int NOT NULL,
+	month int NOT NULL,
+	year int NOT NULL,
+	tenant text NOT NULL,
+	tenant_root text,
+	subject text NOT NULL,
+	framework text NOT NULL,
+	grade bigint NOT NULL,
+	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	UNIQUE (class_id, week, month, year)
+);
+
+
+
+INSERT INTO flexible_groups (name, code, type, parent_id, reference_id) SELECT name, code, 'country', null, null  FROM country_ds ORDER BY id ASC;
+INSERT INTO flexible_groups (name, code, type, parent_id, reference_id) SELECT name, code, 'state', country_id, null FROM state_ds ORDER BY id ASC;
 
 CREATE TABLE temp_state_map AS SELECT fg.id AS new_id, sd.id AS old_id, fg.name AS new_name, sd.name AS old_name FROM flexible_groups fg, state_ds sd WHERE fg.code = sd.code AND fg.type = 'state';
 
@@ -78,32 +114,34 @@ DROP TABLE temp_sd_map;
 DROP TABLE tmp_district_map;
 DROP TABLE tmp_block_map;
 DROP TABLE tmp_cluster_map;
+DROP TABLE temp_school_map;
 
-/* Gruops table migration */
-create table groups_backup as select * from groups;
-create table group_school_mapping_backup as select * from group_school_mapping;
+/* -- US -- */
 
-drop table group_school_mapping;
-drop table groups;
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'country', '[231]', null, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'state', '[2144]', 231, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'school_district', '[2472, 2598]', 2144, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'school', '[241246, 282374]', 2472  ,'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'school', '[285742, 313433]', 2598  ,'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'class', '["97f30f82-182f-41d3-959f-918fc1558d7f"]', 241246, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'class', '["b1fd7de3-ffa6-41ba-a88c-608a724a3cee"]', 282374, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'class', '["a78fc148-eb30-4c02-bf97-3651917ffa7f"]', 285742, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'class', '["23825966-25cc-439b-aa6a-5069f63bbac0"]', 313433, 'ba956a97-ae15-11e5-a302-f8a963065976');
 
-CREATE TABLE groups (
-	id bigserial PRIMARY KEY,
-	name text NOT NULL,
-	code text,
-	description text,
-	type varchar(128) NOT NULL CHECK (type::varchar = ANY(ARRAY['school_district'::varchar, 'district'::varchar, 'block'::varchar, 'cluster'::varchar, 'school'::varchar, 'country'::varchar, 'state'::varchar])),
-	parent_id bigint,
-	tenant text NOT NULL,
-	tenant_root text,
-	hierarchy_id bigint NOT NULL REFERENCES group_hierarchy(id),
-	creator_id text NOT NULL,	
-	modifier_id text NOT NULL,
-	reference_id text,
-	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')	
-);
 
-insert into group_hierarchy_mapping (group_id, hierarchy_id, type, parent_id, tenant, tenant_root) values (101, 1, 'country', null, '8f5b6520-0932-4c53-8be9-4b70f0119937', null);
+insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('97f30f82-182f-41d3-959f-918fc1558d7f', 50, 23, 12, 120, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 559);
+insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('b1fd7de3-ffa6-41ba-a88c-608a724a3cee', 34, 56, 12, 234, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('a78fc148-eb30-4c02-bf97-3651917ffa7f', 12, 65, 34, 123, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('23825966-25cc-439b-aa6a-5069f63bbac0', 56, 23, 23, 345, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 140);
+ 
+insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('97f30f82-182f-41d3-959f-918fc1558d7f', 50, 23, 12, 120, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 559);
+insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('b1fd7de3-ffa6-41ba-a88c-608a724a3cee', 34, 56, 12, 234, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('a78fc148-eb30-4c02-bf97-3651917ffa7f', 12, 65, 34, 123, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('23825966-25cc-439b-aa6a-5069f63bbac0', 56, 23, 23, 345, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 140);
+
+/* -- INDIA -- */
+ 
+ insert into group_hierarchy_mapping (group_id, hierarchy_id, type, parent_id, tenant, tenant_root) values (101, 1, 'country', null, '8f5b6520-0932-4c53-8be9-4b70f0119937', null);
 insert into group_hierarchy_mapping (group_id, hierarchy_id, type, parent_id, tenant, tenant_root) values (50, 1, 'state', 101, '8f5b6520-0932-4c53-8be9-4b70f0119937', null);
 insert into group_hierarchy_mapping (group_id, hierarchy_id, type, parent_id, tenant, tenant_root) select id, 1, sub_type, state_id, '8f5b6520-0932-4c53-8be9-4b70f0119937', null from groups where tenant = '8f5b6520-0932-4c53-8be9-4b70f0119937' and sub_type = 'district';
 insert into group_hierarchy_mapping (group_id, hierarchy_id, type, parent_id, tenant, tenant_root) select id, 1, sub_type, parent_id, '8f5b6520-0932-4c53-8be9-4b70f0119937', null from groups where tenant = '8f5b6520-0932-4c53-8be9-4b70f0119937' and sub_type = 'block';
@@ -111,24 +149,11 @@ insert into group_hierarchy_mapping (group_id, hierarchy_id, type, parent_id, te
 insert into group_hierarchy_mapping (group_id, hierarchy_id, type, parent_id, tenant, tenant_root) select school_id, 1, 'school', group_id, '8f5b6520-0932-4c53-8be9-4b70f0119937', null from group_school_mapping where group_id in (select id from groups where tenant = '8f5b6520-0932-4c53-8be9-4b70f0119937' and sub_type = 'cluster');
 
 
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('07cb9876-9c4b-4b25-9f8a-33f9d4d0a4a1', 'country', '[101]', null, '8f5b6520-0932-4c53-8be9-4b70f0119937');
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('07cb9876-9c4b-4b25-9f8a-33f9d4d0a4a1', 'state', '[50]', null, '8f5b6520-0932-4c53-8be9-4b70f0119937');
 
-CREATE TABLE group_user_acl (
-	id bigserial PRIMARY KEY,
-	user_id text NOT NULL,
-	type varchar(128) NOT NULL CHECK (type::varchar = ANY(ARRAY['school_district'::varchar, 'district'::varchar, 'block'::varchar, 'cluster'::varchar, 'school'::varchar, 'country'::varchar, 'state'::varchar, 'class'::varchar])),
-	groups jsonb,
-	parent_reference_id bigint,
-	tenant text NOT NULL,
-	tenant_root text,
-	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
-);
 
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('07cb9876-9c4b-4b25-9f8a-33f9d4d0a4a1', 'country', '[101]', null, '8f5b6520-0932-4c53-8be9-4b70f0119937');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'country', '[101]', null, 'ba956a97-ae15-11e5-a302-f8a963065976');
 
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('07cb9876-9c4b-4b25-9f8a-33f9d4d0a4a1', 'state', '[296]', 101, '8f5b6520-0932-4c53-8be9-4b70f0119937');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'state', '[296]', 101, 'ba956a97-ae15-11e5-a302-f8a963065976');
 
 insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('07cb9876-9c4b-4b25-9f8a-33f9d4d0a4a1', 'district', '[224525, 224526]', 296 , '8f5b6520-0932-4c53-8be9-4b70f0119937');
 
@@ -204,10 +229,10 @@ insert into group_hierarchy_details(name, type, hierarchy_id, sequence) values (
 
  
  
- insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('430401fa-8244-43b4-84d8-3ca585e76e3d', 50, 23, 12, 120, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
- insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('cd9c540f-1570-43ae-9b07-b76974f3aab1', 34, 56, 12, 234, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
- insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('c9cf7fa3-2227-4f85-a74e-c32ff7be82c6', 12, 65, 34, 123, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
- insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('e8111f6e-79e6-4a6a-91ab-ea5296f6f9cd', 56, 23, 23, 345, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+ insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('430401fa-8244-43b4-84d8-3ca585e76e3d', 50, 23, 12, 120, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+ insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('cd9c540f-1570-43ae-9b07-b76974f3aab1', 34, 56, 12, 234, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+ insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('c9cf7fa3-2227-4f85-a74e-c32ff7be82c6', 12, 65, 34, 123, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+ insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('e8111f6e-79e6-4a6a-91ab-ea5296f6f9cd', 56, 23, 23, 345, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
  insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('77293851-a9e1-412c-bf11-66c083ff4bbe', 67, 87, 23, 129, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
  insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('5e0d9259-4f3f-4a24-964f-2d92c1ca3c9c', 11, 34, 12, 78, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
  insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('0c57d59d-4f92-4793-85a5-400083444a52', 89, 78, 45, 82, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);

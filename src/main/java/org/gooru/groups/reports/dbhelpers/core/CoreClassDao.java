@@ -24,4 +24,8 @@ public interface CoreClassDao {
   @Mapper(ClassModelMapper.class)
   @SqlQuery("SELECT id, title, code, creator_id, course_id, grade_current FROM class where school_id = :schoolId::bigint AND is_deleted = false")
   List<ClassModel> fetchClassesBySchool(@Bind("schoolId") Long schoolId);
+  
+  @Mapper(ClassModelMapper.class)
+  @SqlQuery("SELECT id, title, code, creator_id, course_id, grade_current FROM class where group_id = :groupId::bigint AND is_deleted = false")
+  List<ClassModel> fetchClassesByGroup(@Bind("groupId") Long groupId);
 }
