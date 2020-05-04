@@ -62,6 +62,16 @@ public class CoreService {
     });
     return classModelMap;
   }
+  
+  public Map<String, ClassModel> fetchClassesByGroup(Long groupId) {
+    Map<String, ClassModel> classModelMap = new HashMap<>();
+
+    List<ClassModel> classModels = this.classDao.fetchClassesByGroup(groupId);
+    classModels.forEach(classModel -> {
+      classModelMap.put(classModel.getId(), classModel);
+    });
+    return classModelMap;
+  }
 
   public String fetchCourseTitle(String courseId) {
     return this.courseDao.fetchCourse(courseId);
