@@ -83,7 +83,13 @@ public class GroupCompetencyReportByCountryProcessor implements MessageProcessor
         }
       }
 
-      Long hierarchyId = null;
+      Long hierarchyId = this.groupHierarchyService.fetchGroupHierarchyByTenant(bean.getTenantId());
+      if (hierarchyId == null) {
+        LOGGER.debug("there is no group hierarchy defined for the tenant {}", bean.getTenantId());
+        String resultString = new ObjectMapper().writeValueAsString(populateEmptyResponse());
+        result.complete(MessageResponseFactory.createOkayResponse(new JsonObject(resultString)));
+        return this.result;
+      }
 
       Node<GroupHierarchyDetailsModel> groupHierarchy =
           this.groupHierarchyService.fetchGroupHierarchyDetails(hierarchyId);
