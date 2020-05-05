@@ -19,6 +19,15 @@ public class GroupHierarchyService {
     this.dao = dbi.onDemand(GroupHierarchyDao.class);
   }
   
+  public Long fetchGroupHierarchyByTenant(String tenant) {
+    String strGroupHierarchyId = this.dao.fetchHierarchyByTenant(tenant);
+    try {
+      return Long.parseLong(strGroupHierarchyId);
+    } catch (NumberFormatException nfe) {
+      return null;
+    }
+  }
+  
   @SuppressWarnings({"unchecked", "rawtypes"})
   public Node<GroupHierarchyDetailsModel> fetchGroupHierarchyDetails(Long hierarchyId) {
     List<GroupHierarchyDetailsModel> groupHierarchy = this.dao.fetchGroupHierarchyDetails(hierarchyId);
