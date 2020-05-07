@@ -17,6 +17,7 @@ import org.gooru.groups.reports.competency.initialreport.GroupCompetencyInitialR
 import org.gooru.groups.reports.competency.school.GroupCompetencyReportBySchoolProcessor;
 import org.gooru.groups.reports.competency.state.GroupCompetencyReportByStateProcessor;
 import org.gooru.groups.reports.perf.country.GroupPerfReportByCountryProcessor;
+import org.gooru.groups.reports.perf.drilldownreport.GroupPerformanceDrilldownReportProcessor;
 import org.gooru.groups.reports.perf.fetchsubject.country.FetchSubjectsForPerfReportByCountryProcessor;
 import org.gooru.groups.reports.perf.group.GroupPerfReportByGroupProcessor;
 import org.gooru.groups.reports.perf.school.GroupPerfReportBySchoolProcessor;
@@ -86,6 +87,9 @@ public final class MessageProcessorBuilder {
         
       case Constants.Message.MSG_OP_REPORTS_GROUPS_COMPETENCY:
         return new GroupCompetencyDrilldownReportProcessor(vertx, message);
+        
+      case Constants.Message.MSG_OP_REPORTS_GROUPS_PERFORMANCE:
+        return new GroupPerformanceDrilldownReportProcessor(vertx, message);
         
       case Constants.Message.MSG_OP_HIERARCHIES_GROUP_ALL:
         return new FetchGroupHierarchiesAllProcessor(vertx, message);

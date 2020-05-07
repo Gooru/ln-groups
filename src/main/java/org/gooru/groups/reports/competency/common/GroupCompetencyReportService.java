@@ -13,12 +13,12 @@ import org.skife.jdbi.v2.DBI;
  * @author szgooru on 17-Feb-2020
  *
  */
-public class GroupReportService {
+public class GroupCompetencyReportService {
 
-  private final GroupReportDao dao;
+  private final GroupCompetencyReportDao dao;
 
-  public GroupReportService(DBI dbi) {
-    this.dao = dbi.onDemand(GroupReportDao.class);
+  public GroupCompetencyReportService(DBI dbi) {
+    this.dao = dbi.onDemand(GroupCompetencyReportDao.class);
   }
 
   /*
@@ -26,18 +26,18 @@ public class GroupReportService {
    * for the classes for which it is requested for. Aggregation based on the groups and its classes
    * should be done by the caller of this method.
    */
-  public Map<String, List<GroupReportModel>> fetchCompetencyReportByMonthYear(Set<String> classes,
+  public Map<String, List<GroupCompetencyReportModel>> fetchCompetencyReportByMonthYear(Set<String> classes,
       PGArray<String> tenants, Integer month, Integer year) {
-    List<GroupReportModel> report = this.dao.fetchCompetencyReportByMonthYear(
+    List<GroupCompetencyReportModel> report = this.dao.fetchCompetencyReportByMonthYear(
         CollectionUtils.convertToSqlArrayOfString(classes), tenants, month, year);
 
-    Map<String, List<GroupReportModel>> classReportMap = new HashMap<>();
+    Map<String, List<GroupCompetencyReportModel>> classReportMap = new HashMap<>();
     report.forEach(model -> {
       String classId = model.getClassId();
       if (classReportMap.containsKey(classId)) {
         classReportMap.get(classId).add(model);
       } else {
-        List<GroupReportModel> reportModels = new ArrayList<>();
+        List<GroupCompetencyReportModel> reportModels = new ArrayList<>();
         reportModels.add(model);
         classReportMap.put(classId, reportModels);
       }

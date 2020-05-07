@@ -25,8 +25,8 @@ public class DrilldownDataComputationForSchoolProcessor {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(DrilldownDataComputationForSchoolProcessor.class);
   
-  private final GroupReportService REPORT_SERVICE =
-      new GroupReportService(DBICreator.getDbiForDsdbDS());
+  private final GroupCompetencyReportService REPORT_SERVICE =
+      new GroupCompetencyReportService(DBICreator.getDbiForDsdbDS());
 
   private final CoreService CORE_SERVICE = new CoreService(DBICreator.getDbiForDefaultDS());
 
@@ -53,7 +53,7 @@ public class DrilldownDataComputationForSchoolProcessor {
     // Fetch the competency report for all the classes we resolved above using the user acl. This
     // will return the data for all the classes without grouping them by the specific parent in
     // which the classes fall under.
-    Map<String, List<GroupReportModel>> classReport =
+    Map<String, List<GroupCompetencyReportModel>> classReport =
         this.REPORT_SERVICE.fetchCompetencyReportByMonthYear(classes, tenants, month, year);
     
     Map<Integer, WeekDataModel> weeklyDataModels = prepareWeeeklyDataReport(classReport);
@@ -65,9 +65,9 @@ public class DrilldownDataComputationForSchoolProcessor {
       Long inprogressCompetencies = 0l;
       Long notstartedCompetencies = 0l;
       
-      List<GroupReportModel> classDataModels = classReport.get(classId);
+      List<GroupCompetencyReportModel> classDataModels = classReport.get(classId);
 
-      for (GroupReportModel classDataModel : classDataModels) {
+      for (GroupCompetencyReportModel classDataModel : classDataModels) {
         completedCompetencies = completedCompetencies + classDataModel.getCompletedCompetencies();
         inferredCompetencies = inferredCompetencies + classDataModel.getInferredCompetencies();
         inprogressCompetencies =
@@ -121,11 +121,11 @@ public class DrilldownDataComputationForSchoolProcessor {
   }
 
   private Map<Integer, WeekDataModel> prepareWeeeklyDataReport(
-      Map<String, List<GroupReportModel>> classReport) {
+      Map<String, List<GroupCompetencyReportModel>> classReport) {
     // Data Aggregation by Week
     Map<Integer, WeekDataModel> weeklyDataModels = new HashMap<>();
     for (String classId : classReport.keySet()) {
-      List<GroupReportModel> reportModels = classReport.get(classId);
+      List<GroupCompetencyReportModel> reportModels = classReport.get(classId);
 
       reportModels.forEach(reportModel -> {
         Integer week = reportModel.getWeek();
