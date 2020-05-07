@@ -9,11 +9,11 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
  * @author szgooru on 21-Apr-2020
  *
  */
-public class GroupReportModelMapper implements ResultSetMapper<GroupReportModel>{
+public class GroupCompetencyReportModelMapper implements ResultSetMapper<GroupCompetencyReportModel>{
 
   @Override
-  public GroupReportModel map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-    GroupReportModel model = new GroupReportModel();
+  public GroupCompetencyReportModel map(int index, ResultSet r, StatementContext ctx) throws SQLException {
+    GroupCompetencyReportModel model = new GroupCompetencyReportModel();
     model.setId(r.getLong("id"));
     model.setClassId(r.getString("class_id"));
     model.setCompletedCompetencies(r.getLong("completed_competencies"));

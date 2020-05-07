@@ -4,7 +4,7 @@ package org.gooru.groups.reports.competency.common;
  * @author szgooru on 21-Apr-2020
  *
  */
-public class GroupReportModel {
+public class GroupCompetencyReportModel {
 
   private Long id;
   private String classId;
