@@ -61,6 +61,11 @@ public class GroupPerformanceDrilldownComputationProcessor {
 
     Map<String, List<GroupPerformanceReportModel>> classReport =
         this.REPORT_SERVICE.fetchWeeklyClassPerformance(classes, tenants, month, year);
+    
+    if (classReport == null || classReport.isEmpty()) {
+      LOGGER.debug("looks like there is no data present for any class");
+      return prepareEmptyDataModel(groupModels.get(groupId));
+    }
 
     Map<Integer, GroupPerformanceWeeklyDataModel> weeklyReportModels =
         prepareWeeklyDataReport(classReport);

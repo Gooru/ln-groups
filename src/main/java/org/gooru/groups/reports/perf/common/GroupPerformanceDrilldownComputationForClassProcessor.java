@@ -55,6 +55,11 @@ public class GroupPerformanceDrilldownComputationForClassProcessor {
 
     Map<String, List<GroupPerformanceReportModel>> classReport =
         this.REPORT_SERVICE.fetchWeeklyClassPerformance(classes, tenants, month, year);
+    
+    if (classReport == null || classReport.isEmpty()) {
+      LOGGER.debug("looks like there is no data present for any class");
+      return prepareEmptyDataModel(groupModels.get(groupId));
+    }
 
     Map<Integer, GroupPerformanceWeeklyDataModel> weeklyReportModels =
         prepareWeeklyDataReport(classReport);
@@ -67,23 +72,22 @@ public class GroupPerformanceDrilldownComputationForClassProcessor {
       List<Double> averageCollectionTimespents = new ArrayList<>();
       List<Double> averageAssessmentTimespents = new ArrayList<>();
       List<GroupPerformanceReportModel> classDataModels = classReport.get(classId);
-      if (classModels != null) {
-        for (GroupPerformanceReportModel classModel : classDataModels) {
-          averagePerformances.add(classModel.getAveragePerformance());
+      if (classDataModels != null) {
+        for (GroupPerformanceReportModel clsModel : classDataModels) {
+          averagePerformances.add(clsModel.getAveragePerformance());
           totalCollectionTimespent =
-              totalCollectionTimespent + classModel.getTotalCollectionTimespent();
+              totalCollectionTimespent + clsModel.getTotalCollectionTimespent();
           totalAssessmentTimespent =
-              totalAssessmentTimespent + classModel.getTotalAssessmentTimespent();
-          averageCollectionTimespents.add(classModel.getAverageCollectionTimespent());
-          averageAssessmentTimespents.add(classModel.getAverageAssessmentTimespent());
+              totalAssessmentTimespent + clsModel.getTotalAssessmentTimespent();
+          averageCollectionTimespents.add(clsModel.getAverageCollectionTimespent());
+          averageAssessmentTimespents.add(clsModel.getAverageAssessmentTimespent());
         }
       } else {
         LOGGER.debug("No data present for the class '{}'", classId);
       }
 
-      ClassModel classModel = classModels.get(classId);
       drilldownDataModels.put(classId,
-          prepareAggregatedDataReportModel(classModel, averagePerformances,
+          prepareAggregatedDataReportModel(classModels.get(classId), averagePerformances,
               totalCollectionTimespent, totalAssessmentTimespent, averageCollectionTimespents,
               averageAssessmentTimespents));
     }
