@@ -10,6 +10,7 @@ import org.gooru.groups.reports.dbhelpers.core.groupacl.GroupACLResolver;
 import org.gooru.groups.reports.dbhelpers.core.hierarchy.GroupHierarchyDetailsModel;
 import org.gooru.groups.reports.dbhelpers.core.hierarchy.GroupHierarchyService;
 import org.gooru.groups.reports.dbhelpers.core.hierarchy.Node;
+import org.gooru.groups.reports.dbhelpers.core.validator.RequestDBValidator;
 import org.gooru.groups.reports.perf.common.ContextModel;
 import org.gooru.groups.reports.perf.common.DataModel;
 import org.gooru.groups.reports.perf.common.DataModelForClass;
@@ -66,6 +67,11 @@ public class GroupPerformanceDrilldownReportProcessor implements MessageProcesso
           this.GROUP_HIERARCHY_SERVICE.fetchGroupHierarchyDetails(command.getHierarchyId());
 
       String userId = ebMessage.getUserId().get().toString();
+      
+      // Validate incoming data to check the tenant and hierarchy mappings 
+      RequestDBValidator dbValidator = new RequestDBValidator();
+      dbValidator.verifyTenantAccess(userId, bean.getTenantId(), bean.getTenants());
+      dbValidator.validateTenantHierarchyMapping(bean.getHierarchyId(), bean.getTenants());
 
       // Initiate the group ACLs for the user and group hierarchy and verify whether user has access
       // to requested group id and type. These methods should sufficient to return appropriate error
@@ -116,12 +122,8 @@ public class GroupPerformanceDrilldownReportProcessor implements MessageProcesso
       GroupPerformanceDrilldownReportCommand.GroupPerformanceDrilldownReportCommandBean bean) {
     ContextModel contextModel = new ContextModel();
     contextModel.setReport("performance");
-    List<String> tenants = new ArrayList<>();
-    for (Object o : bean.getTenants().getElements()) {
-      tenants.add(o.toString());
-    }
     contextModel.setHierarchy(bean.getHierarchyId());
-    contextModel.setTenants(tenants);
+    contextModel.setTenants(bean.getTenants());
     contextModel.setGroupId(bean.getGroupId());
     contextModel.setGroupType(bean.getGroupType());
     contextModel.setMonth(bean.getMonth());

@@ -2,11 +2,9 @@ package org.gooru.groups.reports.perf.drilldownreport;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.gooru.groups.app.jdbi.PGArray;
 import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.constants.HttpConstants;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
-import org.gooru.groups.reports.utils.CollectionUtils;
 import org.gooru.groups.reports.utils.CommonUtils;
 import org.gooru.groups.reports.utils.RequestUtils;
 import org.slf4j.Logger;
@@ -147,7 +145,7 @@ public class GroupPerformanceDrilldownReportCommand {
     GroupPerformanceDrilldownReportCommandBean bean =
         new GroupPerformanceDrilldownReportCommandBean();
     bean.hierarchyId = hierarchyId;
-    bean.tenants = CollectionUtils.convertToSqlArrayOfString(tenants);
+    bean.tenants = tenants;
     bean.groupId = groupId;
     bean.groupType = groupType;
     bean.month = month;
@@ -160,7 +158,7 @@ public class GroupPerformanceDrilldownReportCommand {
 
   static class GroupPerformanceDrilldownReportCommandBean {
     private Long hierarchyId;
-    private PGArray<String> tenants;
+    private Set<String> tenants;
     private Long groupId;
     private String groupType;
     private Integer month;
@@ -177,11 +175,11 @@ public class GroupPerformanceDrilldownReportCommand {
       this.hierarchyId = hierarchyId;
     }
 
-    public PGArray<String> getTenants() {
+    public Set<String> getTenants() {
       return tenants;
     }
 
-    public void setTenants(PGArray<String> tenants) {
+    public void setTenants(Set<String> tenants) {
       this.tenants = tenants;
     }
 

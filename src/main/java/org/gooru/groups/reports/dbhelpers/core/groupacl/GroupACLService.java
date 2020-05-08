@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.gooru.groups.app.jdbi.PGArray;
+import org.gooru.groups.reports.utils.CollectionUtils;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class GroupACLService {
    * data is populated by the parent reference id
    */
   public Map<String, Map<Long, JsonArray>> fetchAllUserGroupACL(String userId, Long hierarchyId,
-      PGArray<String> tenants) {
+      Set<String> tenants) {
     List<GroupACLModel> groupAcls = this.dao.fetchUserGroupACL(userId, hierarchyId);
 
     // This map will hold the group type with sub map of group ids by the parent of that group.
@@ -77,8 +78,9 @@ public class GroupACLService {
     return this.dao.fetchAllGroupsByType(hierarchyId, type, tenants);
   }
 
-  private JsonArray resolveGroupIds(Long hierarchyId, String type, PGArray<String> tenants) {
-    Set<Long> allGroupIds = this.dao.fetchAllGroupsByType(hierarchyId, type, tenants);
+  private JsonArray resolveGroupIds(Long hierarchyId, String type, Set<String> tenants) {
+    Set<Long> allGroupIds = this.dao.fetchAllGroupsByType(hierarchyId, type,
+        CollectionUtils.convertToSqlArrayOfString(tenants));
     JsonArray resolvedGroupIds = new JsonArray();
     allGroupIds.forEach(resolvedGroupIds::add);
     return resolvedGroupIds;

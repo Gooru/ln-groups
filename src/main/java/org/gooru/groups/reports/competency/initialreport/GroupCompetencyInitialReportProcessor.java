@@ -16,6 +16,7 @@ import org.gooru.groups.reports.dbhelpers.core.groupacl.GroupACLResolver;
 import org.gooru.groups.reports.dbhelpers.core.hierarchy.GroupHierarchyDetailsModel;
 import org.gooru.groups.reports.dbhelpers.core.hierarchy.GroupHierarchyService;
 import org.gooru.groups.reports.dbhelpers.core.hierarchy.Node;
+import org.gooru.groups.reports.dbhelpers.core.validator.RequestDBValidator;
 import org.gooru.groups.responses.MessageResponse;
 import org.gooru.groups.responses.MessageResponseFactory;
 import org.slf4j.Logger;
@@ -70,9 +71,16 @@ public class GroupCompetencyInitialReportProcessor implements MessageProcessor {
       // start at any level in the group hierarchy.
       // If there is no ACL found then return 403.
       String userId = ebMessage.getUserId().get().toString();
-      GroupACLResolver aclResolver = new GroupACLResolver(userId, bean.getHierarchyId(), bean.getTenants());
+
+      // Validate incoming data to check the tenant and hierarchy mappings
+      RequestDBValidator dbValidator = new RequestDBValidator();
+      dbValidator.verifyTenantAccess(userId, bean.getTenantId(), bean.getTenants());
+      dbValidator.validateTenantHierarchyMapping(bean.getHierarchyId(), bean.getTenants());
+
+      GroupACLResolver aclResolver =
+          new GroupACLResolver(userId, bean.getHierarchyId(), bean.getTenants());
       aclResolver.initFiltereGroupACLs();
-      
+
       // This is the root level based on the user group ACL for which we need to report the data.
       GroupACLModel rootModel = aclResolver.getRootModel();
 
@@ -104,12 +112,8 @@ public class GroupCompetencyInitialReportProcessor implements MessageProcessor {
       String groupType) {
     ContextModel contextModel = new ContextModel();
     contextModel.setReport("competency");
-    List<String> tenants = new ArrayList<>();
-    for (Object o : bean.getTenants().getElements()) {
-      tenants.add(o.toString());
-    }
     contextModel.setHierarchy(bean.getHierarchyId());
-    contextModel.setTenants(tenants);
+    contextModel.setTenants(bean.getTenants());
     contextModel.setGroupId(null);
     contextModel.setGroupType(groupType);
     contextModel.setMonth(bean.getMonth());

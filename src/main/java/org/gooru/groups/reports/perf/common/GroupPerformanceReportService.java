@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.gooru.groups.app.jdbi.PGArray;
 import org.gooru.groups.reports.utils.CollectionUtils;
 import org.skife.jdbi.v2.DBI;
 
@@ -22,9 +21,10 @@ public class GroupPerformanceReportService {
   }
 
   public Map<String, List<GroupPerformanceReportModel>> fetchWeeklyClassPerformance(
-      Set<String> classes, PGArray<String> tenants, Integer month, Integer year) {
-    List<GroupPerformanceReportModel> report = this.dao.fetchWeeklyClassPerformance(
-        CollectionUtils.convertToSqlArrayOfString(classes), tenants, month, year);
+      Set<String> classes, Set<String> tenants, Integer month, Integer year) {
+    List<GroupPerformanceReportModel> report =
+        this.dao.fetchWeeklyClassPerformance(CollectionUtils.convertToSqlArrayOfString(classes),
+            CollectionUtils.convertToSqlArrayOfString(tenants), month, year);
 
     Map<String, List<GroupPerformanceReportModel>> classReportMap = new HashMap<>();
     report.forEach(model -> {
