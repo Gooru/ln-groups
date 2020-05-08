@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.gooru.groups.app.jdbi.DBICreator;
-import org.gooru.groups.app.jdbi.PGArray;
 import org.gooru.groups.reports.dbhelpers.core.ClassModel;
 import org.gooru.groups.reports.dbhelpers.core.CoreService;
 import org.gooru.groups.reports.dbhelpers.core.GroupModel;
@@ -33,7 +32,7 @@ public class GroupPerformanceDrilldownComputationForClassProcessor {
   private final CoreService CORE_SERVICE = new CoreService(DBICreator.getDbiForDefaultDS());
 
   public DataModelForClass processDrilldownComputation(Long groupId, String groupType, Integer month,
-      Integer year, PGArray<String> tenants, GroupACLResolver aclResolver,
+      Integer year, Set<String> tenants, GroupACLResolver aclResolver,
       Node<GroupHierarchyDetailsModel> groupHierarchy) {
 
     // Fetch the group details from the actual group definition table

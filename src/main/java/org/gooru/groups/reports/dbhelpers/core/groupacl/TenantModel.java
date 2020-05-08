@@ -1,4 +1,4 @@
-package org.gooru.groups.hierarchies.users;
+package org.gooru.groups.reports.dbhelpers.core.groupacl;
 
 /**
  * @author szgooru on 31-Mar-2020

@@ -1,4 +1,4 @@
-package org.gooru.groups.hierarchies.users;
+package org.gooru.groups.reports.dbhelpers.core.groupacl;
 
 import java.util.List;
 import java.util.Set;

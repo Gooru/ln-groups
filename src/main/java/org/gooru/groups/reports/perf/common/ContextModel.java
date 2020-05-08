@@ -1,6 +1,6 @@
 package org.gooru.groups.reports.perf.common;
 
-import java.util.List;
+import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -15,7 +15,7 @@ public class ContextModel {
   public Long hierarchy;
 
   @JsonProperty("tenants")
-  public List<String> tenants;
+  public Set<String> tenants;
 
   @JsonProperty("group_id")
   public Long groupId;
@@ -48,11 +48,11 @@ public class ContextModel {
     this.hierarchy = hierarchy;
   }
 
-  public List<String> getTenants() {
+  public Set<String> getTenants() {
     return tenants;
   }
 
-  public void setTenants(List<String> tenants) {
+  public void setTenants(Set<String> tenants) {
     this.tenants = tenants;
   }
 

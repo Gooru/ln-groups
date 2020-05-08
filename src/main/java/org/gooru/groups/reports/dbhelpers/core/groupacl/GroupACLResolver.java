@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.gooru.groups.app.jdbi.DBICreator;
-import org.gooru.groups.app.jdbi.PGArray;
 import org.gooru.groups.constants.GroupConstants;
 import org.gooru.groups.constants.HttpConstants;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
@@ -32,9 +31,9 @@ public class GroupACLResolver {
 
   private final String userId;
   private final Long hierarchyId;
-  private final PGArray<String> tenants;
+  private final Set<String> tenants;
 
-  public GroupACLResolver(String userId, Long hierarchyId, PGArray<String> tenants) {
+  public GroupACLResolver(String userId, Long hierarchyId, Set<String> tenants) {
     this.userId = userId;
     this.hierarchyId = hierarchyId;
     this.tenants = tenants;

@@ -1,3 +1,9 @@
+alter table group_hierarchy_details drop constraint group_hierarchy_details_type_check, add constraint group_hierarchy_details_type_check CHECK (type::character varying::text = ANY (ARRAY['school_district'::character varying, 'district'::character varying, 'block'::character varying, 'cluster'::character varying, 'school'::character varying, 'country'::character varying, 'state'::character varying, 'class'::character varying]::text[]));
+
+insert into group_hierarchy_details(name, type, hierarchy_id, sequence) values ('Class', 'class', 1, 7);
+insert into group_hierarchy_details(name, type, hierarchy_id, sequence) values ('Class', 'class', 2, 5);
+insert into group_hierarchy_details(name, type, hierarchy_id, sequence) values ('Class', 'class', 3, 3);
+
 CREATE TABLE group_user_acl (
 	id bigserial PRIMARY KEY,
 	user_id text NOT NULL,
@@ -19,7 +25,6 @@ CREATE TABLE tenant_user_acl (
 	UNIQUE (user_id, tenant)	
 );
 
-
 CREATE TABLE flexible_groups (
 	id bigserial PRIMARY KEY,
 	name text NOT NULL,
@@ -31,9 +36,6 @@ CREATE TABLE flexible_groups (
 	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
 	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC')
 );
-
-alter table group_hierarchy_details drop constraint group_hierarchy_details_type_check, add constraint group_hierarchy_details_type_check CHECK (type::character varying::text = ANY (ARRAY['school_district'::character varying, 'district'::character varying, 'block'::character varying, 'cluster'::character varying, 'school'::character varying, 'country'::character varying, 'state'::character varying, 'class'::character varying]::text[]));
-
 
 CREATE TABLE group_hierarchy_mapping (
 	group_id bigint NOT NULL REFERENCES flexible_groups(id),
@@ -67,8 +69,29 @@ CREATE TABLE class_competency_base_reports_weekly (
 	UNIQUE (class_id, week, month, year)
 );
 
+CREATE TABLE class_performance_base_reports_weekly (
+	id bigserial PRIMARY KEY,
+	class_id text NOT NULL,
+	content_source text NOT NULL,
+	average_performance numeric(9,2),
+	total_collection_timespent bigint,
+	total_assessment_timespent bigint,
+	average_collection_timespent numeric(9,2),
+	average_assessment_timespent numeric(9,2),
+	week int NOT NULL,
+	month int NOT NULL,
+	year int NOT NULL,
+	tenant text NOT NULL,
+	tenant_root text,
+	subject text NOT NULL,
+	framework text NOT NULL,
+	grade bigint NOT NULL,
+	created_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	updated_at timestamp NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+	UNIQUE (class_id, content_source, week, month, year)
+);
 
-
+	
 INSERT INTO flexible_groups (name, code, type, parent_id, reference_id) SELECT name, code, 'country', null, null  FROM country_ds ORDER BY id ASC;
 INSERT INTO flexible_groups (name, code, type, parent_id, reference_id) SELECT name, code, 'state', country_id, null FROM state_ds ORDER BY id ASC;
 
@@ -103,10 +126,22 @@ UPDATE group_school_mapping SET new_parent = fg.id FROM flexible_groups fg, grou
 CREATE TABLE temp_school_map AS SELECT fg.id AS new_id, sch.id AS old_id, fg.code AS new_code, sch.code AS old_code, fg.name AS new_name, sch.name as old_name FROM flexible_groups fg, school_ds sch WHERE fg.code = sch.code AND fg.type = 'school';
 UPDATE flexible_groups SET parent_id = gsm.new_parent FROM group_school_mapping gsm, temp_school_map tmp WHERE gsm.school_id = tmp.old_id and tmp.new_code = flexible_groups.code;
 
+INSERT INTO flexible_groups (name, code, type, parent_id, reference_id) SELECT sch.name, sch.code, 'school', null , sch.reference_id FROM school_ds sch WHERE sch.id IN (select school_id from country_school_mapping);
+INSERT INTO temp_school_map SELECT fg.id AS new_id, sch.id AS old_id, fg.code AS new_code, sch.code AS old_code, fg.name AS new_name, sch.name as old_name FROM flexible_groups fg, school_ds sch WHERE fg.type = 'school' and sch.id IN (select school_id from country_school_mapping);
+
+-- SAP
+
+alter table country_school_mapping add column new_parent bigint;
+alter table country_school_mapping add column new_school bigint;
+update country_school_mapping set new_parent = fg.id FROM flexible_groups fg, country_ds c where fg.code = c.code and c.id = country_school_mapping.country_id;
+update country_school_mapping set new_school = fg.id FROM flexible_groups fg, school_ds s where fg.reference_id =s.reference_id and s.id = country_school_mapping.school_id;
+UPDATE flexible_groups SET parent_id = csm.new_parent FROM country_school_mapping csm, school_ds sch where sch.id = csm.school_id and sch.reference_id = flexible_groups.reference_id;
+
 /* LAST Steps */
 
 ALTER TABLE class ADD COLUMN group_id BIGINT REFERENCES flexible_groups (id);
 update class SET group_id = tmp.new_id FROM temp_school_map tmp WHERE tmp.old_id = class.school_id;
+update class SET group_id = csm.new_school from country_school_mapping csm where csm.school_id = class.school_id and class.tenant = '8584b1cd-6127-43e5-ae63-1072df92a8f3';
 
 /* DROP temp tables */
 DROP TABLE temp_state_map;
@@ -118,16 +153,21 @@ DROP TABLE temp_school_map;
 
 /* -- US -- */
 
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'country', '[231]', null, 'ba956a97-ae15-11e5-a302-f8a963065976');
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'state', '[2144]', 231, 'ba956a97-ae15-11e5-a302-f8a963065976');
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'school_district', '[2472, 2598]', 2144, 'ba956a97-ae15-11e5-a302-f8a963065976');
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'school', '[241246, 282374]', 2472  ,'ba956a97-ae15-11e5-a302-f8a963065976');
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'school', '[285742, 313433]', 2598  ,'ba956a97-ae15-11e5-a302-f8a963065976');
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'class', '["97f30f82-182f-41d3-959f-918fc1558d7f"]', 241246, 'ba956a97-ae15-11e5-a302-f8a963065976');
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'class', '["b1fd7de3-ffa6-41ba-a88c-608a724a3cee"]', 282374, 'ba956a97-ae15-11e5-a302-f8a963065976');
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'class', '["a78fc148-eb30-4c02-bf97-3651917ffa7f"]', 285742, 'ba956a97-ae15-11e5-a302-f8a963065976');
-insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('bfbc6403-ddb5-48c3-b94d-9410f4f4dd42', 'class', '["23825966-25cc-439b-aa6a-5069f63bbac0"]', 313433, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('df956d5f-b7b2-43ae-98a1-c90a12eacaf9', 'country', '[231]', null, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('df956d5f-b7b2-43ae-98a1-c90a12eacaf9', 'state', '[2144, 2216]', 231, 'ba956a97-ae15-11e5-a302-f8a963065976');
 
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('df956d5f-b7b2-43ae-98a1-c90a12eacaf9', 'school_district', '[2472]', 2144, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('df956d5f-b7b2-43ae-98a1-c90a12eacaf9', 'school_district', '[2598]', 2216, 'ba956a97-ae15-11e5-a302-f8a963065976');
+
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('df956d5f-b7b2-43ae-98a1-c90a12eacaf9', 'school', '[241246, 282374]', 2472  ,'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('df956d5f-b7b2-43ae-98a1-c90a12eacaf9', 'school', '[285742, 313433]', 2598  ,'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('df956d5f-b7b2-43ae-98a1-c90a12eacaf9', 'class', '["97f30f82-182f-41d3-959f-918fc1558d7f"]', 241246, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('df956d5f-b7b2-43ae-98a1-c90a12eacaf9', 'class', '["b1fd7de3-ffa6-41ba-a88c-608a724a3cee"]', 282374, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('df956d5f-b7b2-43ae-98a1-c90a12eacaf9', 'class', '["a78fc148-eb30-4c02-bf97-3651917ffa7f"]', 285742, 'ba956a97-ae15-11e5-a302-f8a963065976');
+insert into group_user_acl (user_id, type, groups,parent_reference_id, tenant) values ('df956d5f-b7b2-43ae-98a1-c90a12eacaf9', 'class', '["23825966-25cc-439b-aa6a-5069f63bbac0"]', 313433, 'ba956a97-ae15-11e5-a302-f8a963065976');
+
+
+----------
 
 insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('97f30f82-182f-41d3-959f-918fc1558d7f', 50, 23, 12, 120, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 559);
 insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('b1fd7de3-ffa6-41ba-a88c-608a724a3cee', 34, 56, 12, 234, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
@@ -138,6 +178,19 @@ insert into class_competency_base_reports_weekly (class_id, completed_competenci
 insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('b1fd7de3-ffa6-41ba-a88c-608a724a3cee', 34, 56, 12, 234, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
 insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('a78fc148-eb30-4c02-bf97-3651917ffa7f', 12, 65, 34, 123, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
 insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('23825966-25cc-439b-aa6a-5069f63bbac0', 56, 23, 23, 345, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 140);
+
+
+-- Performance
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('97f30f82-182f-41d3-959f-918fc1558d7f', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('b1fd7de3-ffa6-41ba-a88c-608a724a3cee', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('a78fc148-eb30-4c02-bf97-3651917ffa7f', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('23825966-25cc-439b-aa6a-5069f63bbac0', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 16, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 140);
+
+
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('97f30f82-182f-41d3-959f-918fc1558d7f', 'coursemap', 50.33, 23123, 12564, 12022.67, 76435.34, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('b1fd7de3-ffa6-41ba-a88c-608a724a3cee', 'coursemap', 67.50, 56455, 12342, 2334.00, 45345.30, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('a78fc148-eb30-4c02-bf97-3651917ffa7f', 'coursemap', 98.00, 67675, 34236, 1232342.55, 64434.12, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('23825966-25cc-439b-aa6a-5069f63bbac0', 'coursemap', 45.50, 23676, 23867, 345234.78, 7654.44, 17, 4, 2020, 'ba956a97-ae15-11e5-a302-f8a963065976', null, 'K12.MA', 'CCSS', 140);
 
 /* -- INDIA -- */
  
@@ -198,13 +251,7 @@ UPDATE class set group_id = 233327 WHERE id in ('2f643615-4122-42e1-b0c3-b6d76c6
 UPDATE class set group_id = 287339 WHERE id in ('d6996c67-01de-4fa0-9af3-7314b419beee', 'c6561880-ed19-4ee1-9817-1c5baf91c7ba');
 UPDATE class set group_id = 287890 WHERE id in ('ce694d72-5772-4fd1-99e7-a16ed777553e', '246c33ad-8ca7-461f-a897-9fa72b1ca421');
 
-alter table group_hierarchy_details drop constraint group_hierarchy_details_type_check, add constraint group_hierarchy_details_type_check CHECK (type::character varying::text = ANY (ARRAY['school_district'::character varying, 'district'::character varying, 'block'::character varying, 'cluster'::character varying, 'school'::character varying, 'country'::character varying, 'state'::character varying, 'class'::character varying]::text[]));
 
-insert into group_hierarchy_details(name, type, hierarchy_id, sequence) values ('Class', 'class', 1, 7);
-
-insert into group_hierarchy_details(name, type, hierarchy_id, sequence) values ('Class', 'class', 2, 5);
-
-insert into group_hierarchy_details(name, type, hierarchy_id, sequence) values ('Class', 'class', 3, 3);
 
  insert into class (title, creator_id, modifier_id, gooru_version,tenant, code) values('test-class-1', '07cb9876-9c4b-4b25-9f8a-33f9d4d0a4a1', '07cb9876-9c4b-4b25-9f8a-33f9d4d0a4a1', 3, '8f5b6520-0932-4c53-8be9-4b70f0119937', 'XPLHCV7');
  insert into class (title, creator_id, modifier_id, gooru_version,tenant, code) values('test-class-2', '07cb9876-9c4b-4b25-9f8a-33f9d4d0a4a1', '07cb9876-9c4b-4b25-9f8a-33f9d4d0a4a1', 3, '8f5b6520-0932-4c53-8be9-4b70f0119937', '8YFXZJL');
@@ -271,4 +318,48 @@ insert into group_hierarchy_details(name, type, hierarchy_id, sequence) values (
  insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('ce694d72-5772-4fd1-99e7-a16ed777553e', 92, 12, 1, 78, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
  insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values('246c33ad-8ca7-461f-a897-9fa72b1ca421', 12, 67, 2, 34, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
 
- insert into class_competency_base_reports_weekly (class_id, completed_competencies, inferred_competencies, inprogress_competencies, notstarted_competencies, week, month, year, tenant, tenant_root, subject, framework, grade) values(
+ 
+ 
+ 
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('430401fa-8244-43b4-84d8-3ca585e76e3d', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('cd9c540f-1570-43ae-9b07-b76974f3aab1', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('c9cf7fa3-2227-4f85-a74e-c32ff7be82c6', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('e8111f6e-79e6-4a6a-91ab-ea5296f6f9cd', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 140);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('77293851-a9e1-412c-bf11-66c083ff4bbe', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('5e0d9259-4f3f-4a24-964f-2d92c1ca3c9c', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('0c57d59d-4f92-4793-85a5-400083444a52', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('88b71c62-e29c-4a14-b221-c8778b8a1235', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 140);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('2f1f89fe-11e1-48b7-ac0d-2f4d6087fd60', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('73d0737c-167e-4248-9d33-79899def42d0', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('82a6f829-0f3a-4c44-b06c-2a9e1814d4cf', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('0ad3bca9-9a47-413e-a1a7-21c38333671b', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 140);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('6d3e3a2f-51c2-449c-b970-7553f773c4ff', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('6a3c7196-e0fc-4d8e-8e02-74b639432d50', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('2f643615-4122-42e1-b0c3-b6d76c66a382', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('03c641db-458d-4b2f-83fe-0ed738437995', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 140);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('c6561880-ed19-4ee1-9817-1c5baf91c7ba', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('d6996c67-01de-4fa0-9af3-7314b419beee', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('ce694d72-5772-4fd1-99e7-a16ed777553e', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('246c33ad-8ca7-461f-a897-9fa72b1ca421', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 16, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 140);
+
+
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('430401fa-8244-43b4-84d8-3ca585e76e3d', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('cd9c540f-1570-43ae-9b07-b76974f3aab1', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('c9cf7fa3-2227-4f85-a74e-c32ff7be82c6', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('e8111f6e-79e6-4a6a-91ab-ea5296f6f9cd', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 140);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('77293851-a9e1-412c-bf11-66c083ff4bbe', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('5e0d9259-4f3f-4a24-964f-2d92c1ca3c9c', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('0c57d59d-4f92-4793-85a5-400083444a52', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('88b71c62-e29c-4a14-b221-c8778b8a1235', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 140);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('2f1f89fe-11e1-48b7-ac0d-2f4d6087fd60', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('73d0737c-167e-4248-9d33-79899def42d0', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('82a6f829-0f3a-4c44-b06c-2a9e1814d4cf', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('0ad3bca9-9a47-413e-a1a7-21c38333671b', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 140);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('6d3e3a2f-51c2-449c-b970-7553f773c4ff', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('6a3c7196-e0fc-4d8e-8e02-74b639432d50', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('2f643615-4122-42e1-b0c3-b6d76c66a382', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('03c641db-458d-4b2f-83fe-0ed738437995', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 140);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('c6561880-ed19-4ee1-9817-1c5baf91c7ba', 'coursemap', 50.55, 23234, 122343, 2342.55, 3433.33, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 559);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('d6996c67-01de-4fa0-9af3-7314b419beee', 'coursemap', 34.12, 56324, 12675, 5453.99, 234242.44, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('ce694d72-5772-4fd1-99e7-a16ed777553e', 'coursemap', 76.20, 6565, 34234, 1234.77, 7643.56, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 45);
+insert into class_performance_base_reports_weekly (class_id, content_source, average_performance, total_collection_timespent, total_assessment_timespent, average_collection_timespent, average_assessment_timespent, week, month, year, tenant, tenant_root, subject, framework, grade) values('246c33ad-8ca7-461f-a897-9fa72b1ca421', 'coursemap', 80.00, 23423, 2356, 6543.00, 78344.45, 17, 4, 2020, '8f5b6520-0932-4c53-8be9-4b70f0119937', null, 'K12.MA', 'CCSS', 140);

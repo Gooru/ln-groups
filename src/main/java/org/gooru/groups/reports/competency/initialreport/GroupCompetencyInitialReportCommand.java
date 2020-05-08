@@ -2,11 +2,9 @@ package org.gooru.groups.reports.competency.initialreport;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.gooru.groups.app.jdbi.PGArray;
 import org.gooru.groups.constants.CommandAttributeConstants;
 import org.gooru.groups.constants.HttpConstants;
 import org.gooru.groups.exceptions.HttpResponseWrapperException;
-import org.gooru.groups.reports.utils.CollectionUtils;
 import org.gooru.groups.reports.utils.CommonUtils;
 import org.gooru.groups.reports.utils.RequestUtils;
 import org.slf4j.Logger;
@@ -104,7 +102,7 @@ public class GroupCompetencyInitialReportCommand {
     bean.month = month;
     bean.year = year;
     bean.hierarchyId = hierarchyId;
-    bean.tenants = CollectionUtils.convertToSqlArrayOfString(tenants);
+    bean.tenants = tenants;
     bean.tenantId = tenantId;
     bean.tenantRoot = tenantRoot;
     return bean;
@@ -114,7 +112,7 @@ public class GroupCompetencyInitialReportCommand {
     private Integer month;
     private Integer year;
     private Long hierarchyId;
-    private PGArray<String> tenants;
+    private Set<String> tenants;
     private String tenantId;
     private String tenantRoot;
 
@@ -142,11 +140,11 @@ public class GroupCompetencyInitialReportCommand {
       this.hierarchyId = hierarchyId;
     }
 
-    public PGArray<String> getTenants() {
+    public Set<String> getTenants() {
       return tenants;
     }
 
-    public void setTenants(PGArray<String> tenants) {
+    public void setTenants(Set<String> tenants) {
       this.tenants = tenants;
     }
 
